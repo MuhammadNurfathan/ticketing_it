@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\LocationController; // ← TAMBAHKAN INI
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -37,11 +39,25 @@ Route::get('/buttons/text-icon', function () {
 })->middleware(['auth'])->name('buttons.text-icon');
 
 
-ROute::get('/location',function(){
-    return view('location/index');
-})->middleware(['auth','verified'])->name('location');
+// HAPUS ROUTE INI (atau comment)
+// Route::get('/location',function(){
+//     return view('location/index');
+// })->middleware(['auth','verified'])->name('location');
 
 Route::get('/department',function(){
     return view('department/index');
-})->Middleware(['auth','verified'])->name('department');
+})->middleware(['auth','verified'])->name('department');
+
+// Location CRUD Routes - PINDAHKAN KE DALAM MIDDLEWARE AUTH
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('locations', LocationController::class);
+});
+
+// Department CRUD Routes - PINDAHKAN KE DALAM MIDDLEWARE AUTH
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('departments', DepartmentController::class);
+});
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('users', DepartmentController::class);
+});
 require __DIR__ . '/auth.php';

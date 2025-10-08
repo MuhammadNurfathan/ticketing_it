@@ -1,0 +1,5 @@
+git clone https://github.com/MuhammadNurfathan/ticketing_it.git
+composer install
+npm install
+copy .env.example .env
+php artisan key:generate
