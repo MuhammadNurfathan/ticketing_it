@@ -8,10 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('status', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
-            $table->string('department_name', 225);
+            $table->string('status_name');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -19,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('departments');
+        Schema::dropIfExists('status');
     }
 };

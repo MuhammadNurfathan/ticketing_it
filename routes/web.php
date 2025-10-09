@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LocationController; // ← TAMBAHKAN INI
 use App\Http\Controllers\ProblemCategoryController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,10 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/DashboardTicket', function () {
+    return view('DashboardTicket');
+})->middleware(['auth', 'verified'])->name('DashboardTicket');
 
 // useless routes
 // Just to demo sidebar dropdown links active states.
@@ -70,5 +75,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('problem_categories', ProblemCategoryController::class);
+});
+Route::middleware('auth')->group(function () {
+    Route::resource('status', StatusController::class);
 });
 require __DIR__ . '/auth.php';

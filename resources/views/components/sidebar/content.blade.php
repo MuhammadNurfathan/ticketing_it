@@ -1,14 +1,14 @@
 <x-perfect-scrollbar as="nav" aria-label="main" class="flex flex-col flex-1 gap-4 px-3">
 
     {{-- Dashboard Ticket --}}
-    <x-sidebar.link title="Dashboard Ticket" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
+    <x-sidebar.link title="Dashboard Project" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
 
     {{-- Dashboard Project --}}
-    <x-sidebar.link title="Dashboard Project" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
+    <x-sidebar.link title="Dashboard Ticket" href="{{ route('DashboardTicket') }}" :isActive="request()->routeIs('DashboardTicket')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
@@ -18,7 +18,7 @@
     <x-sidebar.dropdown 
         title="Master Data" 
         :active="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*')" 
-        :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*') ? true : false"
+        :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*') || request()->routeIs('status.*')? true : false"
     >
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
@@ -29,6 +29,7 @@
         <x-sidebar.link title="Users" href="{{ route('users.index') }}" :isActive="request()->routeIs('users.*')" />
         <x-sidebar.link title="Roles" href="{{ route('roles.index') }}" :isActive="request()->routeIs('roles.*')" />
         <x-sidebar.link title="Problem Category" href="{{ route('problem_categories.index') }}" :isActive="request()->routeIs('problem_categories.*')" />
+        <x-sidebar.link title="Status" href="{{ route('status.index') }}" :isActive="request()->routeIs('status.*')" />
     </x-sidebar.dropdown>
 
 </x-perfect-scrollbar>

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('role_name', 100);
             $table->string('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
