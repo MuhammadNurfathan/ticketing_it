@@ -10,8 +10,8 @@ class Role extends Model
         'role_name',
     ];
 
-    public function departments()
+    public function user()
     {
-        return $this->hasMany(Department::class);
+        return $this->hasMany(user::class);
     }
 }

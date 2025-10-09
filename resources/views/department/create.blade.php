@@ -24,6 +24,7 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
+
                         <div class="mb-4">
                             <label for="location_id" class="block text-sm font-medium text-gray-700">Pilih
                                 Location</label>

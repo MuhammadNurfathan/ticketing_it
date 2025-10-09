@@ -2,22 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function create()
+    public function index()
+{
+    $users = User::latest()->paginate(10);
+    return view('users.index',compact('users'));
+}  
+  public function create()
     {
+        $roles = role::all();
         $departments = Department::all();
-        return view('users.create', compact('departments'));
+        return view('users.create', compact('departments','roles'));
     }
 
     public function edit(User $user)
     {
+        $roles = role::all();
         $departments = Department::all();
-        return view('users.edit', compact('user', 'departments'));
+        return view('users.edit', compact('user', 'departments','roles'));
     }
 
     public function store(Request $request)
@@ -27,9 +35,10 @@ class UserController extends Controller
             'department_id' => 'nullable|exists:departments,id',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            'role_id' => 'required|string',
         ]);
 
-        User::create($request->only('name', 'department_id', 'email', 'password'));
+        User::create($request->only('name', 'department_id','role_id', 'email', 'password'));
         return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
     }
 
@@ -40,14 +49,26 @@ class UserController extends Controller
             'department_id' => 'nullable|exists:departments,id',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
+            'role_id' => 'nullable|string',
         ]);
 
-        $data = $request->only('name', 'department_id', 'email');
+        $data = $request->only('name', 'department_id','role_id', 'email');
         if ($request->password) {
             $data['password'] = $request->password;
         }
 
         $user->update($data);
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+    }
+        public function destroy(User $user)
+    {
+        try {
+            $user->delete();
+            return redirect()->route('users.index')
+                ->with('success', 'User berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->route('users.index')
+                ->with('error', 'Users tidak dapat dihapus karena masih digunakan!');
+        }
     }
 }
