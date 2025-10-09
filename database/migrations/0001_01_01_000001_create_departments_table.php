@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->string('department_name', 225);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

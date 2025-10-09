@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LocationController; // ← TAMBAHKAN INI
+use App\Http\Controllers\ProblemCategoryController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -60,5 +62,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', UserController::class);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::resource('roles', RoleController::class);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::resource('problem_categories', ProblemCategoryController::class);
 });
 require __DIR__ . '/auth.php';

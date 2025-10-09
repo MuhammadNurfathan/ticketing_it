@@ -15,20 +15,20 @@
     </x-sidebar.link>
 
     {{-- Master Data Dropdown --}}
-<x-sidebar.dropdown 
-    title="Master Data" 
-    :active="request()->routeIs('locations.*|departments.*|users.*')" 
-    :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') ? true : false"
+    <x-sidebar.dropdown 
+        title="Master Data" 
+        :active="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*')" 
+        :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*') ? true : false"
+    >
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
 
-
->
-    <x-slot name="icon">
-        <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-    </x-slot>
-
-    <x-sidebar.link title="Location" href="{{ route('locations.index') }}" :isActive="request()->routeIs('locations.*')" />
-    <x-sidebar.link title="Department" href="{{ route('departments.index') }}" :isActive="request()->routeIs('departments.*')" />
-    <x-sidebar.link title="Users" href="{{ route('users.index') }}" :isActive="request()->routeIs('users.*')" />
-</x-sidebar.dropdown>
+        <x-sidebar.link title="Location" href="{{ route('locations.index') }}" :isActive="request()->routeIs('locations.*')" />
+        <x-sidebar.link title="Department" href="{{ route('departments.index') }}" :isActive="request()->routeIs('departments.*')" />
+        <x-sidebar.link title="Users" href="{{ route('users.index') }}" :isActive="request()->routeIs('users.*')" />
+        <x-sidebar.link title="Roles" href="{{ route('roles.index') }}" :isActive="request()->routeIs('roles.*')" />
+        <x-sidebar.link title="Problem Category" href="{{ route('problem_categories.index') }}" :isActive="request()->routeIs('problem_categories.*')" />
+    </x-sidebar.dropdown>
 
 </x-perfect-scrollbar>

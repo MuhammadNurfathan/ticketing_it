@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Location') }}
+            {{ __('Edit Problem Category') }}
         </h2>
     </x-slot>
 
@@ -20,14 +20,15 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('locations.update', $location) }}" method="POST">
+                    <form action="{{ route('problem_categories.update', $problemCategory) }}" method="POST">
                         @csrf
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Location</label>
-                            <input type="text" name="location_name" value="{{ old('location_name', $location->location_name) }}" 
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Role</label>
+                            <input type="text" name="problem_category_name" value="{{ old('problem_category_name', $problemCategory->problem_category_name) }}" 
                                 class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Contoh: Admin, User, Manager" 
                                 required>
                         </div>
 
@@ -35,7 +36,7 @@
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Update
                             </button>
-                            <a href="{{ route('locations.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('roles.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Kembali
                             </a>
                         </div>
