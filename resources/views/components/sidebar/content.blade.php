@@ -17,8 +17,8 @@
     {{-- Master Data Dropdown --}}
     <x-sidebar.dropdown 
         title="Master Data" 
-        :active="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*')" 
-        :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*') || request()->routeIs('status.*')? true : false"
+        :active="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*')|| request()->routeIs('status.*')|| request()->routeIs('priority.*')|| request()->routeIs('assets.*')" 
+        :open="request()->routeIs('locations.*') || request()->routeIs('departments.*') || request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('problem_categories.*') || request()->routeIs('status.*')|| request()->routeIs('priority.*')|| request()->routeIs('assets.*')? true : false"
     >
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
@@ -30,6 +30,8 @@
         <x-sidebar.link title="Roles" href="{{ route('roles.index') }}" :isActive="request()->routeIs('roles.*')" />
         <x-sidebar.link title="Problem Category" href="{{ route('problem_categories.index') }}" :isActive="request()->routeIs('problem_categories.*')" />
         <x-sidebar.link title="Status" href="{{ route('status.index') }}" :isActive="request()->routeIs('status.*')" />
+        <x-sidebar.link title="Priority" href="{{ route('priority.index') }}" :isActive="request()->routeIs('priority.*')" />
+        <x-sidebar.link title="Assets" href="{{ route('assets.index') }}" :isActive="request()->routeIs('assets.*')" />
     </x-sidebar.dropdown>
 
 </x-perfect-scrollbar>

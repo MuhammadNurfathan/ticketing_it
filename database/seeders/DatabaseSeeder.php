@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProblemCategorySeeder::class,
             StatusSeeder::class,
+            PrioritySeeder::class,
+            AssetsSeeder::class,
         ]);
     }
 }

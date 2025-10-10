@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\LocationController; // ← TAMBAHKAN INI
+use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\ProblemCategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AssetsController;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -76,7 +78,22 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('problem_categories', ProblemCategoryController::class);
 });
+
 Route::middleware('auth')->group(function () {
     Route::resource('status', StatusController::class);
 });
+
+Route::middleware('auth')->group(function () {
+    Route::resource('priority', PriorityController::class);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::resource('assets', AssetsController::class);
+});
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TicketsController;
+
+Route::get('/DashboardTicket', [TicketsController::class, 'index'])->name('DashboardTicket');
+
 require __DIR__ . '/auth.php';
