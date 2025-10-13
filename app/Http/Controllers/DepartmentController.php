@@ -10,12 +10,12 @@ class DepartmentController extends Controller
 {
     public function index (){
     $departments = Department::with('location')->paginate(10);
-        return view('department.index',compact('departments'));
+        return view('master/department.index',compact('departments'));
     }
 
     public function create() {
         $locations = location::all();
-        return view('department.create',compact('locations'))
+        return view('master/department.create',compact('locations'))
         ->with('success','Department Berhasil Ditambahkan');
     }
 
@@ -36,7 +36,7 @@ class DepartmentController extends Controller
 
     public function edit(Department $department){
           $locations = location::all();
-        return view('department.edit',compact('department','locations'))
+        return view('master/department.edit',compact('department','locations'))
         ->with('success','Department Berhasil Ditambahkan');
     }
 

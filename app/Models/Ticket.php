@@ -14,7 +14,7 @@ class Ticket extends Model
         'user_id',
         'support_id',
         'category_id',
-        'inventaris_id',
+        'assets_id',
         'status_id',
         'problem',
         'request_date',
@@ -36,26 +36,29 @@ class Ticket extends Model
 
     public function user()  { return $this->belongsTo(User::class, 'user_id'); }
     public function support() { return $this->belongsTo(User::class, 'support_id'); }
-    public function category() { return $this->belongsTo(ProblemCategory::class, 'category_id'); }
+    public function category() { return $this->belongsTo(ProblemCategory::class); }
     public function assets() { return $this->belongsTo(Assets::class); }
     public function status() { return $this->belongsTo(Status::class); }
     public function priority() { return $this->belongsTo(Priority::class); }
 
     // ==================== SCOPES ====================
 
+    // untuk mengambil data tickets yang statusnya Pending
     public function scopeWaiting($query)
     {
         return $query->whereHas('status', fn($q) => $q->where('status_name', 'Pending'));
     }
 
+    // untuk mengambil data tickets yang statusnya In Progress
     public function scopeInProgress($query)
     {
         return $query->whereHas('status', fn($q) => $q->where('status_name', 'In Progress'));
     }
 
+    // untuk mengambil data tickets yang statusnya Done
     public function scopeCompleted($query)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', 'Completed'));
+        return $query->whereHas('status', fn($q) => $q->where('status_name', 'Done'));
     }
 
     public function scopeThisMonth($query)

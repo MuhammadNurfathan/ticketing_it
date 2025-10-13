@@ -13,7 +13,7 @@ class LocationController extends Controller
     public function index()
     {
         $locations = Location::latest()->paginate(10);
-        return view('location.index', compact('locations'));
+        return view('master/location.index', compact('locations'));
     }
 
     /**
@@ -21,7 +21,7 @@ class LocationController extends Controller
      */
     public function create()
     {
-        return view('location.create');
+        return view('master/location.create');
     }
 
     /**
@@ -46,7 +46,7 @@ class LocationController extends Controller
      */
     public function show(Location $location)
     {
-        return view('location.show', compact('location'));
+        return view('master/location.show', compact('location'));
     }
 
     /**
@@ -54,7 +54,7 @@ class LocationController extends Controller
      */
     public function edit(Location $location)
     {
-        return view('location.edit', compact('location'));
+        return view('master/location.edit', compact('location'));
     }
 
     /**

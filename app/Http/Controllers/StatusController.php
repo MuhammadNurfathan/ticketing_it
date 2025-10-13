@@ -10,12 +10,12 @@ class StatusController extends Controller
     public function index()
     {
         $statuses = Status::paginate(10);
-        return view('status.index', compact('statuses'));
+        return view('master/status.index', compact('statuses'));
     }
 
     public function create()
     {
-        return view('status.create');
+        return view('master/status.create');
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class StatusController extends Controller
 
     public function edit(Status $status)
     {
-        return view('status.edit', compact('status'));
+        return view('master/status.edit', compact('status'));
     }
 
   public function update(Request $request, Status $status)

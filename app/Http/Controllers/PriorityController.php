@@ -10,12 +10,12 @@ class PriorityController extends Controller
     public function index()
     {
         $priorities = Priority::latest()->paginate(10);
-        return view('priority.index', compact('priorities'));
+        return view('master/priority.index', compact('priorities'));
     }
 
     public function create()
     {
-        return view('priority.create');
+        return view('master/priority.create');
     }
     public function store(Request $request)
     {
@@ -24,7 +24,7 @@ class PriorityController extends Controller
     }
     public function edit(Priority $priority)
     {
-        return view('priority.edit', compact('priority'));
+        return view('master/priority.edit', compact('priority'));
     }
 
     public function update(Request $request, Priority $priority)

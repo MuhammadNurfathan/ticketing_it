@@ -10,12 +10,12 @@ class AssetsController extends Controller
     public function index()
     {
         $assets = Assets::latest()->paginate(10);
-        return view('assets.index', compact('assets'));
+        return view('master/assets.index', compact('assets'));
     }
 
     public function create()
     {
-        return view('assets.create');
+        return view('master/assets.create');
     }
 
     public function store(Request $request)
@@ -43,7 +43,7 @@ class AssetsController extends Controller
 
     public function edit(Assets $asset)
     {
-        return view('assets.edit', compact('asset'));
+        return view('master/assets.edit', compact('asset'));
     }
 
     public function update(Request $request, Assets $asset)

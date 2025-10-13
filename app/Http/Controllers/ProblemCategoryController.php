@@ -10,12 +10,12 @@ class ProblemCategoryController extends Controller
     public function index()
     {
         $problemCategories = ProblemCategory::latest()->paginate(10);
-        return view('problem_category.index', compact('problemCategories'));
+        return view('master/problem_category.index', compact('problemCategories'));
     }
 
     public function create()
     {
-        return view('problem_category.create');
+        return view('master/problem_category.create');
     }
 
     public function store(Request $request)
@@ -39,12 +39,12 @@ class ProblemCategoryController extends Controller
 
     public function show(ProblemCategory $problemCategory)
     {
-        return view('problem_category.show', compact('problemCategory'));
+        return view('master/problem_category.show', compact('problemCategory'));
     }
 
     public function edit(ProblemCategory $problemCategory)
     {
-        return view('problem_category.edit', compact('problemCategory'));
+        return view('master/problem_category.edit', compact('problemCategory'));
     }
 
     public function update(Request $request, ProblemCategory $problemCategory)

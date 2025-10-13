@@ -12,20 +12,20 @@ class UserController extends Controller
     public function index()
 {
     $users = User::latest()->paginate(10);
-    return view('users.index',compact('users'));
+    return view('master/users.index',compact('users'));
 }  
   public function create()
     {
         $roles = role::all();
         $departments = Department::all();
-        return view('users.create', compact('departments','roles'));
+        return view('master/users.create', compact('departments','roles'));
     }
 
     public function edit(User $user)
     {
         $roles = role::all();
         $departments = Department::all();
-        return view('users.edit', compact('user', 'departments','roles'));
+        return view('master/users.edit', compact('user', 'departments','roles'));
     }
 
     public function store(Request $request)
