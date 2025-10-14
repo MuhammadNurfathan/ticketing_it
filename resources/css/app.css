@@ -7,3 +7,72 @@
 .dark .ps__rail-x {
     background-color: transparent !important;
 }
+
+@layer components {
+  /* 🌤️ Light Mode */
+  table.dataTable {
+    @apply w-full text-sm text-light-text bg-light-eval-1 border border-light-eval-3 rounded-lg shadow-sm;
+  }
+
+  table.dataTable thead {
+    @apply bg-light-eval-2 text-light-text-secondary uppercase;
+  }
+
+  table.dataTable thead th {
+    @apply px-4 py-3 text-left font-semibold;
+  }
+
+  table.dataTable tbody tr {
+    @apply border-b border-light-eval-3 hover:bg-light-eval-2 transition-colors;
+  }
+
+  table.dataTable tbody td {
+    @apply px-4 py-3;
+  }
+
+  table.dataTable tbody tr:last-child {
+    @apply border-0;
+  }
+
+  /* 🌙 Dark Mode */
+  html.dark table.dataTable {
+    @apply text-dark-text bg-dark-eval-1 border border-dark-eval-3;
+  }
+
+  html.dark table.dataTable thead {
+    @apply bg-dark-eval-2 text-dark-text-secondary;
+  }
+
+  html.dark table.dataTable thead th {
+    @apply text-dark-text;
+  }
+
+  html.dark table.dataTable tbody tr {
+    @apply border-b border-dark-eval-3 hover:bg-dark-eval-2 transition-colors;
+  }
+
+  html.dark table.dataTable tbody td {
+    @apply text-dark-text;
+  }
+
+  html.dark table.dataTable tbody tr:last-child {
+    @apply border-0;
+  }
+
+  /* 📄 Pagination dan search box */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    @apply px-3 py-1.5 text-sm rounded-md border border-light-eval-3 bg-light-bg text-light-text-secondary hover:bg-light-eval-2;
+  }
+
+  html.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+    @apply border-dark-eval-3 bg-dark-eval-1 text-dark-text-secondary hover:bg-dark-eval-2;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    @apply ml-2 px-2 py-1 border border-light-eval-3 rounded-md bg-light-bg text-light-text focus:ring-2 focus:ring-blue-500;
+  }
+
+  html.dark .dataTables_wrapper .dataTables_filter input {
+    @apply border-dark-eval-3 bg-dark-bg text-dark-text placeholder-dark-text-muted;
+  }
+}

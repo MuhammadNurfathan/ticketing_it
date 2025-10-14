@@ -8,6 +8,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetsController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TicketsController;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 
@@ -25,17 +27,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/DashboardTicket', function () {
-    return view('DashboardTicket');
-})->middleware(['auth', 'verified'])->name('DashboardTicket');
-
-// useless routes
-// Just to demo sidebar dropdown links active states.
 Route::get('/buttons/text', function () {
     return view('buttons-showcase.text');
 })->middleware(['auth'])->name('buttons.text');
@@ -47,12 +48,6 @@ Route::get('/buttons/icon', function () {
 Route::get('/buttons/text-icon', function () {
     return view('buttons-showcase.text-icon');
 })->middleware(['auth'])->name('buttons.text-icon');
-
-
-// HAPUS ROUTE INI (atau comment)
-// Route::get('/location',function(){
-//     return view('location/index');
-// })->middleware(['auth','verified'])->name('location');
 
 Route::get('/department',function(){
     return view('department/index');
@@ -90,10 +85,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('assets', AssetsController::class);
 });
+Route::middleware('auth')->group(function () {
+    Route::resource('DashboardTicketsAdmin', TicketsController::class);
+});
+Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TicketsController;
-
-Route::get('/DashboardTicket', [TicketsController::class, 'index'])->name('DashboardTicket');
 
 require __DIR__ . '/auth.php';

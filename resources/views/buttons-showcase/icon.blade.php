@@ -1,37 +1,81 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h2 class="text-xl font-semibold leading-tight">
-                {{ __('Buttons') }}
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-900 dark:text-white leading-tight">
+                {{ 'Kelola Location' }}
             </h2>
-            <x-button target="_blank" href="https://github.com/kamona-wd/kui-laravel-breeze" variant="black"
-                class="items-center max-w-xs gap-2">
-                <x-icons.github class="w-6 h-6" aria-hidden="true" />
-                <span>Star on Github</span>
-            </x-button>
+            <a href="{{ route('locations.create') }}" class="bg-blue-500 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded shadow">
+                Tambah Location
+            </a>
         </div>
     </x-slot>
 
-    <p class="py-4 text-gray-600 dark:text-gray-400">Useless Pages to demo sidebar.</p>
+    <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    @if (session('success'))
+                        <div class="bg-green-100 dark:bg-green-800 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-200 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
 
-    <div class="py-6">
-        @php
-        $variants = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'black'];
+                    @if (session('error'))
+                        <div class="bg-red-100 dark:bg-red-800 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
 
-        $sizes = ['sm', 'base', 'lg'];
-        @endphp
+                    <div class="overflow-x-auto rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        No
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Nama Location
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Aksi
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @forelse ($locations as $index => $location)
+                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-200">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                            {{ $locations->firstItem() + $index }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                                            {{ $location->location_name }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-3">
+                                            <a href="{{ route('locations.edit', $location) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Edit</a>
+                                            <form action="{{ route('locations.destroy', $location) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus location ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">Hapus</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            Tidak ada data location
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
 
-        <div class="grid items-center gap-4">
-            @foreach ($variants as $variant)
-            <div class="grid items-start grid-cols-3 gap-4 justify-items-center">
-                @foreach ($sizes as $size)
-                <x-button iconOnly :variant="$variant" :size="$size" :srText="$variant">
-                    <x-heroicon-o-home
-                        class="{{ $size == 'sm' ? 'w-4 h-4' : ($size == 'base' ? 'w-6 h-6' : 'w-7 h-7' ) }}" />
-                </x-button>
-                @endforeach
+                    <div class="mt-6">
+                        {{ $locations->links('pagination::tailwind') }}
+                    </div>
+                </div>
             </div>
-            @endforeach
         </div>
     </div>
 </x-app-layout>

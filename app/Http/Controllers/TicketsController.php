@@ -2,139 +2,87 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Ticket;
-use App\Models\Status;
+use Illuminate\Http\Request;
 
 class TicketsController extends Controller
 {
+
     public function index(Request $request)
     {
-        // Get filter dari request (optional)
-        $month = $request->input('month', now()->month);
-        $year = $request->input('year', now()->year);
-        $date = $request->input('date');
+        // ==================== AMBIL DATA FILTER ====================
+        // Ambil input dari form GET
+        $start = $request->start_date;         // tanggal mulai filter
+        $end   = $request->end_date;           // tanggal akhir filter
+        $filterType = $request->filter_type ?? 'request';  
+        // jika filter_type tidak ada, default = 'request' (filter by tanggal request)
 
-        // ==================== STATISTICS ====================
+        // ==================== STATISTIK ====================
+        if ($filterType === 'end') {
+            // Jika filter berdasarkan tanggal selesai tiket (DONE)
+            // Hitung statistik tiket dalam rentang tanggal selesai
+            $stats = Ticket::getStatsByEndDate($start, $end);
 
-        $waitingTicketsCount = Ticket::waiting()->count();
-        $inProgressTicketsCount = Ticket::inProgress()->count();
-        $completedThisMonthCount = Ticket::completed()->thisMonth()->count();
+            // Ambil query tiket berdasarkan tanggal selesai
+            // (Belum dijalankan, hanya query builder)
+            $ticketsQuery = Ticket::betweenEndDates($start, $end);
+        } else {
+            // Jika filter berdasarkan tanggal request tiket (default)
+            // Hitung statistik tiket dalam rentang tanggal request
+            $stats = Ticket::getStatsByRequest($start, $end);
 
-        // ==================== TICKETS DATA ====================
+            // Ambil query tiket berdasarkan tanggal request
+            $ticketsQuery = Ticket::betweenRequestDates($start, $end);
+        }
 
-        $ticketsInProgress = Ticket::inProgress()->latest()->get();
-        $ticketsWaiting = Ticket::waiting()->latest()->get();
-        $ticketsClosedThisMonth = Ticket::completed()->thisMonth()->latest()->get();
-
-        // ==================== KPI METRICS ====================
-
-        // Average Response Wait Time
-        $avgResponseWaitTime = Ticket::completed()
-            ->thisMonth()
-            ->avg('waiting_hour');
-        $avgResponseWaitTime = $avgResponseWaitTime ? round($avgResponseWaitTime, 2) : 0;
-
-        // Full Resolution Time (request -> end)
-        $fullResolutionTime = Ticket::completed()
-            ->thisMonth()
-            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, request_date, end_date)) as avg_time')
-            ->value('avg_time');
-        $fullResolutionTime = $fullResolutionTime ? round($fullResolutionTime, 2) : 0;
-
-        // Average Resolution Time
-        $avgResolutionTime = Ticket::completed()
-            ->thisMonth()
-            ->avg('time_spent');
-        $avgResolutionTime = $avgResolutionTime ? round($avgResolutionTime, 2) : 0;
-
-        // SLA Meet (selesai <= 48 jam)
-        $totalCompletedThisMonth = Ticket::completed()->thisMonth()->count();
-        $metSLA = Ticket::completed()
-            ->thisMonth()
-            ->where('time_spent', '<=', 48)
-            ->count();
-        $slaPercentage = $totalCompletedThisMonth > 0
-            ? round(($metSLA / $totalCompletedThisMonth) * 100, 2)
-            : 0;
+        // ==================== DETAIL PER STATUS ====================
+        // Clone query supaya query utama tidak terganggu saat filter per status
+        // kemudian ambil data actual dari database
+        $waitingTickets    = (clone $ticketsQuery)->waiting()->get();        // status Waiting
+        $pendingTickets    = (clone $ticketsQuery)->pending()->get();        // status Pending
+        $inProgressTickets = (clone $ticketsQuery)->inProgress()->get();     // status In Progress
+        $doneTickets       = (clone $ticketsQuery)->done()->get();           // status Done
+        $voidTickets       = (clone $ticketsQuery)->void()->get();           // status Void
 
         // ==================== RETURN VIEW ====================
-
-        return view('DashboardTicket', compact(
-            'waitingTicketsCount',
-            'inProgressTicketsCount',
-            'completedThisMonthCount',
-            'ticketsInProgress',
-            'ticketsWaiting',
-            'ticketsClosedThisMonth',
-            'avgResponseWaitTime',
-            'fullResolutionTime',
-            'avgResolutionTime',
-            'slaPercentage'
+        // Kirim data ke view DashboardTicket
+        // compact() otomatis membuat array ['nama_var' => $nama_var]
+        return view('DashboardTicketsAdmin', compact(
+            'stats',            // statistik umum
+            'waitingTickets',   // tiket Waiting
+            'pendingTickets',   // tiket Pending
+            'inProgressTickets',// tiket In Progress
+            'doneTickets',      // tiket Done
+            'voidTickets',      // tiket Void
+            'start',            // tanggal mulai filter (untuk form)
+            'end',              // tanggal akhir filter (untuk form)
+            'filterType'        // tipe filter (request atau end)
         ));
     }
 
-    public function assignTicket(Request $request, Ticket $ticket)
-    {
-        $request->validate([
-            'support_id' => 'required|exists:users,id',
-        ]);
+    public function create(){
 
-        $ticket->update([
-            'support_id' => $request->support_id,
-            'status_id' => Status::where('status_name', 'In Progress')->first()?->id,
-            'start_date' => now(),
-        ]);
-
-        if ($ticket->request_date) {
-            $waitingHours = $ticket->request_date->diffInHours($ticket->start_date);
-            $ticket->update(['waiting_hours' => $waitingHours]);
-        }
-
-        return redirect()->back()->with('success', 'Ticket berhasil di-assign!');
     }
 
-    public function pendTicket(Ticket $ticket)
-    {
-        $ticket->update([
-            'status_id' => Status::where('status_name', 'On Hold')->first()?->id,
-        ]);
+    public function store(){
 
-        return redirect()->back()->with('success', 'Ticket di-pending!');
     }
 
-    public function completeTicket(Request $request, Ticket $ticket)
-    {
-        $request->validate([
-            'solution' => 'required|string|min:10',
-        ]);
+    public function edit(){
 
-        $endDate = now();
-
-        // Hitung time spent (start -> end, fallback ke request_date)
-        $timeSpent = 0;
-        if ($ticket->start_date) {
-            $timeSpent = $ticket->start_date->diffInHours($endDate);
-        } elseif ($ticket->request_date) {
-            $timeSpent = $ticket->request_date->diffInHours($endDate);
-        }
-
-        $ticket->update([
-            'solution' => $request->solution,
-            'status_id' => Status::where('status_name', 'Completed')->first()?->id,
-            'end_date' => $endDate,
-            'time_spent' => $timeSpent,
-        ]);
-
-        return redirect()->back()->with('success', 'Ticket berhasil diselesaikan!');
     }
 
-    public function cancelTicket(Ticket $ticket)
-    {
-        $ticket->update([
-            'status_id' => Status::where('status_name', 'Cancelled')->first()?->id,
-        ]);
+    public function update(){
 
-        return redirect()->back()->with('success', 'Ticket dibatalkan!');
     }
+    
+public function updateStatus(Request $request, Ticket $ticket)
+{
+    $ticket->update([
+        'status_id' => $request->status_id, // ambil dari input form
+    ]);
+
+    return redirect()->route('DashboardTicketsAdmin.index');
+}
+
 }

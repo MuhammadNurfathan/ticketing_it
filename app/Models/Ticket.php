@@ -9,111 +9,154 @@ class Ticket extends Model
 {
     use SoftDeletes;
 
+    // ==================== FILLABLE ====================
+    // Field-field yang bisa diisi massal (mass assignment)
     protected $fillable = [
         'ticket_code',
         'user_id',
         'support_id',
-        'category_id',
+        'problem_category_id',
         'assets_id',
         'status_id',
+        'priority_id',
         'problem',
-        'request_date',
         'solution',
+        'request_date',
         'start_date',
         'end_date',
-        'waiting_hours',
+        'waiting_hour',
         'time_spent',
-        'priority_id',
     ];
 
+    // ==================== CASTS ====================
+    // Otomatis konversi ke tipe data tertentu saat ambil/masukkan data
     protected $casts = [
         'request_date' => 'datetime',
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'start_date'   => 'datetime',
+        'end_date'     => 'datetime',
     ];
 
     // ==================== RELATIONSHIPS ====================
+    // Relasi ke tabel lain
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id'); // User yang membuat tiket
+    }
 
-    public function user()  { return $this->belongsTo(User::class, 'user_id'); }
-    public function support() { return $this->belongsTo(User::class, 'support_id'); }
-    public function category() { return $this->belongsTo(ProblemCategory::class); }
-    public function assets() { return $this->belongsTo(Assets::class); }
-    public function status() { return $this->belongsTo(Status::class); }
-    public function priority() { return $this->belongsTo(Priority::class); }
+    public function support()
+    {
+        return $this->belongsTo(User::class, 'support_id'); // User yang ditugaskan
+    }
+
+    public function problemCategory()
+    {
+        return $this->belongsTo(ProblemCategory::class); // Kategori masalah
+    }
+
+    public function assets()
+    {
+        return $this->belongsTo(Assets::class); // Aset terkait tiket
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class); // Status tiket
+    }
+
+    public function priority()
+    {
+        return $this->belongsTo(Priority::class); // Prioritas tiket
+    }
 
     // ==================== SCOPES ====================
+    // Scope untuk filter query
 
-    // untuk mengambil data tickets yang statusnya Pending
-    public function scopeWaiting($query)
+    /**
+     * Filter tiket berdasarkan tanggal request
+     */
+    public function scopeBetweenRequestDates($query, $start, $end)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', 'Pending'));
+        if ($start && $end) {
+            $start = date('Y-m-d 00:00:00', strtotime($start));
+            $end   = date('Y-m-d 23:59:59', strtotime($end));
+            return $query->whereBetween('request_date', [$start, $end]);
+        }
+        return $query;
     }
 
-    // untuk mengambil data tickets yang statusnya In Progress
-    public function scopeInProgress($query)
+    /**
+     * Filter tiket berdasarkan status
+     */
+    public function scopeByStatus($query, $status)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', 'In Progress'));
+        return $query->whereHas('status', fn($q) => $q->where('status_name', $status));
     }
 
-    // untuk mengambil data tickets yang statusnya Done
-    public function scopeCompleted($query)
+    // Shortcut scope untuk status tertentu
+    public function scopeWaiting($query)    { return $this->scopeByStatus($query, 'Waiting'); }
+    public function scopePending($query)    { return $this->scopeByStatus($query, 'Pending'); }
+    public function scopeInProgress($query) { return $this->scopeByStatus($query, 'In Progress'); }
+    public function scopeDone($query)       { return $this->scopeByStatus($query, 'Done'); }
+    public function scopeVoid($query)       { return $this->scopeByStatus($query, 'Void'); }
+
+    // ==================== STATISTIK ====================
+    /**
+     * Hitung statistik tiket berdasarkan tanggal request
+     */
+    public static function getStatsByRequest($start = null, $end = null)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', 'Done'));
+        return self::calculateStats(self::betweenRequestDates($start, $end));
     }
 
-    public function scopeThisMonth($query)
+    /**
+     * Hitung statistik tiket berdasarkan tanggal selesai
+     */
+    public static function getStatsByEndDate($start = null, $end = null)
     {
-        return $query->where(function ($q) {
-            $q->whereMonth('end_date', now()->month)
-              ->whereYear('end_date', now()->year);
-        })->orWhere(function ($q) {
-            $q->whereNull('end_date')
-              ->whereMonth('created_at', now()->month)
-              ->whereYear('created_at', now()->year);
-        });
+        return self::calculateStats(self::betweenEndDates($start, $end));
     }
 
-    public function scopeByMonth($query, $month, $year)
+    // ==================== FUNGSI PERHITUNGAN ====================
+    /**
+     * Fungsi utama untuk menghitung statistik tiket
+     *
+     * Menghitung:
+     * - Total tiket per status
+     * - Rata-rata waktu menunggu (avg_waiting)
+     * - Rata-rata waktu penyelesaian (avg_time_spent)
+     * - Total jam yang dihabiskan (sum_time_spent)
+     * - SLA (% tiket selesai <= 8 jam)
+     */
+    protected static function calculateStats($query)
     {
-        return $query->whereMonth('created_at', $month)
-                     ->whereYear('created_at', $year);
-    }
+        $waiting    = (clone $query)->waiting()->count();
+        $pending    = (clone $query)->pending()->count();
+        $inProgress = (clone $query)->inProgress()->count();
+        $done       = (clone $query)->done()->count();
+        $void       = (clone $query)->void()->count();
 
-    public function scopeByDate($query, $date)
-    {
-        return $query->whereDate('created_at', $date);
-    }
+        $totalAll   = $waiting + $pending + $inProgress + $done + $void;
+        $totalValid = $waiting + $pending + $inProgress + $done;
 
-    // ==================== HELPERS ====================
+        // ======================== Statistik tambahan ========================
+        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
+        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
+        $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
 
-    public function isWaiting()  { return $this->status && $this->status->status_name === 'Pending'; }
-    public function isInProgress() { return $this->status && $this->status->status_name === 'In Progress'; }
-    public function isCompleted()  { return $this->status && $this->status->status_name === 'Completed'; }
+        $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
+        $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
 
-    public function getStatusBadgeColor()
-    {
-        if (!$this->status) return 'gray';
-
-        return match($this->status->status_name) {
-            'Pending' => 'yellow',
-            'In Progress' => 'blue',
-            'Completed' => 'green',
-            'Cancelled' => 'red',
-            'On Hold' => 'orange',
-            default => 'gray',
-        };
-    }
-
-    public function getPriorityBadgeColor()
-    {
-        if (!$this->priority) return 'gray';
-
-        return match($this->priority->priority_name) {
-            'Low' => 'green',
-            'Medium' => 'yellow',
-            'High' => 'orange',
-            'Critical' => 'red',
-            default => 'gray',
-        };
+        return [
+            'total'           => $totalAll,
+            'waiting'         => $waiting,
+            'pending'         => $pending,
+            'in_progress'     => $inProgress,
+            'done'            => $done,
+            'void'            => $void,
+            'avg_waiting'     => $avgWaiting,    // rata-rata menunggu
+            'avg_time_spent'  => $avgTimeSpent,  // rata-rata penyelesaian
+            'sum_time_spent'  => $sumTimeSpent,  // total jam
+            'sla'             => $slaPercent,    // persentase SLA
+        ];
     }
 }

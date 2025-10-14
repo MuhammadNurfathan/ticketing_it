@@ -8,7 +8,7 @@
     </x-sidebar.link>
 
     {{-- Dashboard Project --}}
-    <x-sidebar.link title="Dashboard Ticket" href="{{ route('DashboardTicket') }}" :isActive="request()->routeIs('DashboardTicket')">
+    <x-sidebar.link title="Dashboard Ticket" href="{{ route('DashboardTicketsAdmin.index') }}" :isActive="request()->routeIs('DashboardTicketsAdmin.index')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
