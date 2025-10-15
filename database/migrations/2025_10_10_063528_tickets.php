@@ -10,27 +10,62 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('ticket_code', 20)->unique();
 
-            // Relasi ke users
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('support_id')->nullable()->constrained('users')->nullOnDelete();
+            // kode tiket unik
+            $table->string('ticket_code', 10)->unique();
 
-            // Relasi ke tabel lain
-            $table->foreignId('problem_category_id')->nullable()->constrained('problem_categories')->nullOnDelete();
-            $table->foreignId('assets_id')->nullable()->constrained('assets')->nullOnDelete();
-            $table->foreignId('status_id')->nullable()->constrained('status')->nullOnDelete();
-            $table->foreignId('priority_id')->nullable()->constrained('priority')->nullOnDelete();
+            // relasi user (pelapor)
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
 
-            // Detail tiket
-            $table->string('problem')->nullable();
+            // relasi user support
+            $table->foreignId('support_id')
+                ->nullable()
+                ->constrained('users')
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+
+            // relasi ke kategori, inventaris, status, dan prioritas
+            $table->foreignId('problem_category_id')
+                ->nullable()
+                ->constrained('problem_categories')
+                ->nullOnDelete();
+
+            $table->foreignId('assets_id')
+                ->nullable()
+                ->constrained('assets')
+                ->nullOnDelete();
+
+            $table->foreignId('status_id')
+                ->nullable()
+                ->constrained('status')
+                ->nullOnDelete();
+
+            $table->foreignId('priority_id')
+                ->nullable()
+                ->constrained('priority')
+                ->nullOnDelete();
+
+            // detail tiket
+            $table->text('problem')->nullable();
+
+            // path gambar disimpan di database (file fisiknya di folder storage)
+            $table->string('image', 255)->nullable();
+
             $table->text('solution')->nullable();
+            $table->text('notes')->nullable();
+
+            // waktu dan durasi
             $table->dateTime('request_date')->nullable();
+            $table->integer('waiting_hour')->nullable(); // perhatikan plural: hours
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
-            $table->integer('waiting_hour')->nullable();
             $table->integer('time_spent')->nullable();
 
+            // timestamps dan soft delete
             $table->timestamps();
             $table->softDeletes();
         });

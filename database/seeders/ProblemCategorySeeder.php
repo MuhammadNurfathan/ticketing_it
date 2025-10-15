@@ -13,8 +13,19 @@ class ProblemCategorySeeder extends Seeder
     public function run(): void
     {
         DB::table('problem_categories')->insert([
-            ['problem_category_name' => 'SoftWare', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'HardWare', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - Netsuite', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - Accurate', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - RP', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - FRP', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - Iseller', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'SoftWare - Lain-lain', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'HardWare - Monitor/Proyektor/TV', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'HardWare - Laptop/PC', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'HardWare - Handphone', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'HardWare - CCTV', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'HardWare - Lain-lain', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Jaringan - Internet Lambat', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Jaringan - Tidak Dalam Terhubung Ke Internet', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

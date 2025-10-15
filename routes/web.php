@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('DashboardTicketsAdmin', TicketsController::class);
 });
 Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
+Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
 
 
 require __DIR__ . '/auth.php';

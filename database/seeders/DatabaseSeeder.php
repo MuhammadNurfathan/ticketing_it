@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             StatusSeeder::class,
             PrioritySeeder::class,
             AssetsSeeder::class,
+            TicketsSeeder::class,
         ]);
     }
 }

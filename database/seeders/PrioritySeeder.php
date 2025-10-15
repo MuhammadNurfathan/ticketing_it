@@ -17,6 +17,6 @@ class PrioritySeeder extends Seeder
             ['priority_name' => 'Low', 'created_at' => now(), 'updated_at' => null],
             ['priority_name' => 'Medium', 'created_at' => now(), 'updated_at' => null],
             ['priority_name' => 'High', 'created_at' => now(), 'updated_at' => null],
-                ]);
+        ]);
     }
 }
