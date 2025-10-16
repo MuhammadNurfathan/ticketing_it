@@ -52,7 +52,7 @@ class TicketsController extends Controller
     $userId = Auth::id();
     $myTicket = Ticket::where('user_id', $userId)->get();
     $hasDoneTicket = Ticket::where('user_id', $userId)
-        ->where('status_id', 3)
+        ->where('status_id')
         ->exists();
     return view('tickets.DashboardTicketsUser', compact('myTicket', 'hasDoneTicket'));
     }
@@ -88,7 +88,7 @@ class TicketsController extends Controller
 
         // Kalau ada tiket yang DONE, larang akses halaman create
         if ($hasDoneTicket) {
-            return redirect()->route('DashboardTicketsUser.index')
+            return redirect()->route('DashboardTicketsUser.indexUser')
                 ->with('error', 'Kamu tidak bisa membuat tiket baru karena masih ada tiket yang sudah selesai (DONE).');
         }
     }
