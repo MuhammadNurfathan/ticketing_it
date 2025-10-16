@@ -1,9 +1,7 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
-    use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Department extends Model
 {
     use SoftDeletes;
@@ -11,7 +9,8 @@ class Department extends Model
     protected $primaryKey = 'id';
     protected $fillable =['location_id','department_name'];
 
-    public function location(){
+    public function location()
+    {
         return $this->belongsTo(Location::class,'location_id');
     }
 }

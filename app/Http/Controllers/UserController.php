@@ -10,11 +10,12 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     public function index()
-{
+    {
     $users = User::latest()->paginate(10);
     return view('master/users.index',compact('users'));
-}  
-  public function create()
+    }
+
+    public function create()
     {
         $roles = role::all();
         $departments = Department::all();

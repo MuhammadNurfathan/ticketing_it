@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Priority;
 use Illuminate\Http\Request;
 
@@ -17,6 +15,7 @@ class PriorityController extends Controller
     {
         return view('master/priority.create');
     }
+
     public function store(Request $request)
     {
         Priority::create(['priority_name' => $request->priority_name,]);
@@ -32,6 +31,7 @@ class PriorityController extends Controller
         $priority->update(['priority_name' => $request->priority_name,]);
         return redirect()->route('priority.index');
     }
+
     public function destroy(Priority $priority)
     {
         $priority->delete();

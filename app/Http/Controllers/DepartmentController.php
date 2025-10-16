@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Location;
 use App\Models\Department;
 use Illuminate\Http\Request;
@@ -9,7 +7,7 @@ use Illuminate\Http\Request;
 class DepartmentController extends Controller
 {
     public function index (){
-    $departments = Department::with('location')->paginate(10);
+        $departments = Department::with('location')->paginate(10);
         return view('master/department.index',compact('departments'));
     }
 

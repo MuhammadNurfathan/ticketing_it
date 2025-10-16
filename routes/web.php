@@ -86,10 +86,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('assets', AssetsController::class);
 });
 Route::middleware('auth')->group(function () {
-    Route::resource('DashboardTicketsAdmin', TicketsController::class);
+    Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);;
 });
 Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
 Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
-
+Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.create');
+Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])
+    ->name('DashboardTicketsUser.index');
 
 require __DIR__ . '/auth.php';

@@ -36,40 +36,27 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
-                        {{-- User --}}
-                        <div class="mb-4 relative">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Pilih User <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="user-search" placeholder="Cari user..."
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                            <input type="hidden" name="user_id" id="user-id" required>
-
-                            <ul id="search-results"
-                                class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
-                                @foreach ($users as $user)
-                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $user->id }}">{{ $user->name }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        {{-- IT Support --}}
+                        {{-- User (otomatis sesuai login, readonly) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                IT Support <span class="text-red-500">*</span>
+                                User
                             </label>
-                            <select name="support_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih IT Support --</option>
-                                @foreach ($developers as $dev)
-                                    <option value="{{ $dev->id }}"
-                                        {{ old('support_id') == $dev->id ? 'selected' : '' }}>
-                                        {{ $dev->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="text" value="{{ Auth::user()->name }}" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
                         </div>
+
+                        <div class="mb-4 hidden">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                User
+                            </label>
+                            <input type="text" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <input type="hidden" name="status_id" value="1">
+                        </div>
+
+
+
 
                         {{-- Problem Category --}}
                         <div class="mb-4">
@@ -88,7 +75,7 @@
                             </select>
                         </div>
 
-                        {{-- Assets --}}
+                        {{-- Assets
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Assets <span class="text-red-500">*</span>
@@ -103,7 +90,8 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
+
 
                         {{-- Problem --}}
                         <div class="mb-4">
@@ -113,14 +101,7 @@
                             <input type="text" name="problem" placeholder="Masukkan Kendala..."
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
-                        {{-- Problem --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Solusi <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="solution" placeholder="Masukkan Solusi..."
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        </div>
+
 
                         {{-- Priority --}}
                         <div class="mb-4">
@@ -139,58 +120,6 @@
                             </select>
                         </div>
 
-                        {{-- Status --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Status <span class="text-red-500">*</span>
-                            </label>
-                            <select name="status_id" id="status-select"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option hidden value="">-- Pilih Status --</option>
-                                @foreach ($statuses as $stat)
-                                    @if ($stat->id != 4)
-                                        <option value="{{ $stat->id }}"
-                                            data-name="{{ strtolower($stat->status_name) }}">
-                                            {{ $stat->status_name }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Start Date --}}
-                        <div id="start-date-container" class="mb-4 hidden">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Start Date & Time
-                            </label>
-                            <input type="datetime-local" id="start_datetime" name="start_date"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        {{-- End Date --}}
-                        <div id="end-date-container" class="mb-4 hidden">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                End Date & Time
-                            </label>
-                            <input type="datetime-local" id="end_datetime" name="end_date"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        {{-- Time Spent --}}
-                        <div id="time-spent-container" class="mb-4 hidden">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Time Spent (Menit)
-                                </label>
-                                <label class="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
-                                    <input type="checkbox" id="manual_time" class="mr-2"> Manual Input
-                                </label>
-                            </div>
-                            <input type="number" id="time_spent" name="time_spent" readonly
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        </div>
-
-                        {{-- Upload Media --}}
                         {{-- Upload Media (1 file saja) --}}
                         <div class="mb-6">
                             <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -206,10 +135,8 @@
                                 class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
                         </div>
 
-
                         <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Simpan
-                            Ticket</button>
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Simpan Ticket</button>
                     </form>
                     {{-- jQuery --}}
                     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>

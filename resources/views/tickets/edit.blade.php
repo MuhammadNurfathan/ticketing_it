@@ -113,7 +113,7 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
-                        {{-- Solution --}}
+                        {{-- Solution
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Solusi <span class="text-red-500">*</span>
@@ -121,7 +121,7 @@
                             <input type="text" name="solution" value="{{ $ticket->solution }}"
                                 placeholder="Masukkan Solusi..."
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        </div>
+                        </div> --}}
 
                         {{-- Priority --}}
                         <div class="mb-4">

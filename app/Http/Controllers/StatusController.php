@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Status;
 use Illuminate\Http\Request;
 
@@ -37,7 +35,6 @@ class StatusController extends Controller
         }
     }
 
-
     public function edit(Status $status)
     {
         return view('master/status.edit', compact('status'));
@@ -61,9 +58,6 @@ class StatusController extends Controller
             ->with('error', 'Gagal mengupdate status: ' . $e->getMessage());
     }
 }
-
-
-
 
     public function destroy(Status $status)
     {

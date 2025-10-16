@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -11,17 +9,19 @@ class Ticket extends Model
 
     // ==================== FILLABLE ====================
     // Field-field yang bisa diisi massal (mass assignment)
-    protected $fillable = [
-    'ticket_code', 'user_id', 'support_id',
-    'problem_category_id', 'assets_id', 'status_id', 'priority_id',
-    'problem', 'image', 'solution', 'notes',
-    'request_date', 'waiting_hour', 'start_date', 'end_date', 'time_spent',
-];
+    protected $fillable =
+    [
+        'ticket_code', 'user_id', 'support_id',
+        'problem_category_id', 'assets_id', 'status_id', 'priority_id',
+        'problem', 'image', 'solution', 'notes',
+        'request_date', 'waiting_hour', 'start_date', 'end_date', 'time_spent',
+    ];
 
 
     // ==================== CASTS ====================
     // Otomatis konversi ke tipe data tertentu saat ambil/masukkan data
-    protected $casts = [
+    protected $casts = 
+    [
         'request_date' => 'datetime',
         'start_date'   => 'datetime',
         'end_date'     => 'datetime',

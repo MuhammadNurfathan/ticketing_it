@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
-
-    protected $fillable = [
+    protected $fillable = 
+    [
         'name',
         'department_id',
         'role_id',
@@ -20,12 +20,11 @@ class User extends Authenticatable
         'job_position',
         'password',
     ];
-
-    protected $hidden = [
+    protected $hidden = 
+    [
         'password',
         'remember_token',
     ];
-
     protected function casts(): array
     {
         return [
@@ -33,14 +32,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    // Relasi ke Department
     public function department()
     {
         return $this->belongsTo(Department::class);
     }
-
-    // Relasi ke Role (jika ada)
     public function role()
     {
         return $this->belongsTo(Role::class);
