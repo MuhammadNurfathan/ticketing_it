@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -190,20 +190,16 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
-                        {{-- Upload Media --}}
                         {{-- Upload Media (1 file saja) --}}
                         <div class="mb-6">
                             <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Upload Gambar / Video (Max 10 MB)
                             </label>
                             <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4"
-                                class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 
-        file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
-        file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 
-        hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 
-        dark:hover:file:bg-gray-600">
+                                class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600">
                             <div id="preview-container"
-                                class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+                                class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            </div>
                         </div>
 
 
@@ -211,9 +207,11 @@
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Simpan
                             Ticket</button>
                     </form>
-                    {{-- jQuery --}}
+                    
+                    {{-- jQuery --}}   
                     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
+                    {{-- TRIGGER FIELD BY STATUS --}}
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
                             const statusSelect = document.getElementById("status-select");
@@ -276,7 +274,6 @@
                         });
                     </script>
 
-
                     {{-- Script: User Search --}}
                     <script>
                         $(function() {
@@ -328,6 +325,7 @@
                         });
                     </script>
 
+                    {{-- VALIDASI IMAGES --}}
                     <script>
                         document.addEventListener("DOMContentLoaded", function() {
                             const input = document.getElementById("media");
@@ -405,7 +403,6 @@
                             });
                         });
                     </script>
-
 
                     {{-- Custom Scrollbar --}}
                     <style>

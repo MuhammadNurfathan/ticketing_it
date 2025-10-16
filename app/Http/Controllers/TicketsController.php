@@ -47,8 +47,6 @@ class TicketsController extends Controller
         ));
     }
 
-
-
     public function indexUser()
     {
     $userId = Auth::id();
@@ -63,7 +61,7 @@ class TicketsController extends Controller
     {
         $data = Ticket::data();
         return view(
-            'tickets.create',
+            'tickets.Create',
             [
                 'users'      => $data['users'],
                 'assets'     => $data['assets'],
@@ -98,7 +96,7 @@ class TicketsController extends Controller
     // Kalau aman, ambil data dan lanjut ke halaman create
     $data = Ticket::data();
 
-    return view('tickets.create-users', [
+    return view('tickets.CreateUser', [
         'users'          => $data['users'],
         'assets'         => $data['assets'],
         'categories'     => $data['categories'],
@@ -108,9 +106,9 @@ class TicketsController extends Controller
     }
 
     public function updateStatus(Request $request, Ticket $ticket)
-    {
+    { 
         $ticket->update([
-            'status_id' => $request->status_id, // ambil dari input form
+            'status_id' => $request->status_id,
         ]);
 
         return redirect()->route('DashboardTicketsAdmin.index');
@@ -158,7 +156,7 @@ class TicketsController extends Controller
         $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
         $data = Ticket::data(); // ambil data tambahan seperti users, categories, etc
 
-        return view('tickets.edit', [ // bisa bikin view baru tickets.edit
+        return view('tickets.Edit', [ // bisa bikin view baru tickets.edit
             'ticket'      => $ticket,
             'users'       => $data['users'],
             'assets'      => $data['assets'],

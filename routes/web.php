@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/login');
 });
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -53,12 +53,10 @@ Route::get('/department',function(){
     return view('department/index');
 })->middleware(['auth','verified'])->name('department');
 
-// Location CRUD Routes - PINDAHKAN KE DALAM MIDDLEWARE AUTH
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('locations', LocationController::class);
 });
 
-// Department CRUD Routes - PINDAHKAN KE DALAM MIDDLEWARE AUTH
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('departments', DepartmentController::class);
 });
@@ -85,13 +83,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('assets', AssetsController::class);
 });
-Route::middleware('auth')->group(function () {
-    Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);;
-});
+
 Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
 Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
+Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
+Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.index');
 Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.create');
-Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])
-    ->name('DashboardTicketsUser.index');
+
 
 require __DIR__ . '/auth.php';

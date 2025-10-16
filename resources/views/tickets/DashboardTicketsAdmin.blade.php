@@ -13,38 +13,26 @@
         @endauth
 
     </x-slot>
-
+    
     <div class="p-6 space-y-6">
+        {{-- FILTER DATE UNTUK STATUS DONE  --}}
+        <form method="GET" action="{{ route('DashboardTicketsAdmin.index') }}" class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Dari (Request Date)
+                </label>
+                <input type="date" name="start_date" value="{{ $start }}" class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
 
-        @auth
-            @if (Auth::user()->role_id != 3)
-                <!-- tampilkan form -->
-                <form method="GET" action="{{ route('DashboardTicketsAdmin.index') }}"
-                    class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                            Dari (Request Date)
-                        </label>
-                        <input type="date" name="start_date" value="{{ $start }}"
-                            class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
-                    </div>
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Sampai (Request Date)</label>
+                <input type="date" name="end_date" value="{{ $end }}"class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                            Sampai (Request Date)
-                        </label>
-                        <input type="date" name="end_date" value="{{ $end }}"
-                            class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
-                    </div>
-
-                    <button type="submit"
-                        class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">
-                        Filter
-                    </button>
-                </form>
-            @endif
-        @endauth
-
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">
+                    Filter
+            </button>
+        </form>
 
         {{-- STATISTIK CARDS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -316,14 +304,14 @@
                                     @endif
                                 </td>
 
- @auth
-            @if (Auth::user()->role_id != 3)
-            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block">Pilih</a>
-            </td>
- @endif
-        @endauth
+                                @auth
+                                    @if (Auth::user()->role_id != 3)
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                            <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
+                                                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block">Pilih</a>
+                                        </td>
+                                    @endif
+                                @endauth
 
                             </tr>
                         @endforeach
@@ -372,14 +360,14 @@
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
                                 Image</th>
-                          
-                           @auth
-            @if (Auth::user()->role_id != 3)
-            <th
-            class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-            Action</th>
- @endif
-        @endauth
+
+                            @auth
+                                @if (Auth::user()->role_id != 3)
+                                    <th
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                        Action</th>
+                                @endif
+                            @endauth
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-dark-eval-1">
@@ -435,21 +423,21 @@
                                     @endif
                                 </td>
 
-                                 @auth
-            @if (Auth::user()->role_id != 3)
-            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
-                    method="POST" class="inline">
-                    @csrf
-                    <input type="hidden" name="status_id" value="2">
-                    <button
-                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
-                        Cancel
-                    </button>
-                </form>
-            </td>
- @endif
-        @endauth
+                                @auth
+                                    @if (Auth::user()->role_id != 3)
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
+                                                method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="2">
+                                                <button
+                                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
+                                @endauth
                             </tr>
                         @endforeach
                     </tbody>
@@ -485,13 +473,13 @@
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Tanggal Req</th>
- @auth
-            @if (Auth::user()->role_id != 3)
-            <th
-                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                Action</th>
- @endif
-        @endauth
+                            @auth
+                                @if (Auth::user()->role_id != 3)
+                                    <th
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                        Action</th>
+                                @endif
+                            @endauth
 
                         </tr>
                     </thead>
@@ -516,23 +504,23 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
-                                
-                                 @auth
-            @if (Auth::user()->role_id != 3)
-            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
-                method="POST" class="inline">
-                @csrf
-                <input type="hidden" name="status_id" value="2">
-                <button
-                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
-                    Cancel
-                </button>
-            </form>
-           </td>
- @endif
-        @endauth
-                                
+
+                                @auth
+                                    @if (Auth::user()->role_id != 3)
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
+                                                method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="2">
+                                                <button
+                                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
+                                @endauth
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -545,6 +533,7 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
+    {{-- ================= DATATABLE ================= --}}
     <script>
         $(document).ready(function() {
             $('.datatable').DataTable({
@@ -586,8 +575,9 @@
             });
         });
     </script>
+
+    {{-- ================= DONE BUTTON ================= --}}
     <script>
-        // JS
         document.querySelectorAll('.doneBtn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const modal = this.nextElementSibling;
@@ -638,11 +628,13 @@
             });
         });
     </script>
+
+    {{-- ================= SAVE BUTTON ================= --}}
     <script>
         document.querySelectorAll('.saveBtn').forEach(button => {
             button.addEventListener('click', function(e) {
-                e.stopImmediatePropagation(); // hentikan semua event lain
-                e.preventDefault(); // cegah submit otomatis
+                e.stopImmediatePropagation();
+                e.preventDefault();
 
                 const modal = button.closest('.timeSpentModal');
                 const solutionInput = modal.querySelector('.solutionInput');
@@ -654,10 +646,9 @@
                 if (!solution) {
                     alert('Field Solution wajib diisi!');
                     solutionInput.focus();
-                    return false; // pastikan berhenti total
+                    return false;
                 }
 
-                // kalau lolos validasi baru submit
                 hiddenSolution.value = solution;
                 doneForm.submit();
             });
@@ -718,3 +709,4 @@
                 </div>
             </div>
         </div> --}}
+

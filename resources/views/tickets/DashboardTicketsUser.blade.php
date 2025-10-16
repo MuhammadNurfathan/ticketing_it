@@ -1,30 +1,24 @@
 <x-app-layout>
-
     <x-slot name="header">
         <h2 class="text-xl font-semibold text-gray-800 leading-tight">
             {{ __('Dashboard Tickets User') }}
         </h2>
     </x-slot>
+    
+    <div class="p-6 space-y-6 ">
 
-
-
-    <div class="p-6 space-y-6">
-
-       
+        {{-- BUTTON TAMBAH TICKET --}}
         @if (!$hasDoneTicket)
-            <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                 <a href="{{ route('DashboardTicketsUser.create') }}"
-                      >
-                        Tambah Ticket
-                    </a>
-            </button>
+            <a href="{{ route('DashboardTicketsUser.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">
+                Tambah Ticket
+            </a>
         @endif
 
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                My Tickets</h3>
+        {{-- TABLE MY TICKET --}}
+        <div class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700 mt-4">
+            <h3 class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                My Tickets
+            </h3>
             <div class="flex gap-4 text-sm mb-4 text-light-text-secondary dark:text-dark-text-secondary">
                 <div>Total: {{ $myTicket->count() }}</div>
             </div>
@@ -32,80 +26,40 @@
                 <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Ticket Code</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Nama</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Kategori</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Masalah</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Tanggal Req</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Tanggal Req</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Image</th>
-
-
-                            <th
-                                class="bord     er border-gray-300 dark:border-gray-600 p-2 text-center text-light-text dark:text-dark-text text-center align-middle">
-                                Action</th>
-
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Ticket Code</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Nama</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Kategori</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Masalah</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Status</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Tanggal Req</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Image</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-dark-eval-1">
                         @foreach ($myTicket as $ticket)
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->ticket_code }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->user->name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->problem }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->status->status_name }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->request_date?->format('Y-m-d') }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->ticket_code }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->user->name ?? '-' }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->problem }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->status->status_name }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->request_date?->format('Y-m-d') }}</td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">
                                     @if ($ticket->image)
-                                        <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
-                                            class="text-blue-600 underline">
-                                            Lihat File
-                                        </a>
+                                        <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank" class="text-blue-600 underline">Lihat File</a>
                                     @else
                                         <span class="text-gray-500 text-sm italic">No media</span>
                                     @endif
                                 </td>
-
-
                                 @if ($ticket->status_id == 3)
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                        <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
-                                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block">
+                                        <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block">
                                             Feedback
                                         </a>
                                     </td>
                                 @else
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                        -
-                                    </td>
+                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">-</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -116,10 +70,29 @@
 
     </div>
 
+    {{-- MODAL FORM (DI BAWAH APP LAYOUT) --}}
+    <div id="ticketModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white dark:bg-dark-eval-1 rounded-lg shadow-lg p-6 w-96 relative">
+            <button id="closeModal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+            <h3 class="font-bold text-lg mb-4 text-light-text dark:text-dark-text">Update Ticket</h3>
+            <form method="POST" id="ticketForm">
+                @csrf
+                <input type="hidden" name="ticket_id" id="modalTicketId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-light-text dark:text-dark-text">Time Spent (hours)</label>
+                    <input type="number" step="0.01" name="time_spent" id="timeSpentInput" class="w-full border border-gray-300 dark:border-gray-600 rounded p-2 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text" required>
+                </div>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    {{-- CDN --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
+    {{-- DATATABLE --}}
     <script>
         $(document).ready(function() {
             $('.datatable').DataTable({
@@ -132,110 +105,28 @@
                     search: "_INPUT_",
                     searchPlaceholder: "Cari data...",
                     emptyTable: "Tidak ada data tersedia di tabel ini",
-                    paginate: {
-                        next: "›",
-                        previous: "‹"
-                    },
+                    paginate: { next: "›", previous: "‹" },
                 },
                 dom: '<"flex flex-wrap justify-between items-center mb-4"<"flex gap-2"l><"flex gap-2"f>>t<"flex flex-wrap justify-between items-center mt-4"<"text-sm"i><"flex gap-2"p>>',
-                initComplete: function() {
-                    const isDark = document.documentElement.classList.contains('dark');
-
-                    // Search input & length select
-                    $('div.dataTables_filter input, div.dataTables_length select').addClass(
-                        `rounded-md border px-2 py-1 text-sm transition ${isDark ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400' : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400'}`
-                    );
-                    $('div.dataTables_length select').css('width', '3.5rem'); // lebar select
-
-                    // Pagination
-                    $('div.dataTables_paginate a').each(function() {
-                        $(this).addClass(
-                            `px-3 py-1 border rounded-md mx-1 text-sm font-medium transition ${isDark ? 'border-gray-700 text-gray-100 hover:bg-gray-700' : 'border-gray-300 text-gray-800 hover:bg-gray-100'}`
-                        );
-                    });
-
-                    // Info text
-                    $('div.dataTables_info').addClass(isDark ? 'text-gray-400 text-sm mt-2' :
-                        'text-gray-600 text-sm mt-2');
-                }
             });
         });
-    </script>
-    <script>
-        // JS
-        document.querySelectorAll('.doneBtn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modal = this.nextElementSibling;
-                modal.classList.remove('hidden');
 
-                const start = new Date(this.dataset.start);
-                const timeInput = modal.querySelector('.timeInput');
-                const solutionInput = modal.querySelector('.solutionInput');
-                const notesContainer = modal.querySelector('.notesContainer');
-                const notesInput = modal.querySelector('.notesInput');
-                const manualCheckbox = modal.querySelector('.manualCheckbox');
+        // MODAL JS
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('ticketModal');
+            const closeBtn = document.getElementById('closeModal');
+            const ticketIdInput = document.getElementById('modalTicketId');
 
-                // Auto hitung time spent kalau ada start & end (opsional)
-                function autoTime() {
-                    if (!manualCheckbox.checked && start) {
-                        const now = new Date();
-                        const diff = Math.floor((now - start) / (1000 * 60));
-                        timeInput.value = diff > 0 ? diff : 0;
-                    }
-                }
-                autoTime();
-
-                // Toggle manual
-                manualCheckbox.addEventListener('change', () => {
-                    if (manualCheckbox.checked) {
-                        timeInput.removeAttribute('readonly');
-                        timeInput.classList.remove('bg-gray-100');
-                        notesContainer.classList.remove('hidden');
-                    } else {
-                        timeInput.setAttribute('readonly', true);
-                        timeInput.classList.add('bg-gray-100');
-                        notesContainer.classList.add('hidden');
-                        notesInput.value = '';
-                        autoTime();
-                    }
+            // Jika ada tombol action ingin buka modal, tambahkan class "openModalBtn" pada tombol
+            document.querySelectorAll('.openModalBtn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    ticketIdInput.value = btn.dataset.ticketId;
+                    modal.classList.remove('hidden');
                 });
-
-                // Cancel
-                modal.querySelector('.cancelBtn').onclick = () => modal.classList.add('hidden');
-
-                // Save
-                modal.querySelector('.saveBtn').onclick = () => {
-                    document.querySelector('.doneForm .hiddenTimeSpent').value = timeInput.value;
-                    document.querySelector('.doneForm .hiddenSolution').value = solutionInput.value;
-                    document.querySelector('.doneForm .hiddenNotes').value = notesInput.value;
-                    document.querySelector('.doneForm').submit();
-                }
             });
-        });
-    </script>
-    <script>
-        document.querySelectorAll('.saveBtn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopImmediatePropagation(); // hentikan semua event lain
-                e.preventDefault(); // cegah submit otomatis
 
-                const modal = button.closest('.timeSpentModal');
-                const solutionInput = modal.querySelector('.solutionInput');
-                const hiddenSolution = document.querySelector('.hiddenSolution');
-                const doneForm = document.querySelector('.doneForm');
-
-                const solution = solutionInput.value.trim();
-
-                if (!solution) {
-                    alert('Field Solution wajib diisi!');
-                    solutionInput.focus();
-                    return false; // pastikan berhenti total
-                }
-
-                // kalau lolos validasi baru submit
-                hiddenSolution.value = solution;
-                doneForm.submit();
-            });
+            closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
         });
     </script>
 
