@@ -25,7 +25,7 @@
                     {{-- Form Ticket --}}
                     <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-
+`                       <input type="hidden" name="from" value="user">
                         {{-- Ticket Code --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

@@ -140,13 +140,7 @@
                                     @if (Auth::user()->role_id != 3)
                                         <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
 
-                                            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
-                                                method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="status_id" value="4">
-                                                <button
-                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Void</button>
-                                            </form>
+                                            
 
                                             <button type="button"
                                                 class="doneBtn bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
@@ -183,7 +177,7 @@
                                                     <div class="mb-4 hidden notesContainer">
                                                         <label
                                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                            Notes (Kenapa manual)
+                                                            Notes (Kenapa manual) <span class="text-red-500">*</span>
                                                         </label>
                                                         <textarea
                                                             class="notesInput w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -306,7 +300,15 @@
 
                                 @auth
                                     @if (Auth::user()->role_id != 3)
-                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                    <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
+                                                method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="4">
+                                                <button
+                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Void</button>
+                                            </form>
+                                        
                                             <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
                                                 class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block">Pilih</a>
                                         </td>
@@ -353,6 +355,9 @@
                                 Time Spent</th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Feedback</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Solusi</th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -394,6 +399,9 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->time_spent ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{$ticket->feedback->description?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->solution ?? '-' }}</td>
@@ -511,7 +519,7 @@
                                             <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
                                                 method="POST" class="inline">
                                                 @csrf
-                                                <input type="hidden" name="status_id" value="2">
+                                                <input type="hidden" name="status_id" value="1">
                                                 <button
                                                     class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
                                                     Cancel
@@ -577,136 +585,86 @@
     </script>
 
     {{-- ================= DONE BUTTON ================= --}}
-    <script>
-        document.querySelectorAll('.doneBtn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modal = this.nextElementSibling;
-                modal.classList.remove('hidden');
+   <script>
+document.querySelectorAll('.doneBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const modal = this.nextElementSibling;
+        const start = new Date(this.dataset.start);
+        const timeInput = modal.querySelector('.timeInput');
+        const solutionInput = modal.querySelector('.solutionInput');
+        const notesContainer = modal.querySelector('.notesContainer');
+        const notesInput = modal.querySelector('.notesInput');
+        const manualCheckbox = modal.querySelector('.manualCheckbox');
+        const form = modal.parentElement.querySelector('.doneForm');
+        
+        modal.classList.remove('hidden');
 
-                const start = new Date(this.dataset.start);
-                const timeInput = modal.querySelector('.timeInput');
-                const solutionInput = modal.querySelector('.solutionInput');
-                const notesContainer = modal.querySelector('.notesContainer');
-                const notesInput = modal.querySelector('.notesInput');
-                const manualCheckbox = modal.querySelector('.manualCheckbox');
+        // Auto hitung time spent
+        const calcAutoTime = () => {
+            if (!manualCheckbox.checked && start) {
+                const now = new Date();
+                const diff = Math.floor((now - start) / (1000 * 60));
+                timeInput.value = diff > 0 ? diff : 0;
+            }
+        }
+        calcAutoTime();
 
-                // Auto hitung time spent kalau ada start & end (opsional)
-                function autoTime() {
-                    if (!manualCheckbox.checked && start) {
-                        const now = new Date();
-                        const diff = Math.floor((now - start) / (1000 * 60));
-                        timeInput.value = diff > 0 ? diff : 0;
-                    }
-                }
-                autoTime();
-
-                // Toggle manual
-                manualCheckbox.addEventListener('change', () => {
-                    if (manualCheckbox.checked) {
-                        timeInput.removeAttribute('readonly');
-                        timeInput.classList.remove('bg-gray-100');
-                        notesContainer.classList.remove('hidden');
-                    } else {
-                        timeInput.setAttribute('readonly', true);
-                        timeInput.classList.add('bg-gray-100');
-                        notesContainer.classList.add('hidden');
-                        notesInput.value = '';
-                        autoTime();
-                    }
-                });
-
-                // Cancel
-                modal.querySelector('.cancelBtn').onclick = () => modal.classList.add('hidden');
-
-                // Save
-                modal.querySelector('.saveBtn').onclick = () => {
-                    document.querySelector('.doneForm .hiddenTimeSpent').value = timeInput.value;
-                    document.querySelector('.doneForm .hiddenSolution').value = solutionInput.value;
-                    document.querySelector('.doneForm .hiddenNotes').value = notesInput.value;
-                    document.querySelector('.doneForm').submit();
-                }
-            });
+        // Toggle manual
+        manualCheckbox.addEventListener('change', () => {
+            if (manualCheckbox.checked) {
+                timeInput.removeAttribute('readonly');
+                timeInput.classList.remove('bg-gray-100');
+                notesContainer.classList.remove('hidden');
+            } else {
+                timeInput.setAttribute('readonly', true);
+                timeInput.classList.add('bg-gray-100');
+                notesContainer.classList.add('hidden');
+                notesInput.value = '';
+                calcAutoTime();
+            }
         });
-    </script>
+
+        // Cancel
+        modal.querySelector('.cancelBtn').onclick = () => modal.classList.add('hidden');
+
+        // Save dengan validasi
+        modal.querySelector('.saveBtn').onclick = () => {
+            // Validasi
+            if (!solutionInput.value.trim()) {
+                alert('Kolom Solution wajib diisi!');
+                solutionInput.focus();
+                return;
+            }
+            if (!notesContainer.classList.contains('hidden') && !notesInput.value.trim()) {
+                alert('Kolom Notes wajib diisi saat manual!');
+                notesInput.focus();
+                return;
+            }
+
+            // Set ke hidden form dan submit
+            form.querySelector('.hiddenTimeSpent').value = timeInput.value;
+            form.querySelector('.hiddenSolution').value = solutionInput.value;
+            form.querySelector('.hiddenNotes').value = notesInput.value;
+
+            form.submit();
+        }
+    });
+});
+</script>
+
 
     {{-- ================= SAVE BUTTON ================= --}}
     <script>
-        document.querySelectorAll('.saveBtn').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
+       modal.querySelector('.saveBtn').onclick = () => {
+    // ambil form hidden yang berada di satu td dengan modal
+    const form = modal.parentElement.querySelector('.doneForm');
 
-                const modal = button.closest('.timeSpentModal');
-                const solutionInput = modal.querySelector('.solutionInput');
-                const hiddenSolution = document.querySelector('.hiddenSolution');
-                const doneForm = document.querySelector('.doneForm');
+    form.querySelector('.hiddenTimeSpent').value = timeInput.value;
+    form.querySelector('.hiddenSolution').value = solutionInput.value;
+    form.querySelector('.hiddenNotes').value = notesInput.value;
 
-                const solution = solutionInput.value.trim();
-
-                if (!solution) {
-                    alert('Field Solution wajib diisi!');
-                    solutionInput.focus();
-                    return false;
-                }
-
-                hiddenSolution.value = solution;
-                doneForm.submit();
-            });
-        });
+    form.submit();
+            }
     </script>
 
 </x-app-layout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{{-- METRIK SUMMARY --}}
-{{-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center mt-6">
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
-                <span class="text-2xl">📊</span>
-                <div class="text-light-text-secondary dark:text-dark-text-secondary text-sm mt-1">SLA</div>
-                <div class="text-light-text dark:text-dark-text font-bold text-xl">{{ $stats['sla'] }}%</div>
-            </div>
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
-                <span class="text-2xl">⏱</span>
-                <div class="text-light-text-secondary dark:text-dark-text-secondary text-sm mt-1">Avg Waiting</div>
-                <div class="text-light-text dark:text-dark-text font-bold text-xl">{{ $stats['avg_waiting'] }} jam
-                </div>
-            </div>
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
-                <span class="text-2xl">⏳</span>
-                <div class="text-light-text-secondary dark:text-dark-text-secondary text-sm mt-1">Avg Resolution</div>
-                <div class="text-light-text dark:text-dark-text font-bold text-xl">{{ $stats['avg_time_spent'] }} jam
-                </div>
-            </div>
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
-                <span class="text-2xl">🕒</span>
-                <div class="text-light-text-secondary dark:text-dark-text-secondary text-sm mt-1">Total Time Spent
-                </div>
-                <div class="text-light-text dark:text-dark-text font-bold text-xl">{{ $stats['sum_time_spent'] }} jam
-                </div>
-            </div>
-        </div> --}}
-

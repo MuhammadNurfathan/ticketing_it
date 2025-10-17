@@ -92,7 +92,7 @@
 
 
         {{-- Dashboard Ticket --}}
-        <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.index') }}" :isActive="request()->routeIs('DashboardTicketsUser')">
+        <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.indexUser') }}" :isActive="request()->routeIs('DashboardTicketsUser.indexUser')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>

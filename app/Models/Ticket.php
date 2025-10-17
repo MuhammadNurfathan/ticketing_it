@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -11,16 +13,28 @@ class Ticket extends Model
     // Field-field yang bisa diisi massal (mass assignment)
     protected $fillable =
     [
-        'ticket_code', 'user_id', 'support_id',
-        'problem_category_id', 'assets_id', 'status_id', 'priority_id',
-        'problem', 'image', 'solution', 'notes',
-        'request_date', 'waiting_hour', 'start_date', 'end_date', 'time_spent',
+        'ticket_code',
+        'user_id',
+        'support_id',
+        'problem_category_id',
+        'assets_id',
+        'status_id',
+        'priority_id',
+        'problem',
+        'image',
+        'solution',
+        'notes',
+        'request_date',
+        'waiting_hour',
+        'start_date',
+        'end_date',
+        'time_spent',
     ];
 
 
     // ==================== CASTS ====================
     // Otomatis konversi ke tipe data tertentu saat ambil/masukkan data
-    protected $casts = 
+    protected $casts =
     [
         'request_date' => 'datetime',
         'start_date'   => 'datetime',
@@ -52,6 +66,10 @@ class Ticket extends Model
     public function priority()
     {
         return $this->belongsTo(Priority::class);
+    }
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'ticket_id');
     }
 
     // ==================== SCOPES ====================
@@ -87,8 +105,11 @@ class Ticket extends Model
     }
     public function scopeDone($query)
     {
-        return $this->scopeByStatus($query, 'Done');
+        return $query->whereHas('status', function ($q) {
+            $q->whereIn('status_name', ['Done', 'Done Feedback']);
+        });
     }
+
     public function scopeVoid($query)
     {
         return $this->scopeByStatus($query, 'Void');
@@ -185,29 +206,27 @@ class Ticket extends Model
     }
 
     // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
-public static function getStatsFiltered($start = null, $end = null, $filterType = 'request')
-{
-    // Hitung status lain TANPA filter tanggal
-    $waitingCount    = self::waiting()->count();
-    $pendingCount    = self::pending()->count();
-    $inProgressCount = self::inProgress()->count();
-    $voidCount       = self::void()->count();
+    public static function getStatsFiltered($start = null, $end = null, $filterType = 'request')
+    {
+        // Hitung status lain TANPA filter tanggal
+        $waitingCount    = self::waiting()->count();
+        $pendingCount    = self::pending()->count();
+        $inProgressCount = self::inProgress()->count();
+        $voidCount       = self::void()->count();
 
-    // DONE dihitung sesuai filterType
-    if ($filterType === 'end') {
-        $doneCount = self::done()->betweenEndDates($start, $end)->count();
-    } else {
-        $doneCount = self::done()->betweenRequestDates($start, $end)->count();
+        // DONE dihitung sesuai filterType
+        if ($filterType === 'end') {
+            $doneCount = self::done()->betweenEndDates($start, $end)->count();
+        } else {
+            $doneCount = self::done()->betweenRequestDates($start, $end)->count();
+        }
+
+        return [
+            'waiting' => $waitingCount,
+            'pending' => $pendingCount,
+            'in_progress' => $inProgressCount,
+            'done' => $doneCount,
+            'void' => $voidCount,
+        ];
     }
-
-    return [
-        'waiting' => $waitingCount,
-        'pending' => $pendingCount,
-        'in_progress' => $inProgressCount,
-        'done' => $doneCount,
-        'void' => $voidCount,
-    ];
-}
-
-
 }

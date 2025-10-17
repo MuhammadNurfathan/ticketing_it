@@ -5,7 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+    <div
+        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -26,7 +27,7 @@
                     <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-
+                        <input type="hidden" name="from" value="admin">
                         {{-- Ticket Code --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -148,7 +149,7 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option hidden value="">-- Pilih Status --</option>
                                 @foreach ($statuses as $stat)
-                                    @if ($stat->id != 4)
+                                    @if (!in_array($stat->id, [4, 5]))
                                         <option value="{{ $stat->id }}"
                                             data-name="{{ strtolower($stat->status_name) }}">
                                             {{ $stat->status_name }}
@@ -189,6 +190,16 @@
                             <input type="number" id="time_spent" name="time_spent" readonly
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
+                        {{-- Notes (hanya muncul saat Manual Input dicentang) --}}
+                        <div id="notes-container" class="mb-4 hidden">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Notes
+                            </label>
+                            <textarea name="notes" id="notes" rows="3"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                placeholder="Masukkan catatan..."></textarea>
+                        </div>
+
 
                         {{-- Upload Media (1 file saja) --}}
                         <div class="mb-6">
@@ -207,8 +218,8 @@
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Simpan
                             Ticket</button>
                     </form>
-                    
-                    {{-- jQuery --}}   
+
+                    {{-- jQuery --}}
                     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
                     {{-- TRIGGER FIELD BY STATUS --}}
@@ -262,15 +273,22 @@
 
                             // === TOGGLE MANUAL MODE ===
                             manualCheckbox.addEventListener("change", function() {
+                                const notesContainer = document.getElementById("notes-container");
+
                                 if (this.checked) {
+                                    // Buka manual input & notes
                                     timeInput.removeAttribute("readonly");
                                     timeInput.classList.remove("bg-gray-100");
+                                    notesContainer.classList.remove("hidden");
                                 } else {
+                                    // Kembali ke auto & sembunyikan notes
                                     timeInput.setAttribute("readonly", true);
                                     timeInput.classList.add("bg-gray-100");
                                     hitungTimeSpent(); // langsung hitung ulang otomatis
+                                    notesContainer.classList.add("hidden");
                                 }
                             });
+
                         });
                     </script>
 

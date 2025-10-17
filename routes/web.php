@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetsController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TicketsController;
 use GuzzleHttp\Middleware;
@@ -87,8 +88,11 @@ Route::middleware('auth')->group(function () {
 Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
 Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
 Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
-Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.index');
-Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.create');
+Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.indexUser');
+Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
+Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
+Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
+
 
 
 require __DIR__ . '/auth.php';
