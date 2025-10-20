@@ -15,13 +15,19 @@ class StatusSeeder extends Seeder
     {
         DB::table('status')->insert([
             [
-                'id'=>1,'status_name' => 'Pending'
+                'id'=>1,'status_name' => 'Waiting'
             ],
             [
                 'id'=>2,'status_name' => 'In Progress'
             ],
             [
                 'id'=>3,'status_name' => 'Done'
+            ],
+            [
+                'id'=>4,'status_name' => 'Void'
+            ],
+            [
+                'id'=>5,'status_name' => 'Feedback'
             ]
         ]);
     }

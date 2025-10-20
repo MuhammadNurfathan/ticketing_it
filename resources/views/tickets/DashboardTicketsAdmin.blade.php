@@ -139,9 +139,6 @@
                                 @auth
                                     @if (Auth::user()->role_id != 3)
                                         <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
-
-                                            
-
                                             <button type="button"
                                                 class="doneBtn bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
                                                 data-start="{{ $ticket->start_date?->format('Y-m-d H:i:s') }}">

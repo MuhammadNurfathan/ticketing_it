@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             PrioritySeeder::class,
             AssetsSeeder::class,
             TicketsSeeder::class,
+            ProjectHeaderSeeder::class,
+            ProjectDetailSeeder::class,
         ]);
     }
 }

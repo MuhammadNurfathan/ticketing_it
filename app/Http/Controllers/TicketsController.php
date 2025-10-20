@@ -17,17 +17,13 @@ class TicketsController extends Controller
 
         $stats = Ticket::getStatsFiltered($start, $end, $filterType);
 
-        // Filter berdasarkan tanggal
-        if ($filterType === 'end') {
-            $doneTicketsQuery = Ticket::betweenEndDates($start, $end);
-        } else {
-            $doneTicketsQuery = Ticket::betweenRequestDates($start, $end);
-        }
+        $doneTicketsQuery = Ticket::betweenRequestDates($start, $end);
 
-        // Ambil tiket yang status-nya "Done" atau "Done Feedback"
+
+        // Ambil tiket yang status-nya "Done" atau "Feedback"
         $doneTickets = $doneTicketsQuery
             ->whereHas('status', function ($q) {
-                $q->whereIn('status_name', ['Done', 'Done Feedback']);
+                $q->whereIn('status_name', ['Done', 'Feedback']);
             })
             ->with('feedback') // ← ini tambahan
             ->get();

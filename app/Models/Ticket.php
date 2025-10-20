@@ -9,8 +9,6 @@ class Ticket extends Model
 {
     use SoftDeletes;
 
-    // ==================== FILLABLE ====================
-    // Field-field yang bisa diisi massal (mass assignment)
     protected $fillable =
     [
         'ticket_code',
@@ -31,9 +29,6 @@ class Ticket extends Model
         'time_spent',
     ];
 
-
-    // ==================== CASTS ====================
-    // Otomatis konversi ke tipe data tertentu saat ambil/masukkan data
     protected $casts =
     [
         'request_date' => 'datetime',
@@ -42,7 +37,6 @@ class Ticket extends Model
     ];
 
     // ==================== RELATIONSHIPS ====================
-    // Relasi ke tabel lain
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -73,7 +67,6 @@ class Ticket extends Model
     }
 
     // ==================== SCOPES ====================
-    // Filter tiket berdasarkan tanggal request
     public function scopeBetweenRequestDates($query, $start, $end)
     {
         if ($start && $end) {
@@ -106,10 +99,9 @@ class Ticket extends Model
     public function scopeDone($query)
     {
         return $query->whereHas('status', function ($q) {
-            $q->whereIn('status_name', ['Done', 'Done Feedback']);
+            $q->whereIn('status_name', ['Done', 'Feedback']);
         });
     }
-
     public function scopeVoid($query)
     {
         return $this->scopeByStatus($query, 'Void');
@@ -122,20 +114,7 @@ class Ticket extends Model
         return self::calculateStats(self::betweenRequestDates($start, $end));
     }
 
-    // Hitung statistik tiket berdasarkan tanggal selesai
-    public static function getStatsByEndDate($start = null, $end = null)
-    {
-        return self::calculateStats(self::betweenEndDates($start, $end));
-    }
-
     // ==================== FUNGSI PERHITUNGAN ====================
-    // Fungsi utama untuk menghitung statistik tiket
-    // Menghitung:
-    // - Total tiket per status
-    // - Rata-rata waktu menunggu (avg_waiting)
-    // - Rata-rata waktu penyelesaian (avg_time_spent)
-    // - Total jam yang dihabiskan (sum_time_spent)
-    // - SLA (% tiket selesai <= 8 jam)
     protected static function calculateStats($query)
     {
         $waiting    = (clone $query)->waiting()->count();
@@ -143,17 +122,15 @@ class Ticket extends Model
         $inProgress = (clone $query)->inProgress()->count();
         $done       = (clone $query)->done()->count();
         $void       = (clone $query)->void()->count();
-
         $totalAll   = $waiting + $pending + $inProgress + $done + $void;
-        $totalValid = $waiting + $pending + $inProgress + $done;
-
+        
         // ======================== Statistik tambahan ========================
-        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
-        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
-        $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
-
-        $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
-        $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
+        // $totalValid = $waiting + $pending + $inProgress + $done;
+        // $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
+        // $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
+        // $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
+        // $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
+        // $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
 
         return [
             'total'           => $totalAll,
@@ -162,10 +139,10 @@ class Ticket extends Model
             'in_progress'     => $inProgress,
             'done'            => $done,
             'void'            => $void,
-            'avg_waiting'     => $avgWaiting,    // rata-rata menunggu
-            'avg_time_spent'  => $avgTimeSpent,  // rata-rata penyelesaian
-            'sum_time_spent'  => $sumTimeSpent,  // total jam
-            'sla'             => $slaPercent,    // persentase SLA
+            // 'avg_waiting'     => $avgWaiting,    // rata-rata menunggu
+            // 'avg_time_spent'  => $avgTimeSpent,  // rata-rata penyelesaian
+            // 'sum_time_spent'  => $sumTimeSpent,  // total jam
+            // 'sla'             => $slaPercent,    // persentase SLA
         ];
     }
 
@@ -214,12 +191,8 @@ class Ticket extends Model
         $inProgressCount = self::inProgress()->count();
         $voidCount       = self::void()->count();
 
-        // DONE dihitung sesuai filterType
-        if ($filterType === 'end') {
-            $doneCount = self::done()->betweenEndDates($start, $end)->count();
-        } else {
             $doneCount = self::done()->betweenRequestDates($start, $end)->count();
-        }
+
 
         return [
             'waiting' => $waitingCount,
