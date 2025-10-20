@@ -8,24 +8,20 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketsController extends Controller
 {
-
     public function index(Request $request)
     {
+        //ambil data dari url
         $start = $request->start_date;
         $end   = $request->end_date;
-        $filterType = $request->filter_type ?? 'request';
-
-        $stats = Ticket::getStatsFiltered($start, $end, $filterType);
-
+        $stats = Ticket::getStatsFiltered($start, $end);
         $doneTicketsQuery = Ticket::betweenRequestDates($start, $end);
-
 
         // Ambil tiket yang status-nya "Done" atau "Feedback"
         $doneTickets = $doneTicketsQuery
             ->whereHas('status', function ($q) {
                 $q->whereIn('status_name', ['Done', 'Feedback']);
             })
-            ->with('feedback') // ← ini tambahan
+            ->with('feedback')
             ->get();
 
         // Ambil kategori status lain
@@ -41,28 +37,21 @@ class TicketsController extends Controller
             'voidTickets',
             'start',
             'end',
-            'filterType'
         ));
     }
 
+    public function indexUser()
+    {
+        $userId = Auth::id();
 
- public function indexUser()
-{
-    $userId = Auth::id();
+        // Ambil tiket user, terbaru di atas
+        $myTicket = Ticket::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
 
-    // Ambil tiket user, terbaru di atas
-    $myTicket = Ticket::where('user_id', $userId)
-        ->orderBy('created_at', 'desc') // urutkan dari terbaru
-        ->get();
+        // Cek apakah ada ticket dengan status Done
+        $hasDoneTicket = Ticket::where('user_id', $userId)->where('status_id', 3)->exists();
 
-    // Cek apakah ada ticket dengan status Done
-    $hasDoneTicket = Ticket::where('user_id', $userId)
-        ->where('status_id', 3)
-        ->exists();
-
-    return view('tickets.DashboardTicketsUser', compact('myTicket', 'hasDoneTicket'));
-}
-
+        return view('tickets.DashboardTicketsUser', compact('myTicket', 'hasDoneTicket'));
+    }
 
     public function create()
     {
@@ -83,32 +72,25 @@ class TicketsController extends Controller
     }
 
     public function createUser()
-{
-    $user = Auth::user(); // ambil user login
+    {
+        $user = Auth::user();
+        $hasDoneWithoutFeedback = Ticket::where('user_id', $user->id)->where('status_id', 3)->exists();
 
-    // 🔍 Cek apakah user punya tiket dengan status DONE (belum kasih feedback)
-    $hasDoneWithoutFeedback = Ticket::where('user_id', $user->id)
-        ->where('status_id', 3) // 3 = Done (belum feedback)
-        ->exists();
+        if ($hasDoneWithoutFeedback) {
+            return redirect()->route('DashboardTicketsUser.indexUser')
+                ->with('error', '⚠️ Kamu tidak bisa membuat tiket baru karena masih ada tiket yang selesai (DONE) tetapi belum diberi feedback.');
+        }
 
-    // 🚫 Kalau masih ada tiket Done tanpa feedback, tolak akses
-    if ($hasDoneWithoutFeedback) {
-        return redirect()->route('DashboardTicketsUser.indexUser')
-            ->with('error', '⚠️ Kamu tidak bisa membuat tiket baru karena masih ada tiket yang selesai (DONE) tetapi belum diberi feedback.');
+        $data = Ticket::data();
+
+        return view('tickets.CreateUser', [
+            'users'          => $data['users'],
+            'assets'         => $data['assets'],
+            'categories'     => $data['categories'],
+            'priorities'     => $data['priorities'],
+            'generateticket' => $data['generateticket'],
+        ]);
     }
-
-    // ✅ Kalau aman, ambil data dan lanjut ke halaman create
-    $data = Ticket::data();
-
-    return view('tickets.CreateUser', [
-        'users'          => $data['users'],
-        'assets'         => $data['assets'],
-        'categories'     => $data['categories'],
-        'priorities'     => $data['priorities'],
-        'generateticket' => $data['generateticket'],
-    ]);
-}
-
 
     public function updateStatus(Request $request, Ticket $ticket)
     {
@@ -120,8 +102,7 @@ class TicketsController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // 🔹 Validasi input
+    {   
         $validated = $request->validate([
             'ticket_code'         => 'nullable',
             'user_id'             => 'nullable',
@@ -140,8 +121,11 @@ class TicketsController extends Controller
             'image'               => 'nullable|file|mimes:jpg,jpeg,png,mp4|max:10240', // 10MB
         ]);
 
-        // 🔹 Set request_date sekarang
+        // 🔹 Set request_date ke sekarang (Asia/Jakarta), jam = 00:00:00
         $validated['request_date'] = now();
+
+        // 🔹 Waiting_hour awal = 0 (belum menunggu)
+        $validated['waiting_hour'] = 0;
 
         // 🔹 Upload file jika ada
         if ($request->hasFile('image')) {
@@ -150,15 +134,10 @@ class TicketsController extends Controller
             $validated['image'] = $path;
         }
 
-        // 🔹 Hitung waiting_hour otomatis jika status bukan 'waiting' (misal id 1 = waiting)
-        if (!empty($validated['status_id']) && $validated['status_id'] != 1) {
-            $validated['waiting_hour'] = now()->diffInMinutes($validated['request_date']);
-        }
-
         // 🔹 Simpan ke database
         Ticket::create($validated);
 
-        // 🔹 Redirect berdasarkan asal
+        // 🔹 Redirect sesuai asal
         if ($request->input('from') === 'user') {
             return redirect()->route('DashboardTicketsUser.indexUser')
                 ->with('success', 'Ticket berhasil ditambahkan!');
@@ -166,6 +145,7 @@ class TicketsController extends Controller
             return redirect()->route('DashboardTicketsAdmin.index')
                 ->with('success', 'Ticket berhasil ditambahkan!');
         }
+
     }
 
     public function edit($id)
@@ -201,11 +181,10 @@ class TicketsController extends Controller
             'solution'            => 'nullable|string',
             'notes'               => 'nullable|string',
             'request_date'        => 'nullable|date',
-            'waiting_hour'        => 'nullable|integer',
             'start_date'          => 'nullable|date',
             'end_date'            => 'nullable|date',
             'time_spent'          => 'nullable|integer',
-            'image'               => 'nullable|file|mimes:jpg,jpeg,png,mp4|max:10240', // 10MB
+            'image'               => 'nullable|file|mimes:jpg,jpeg,png,mp4|max:10240',
         ]);
 
         // 🔹 Upload file baru jika ada
@@ -215,10 +194,9 @@ class TicketsController extends Controller
             $validated['image'] = $path;
         }
 
-        // 🔹 Hitung waiting_hour otomatis
-        // misal id 1 = waiting
-        if (!empty($validated['status_id']) && $validated['status_id'] != 1 && !$ticket->waiting_hour) {
-            $validated['waiting_hour'] = now()->diffInMinutes($ticket->request_date);
+        // 🔹 Hitung waiting_hour jika status bukan Waiting
+        if ($request->status_id != 1) {
+            $validated['waiting_hour'] = $ticket->request_date->diffInMinutes(now(), true);
         }
 
         $ticket->update($validated);
@@ -227,18 +205,17 @@ class TicketsController extends Controller
             ->with('success', 'Ticket berhasil diupdate!');
     }
 
-
-    public function updateStatusDone(Request $request, Ticket $ticket)
+   public function updateStatusDone(Request $request, Ticket $ticket)
     {
         $statusId  = $request->input('status_id');
         $timeSpent = $request->input('time_spent');
-        $solution  = $request->input('solution'); // ambil input solution
-        $notes     = $request->input('notes');    // ambil input notes
+        $solution  = $request->input('solution'); 
+        $notes     = $request->input('notes');   
 
         $ticket->status_id  = $statusId;
         $ticket->time_spent = $timeSpent;
-        $ticket->solution   = $solution; // simpan solution
-        $ticket->notes      = $notes;    // simpan notes
+        $ticket->solution   = $solution;
+        $ticket->notes      = $notes;    
 
         // jika status Done (3) dan end_date null, set sekarang
         if ($statusId == 3 && !$ticket->end_date) {

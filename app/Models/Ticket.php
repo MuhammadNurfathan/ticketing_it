@@ -84,39 +84,32 @@ class Ticket extends Model
     }
 
     // Shortcut scope untuk status tertentu
-    public function scopeWaiting($query)
-    {
+    public function scopeWaiting($query){
         return $this->scopeByStatus($query, 'Waiting');
     }
-    public function scopePending($query)
-    {
+    public function scopePending($query){
         return $this->scopeByStatus($query, 'Pending');
     }
-    public function scopeInProgress($query)
-    {
+    public function scopeInProgress($query){
         return $this->scopeByStatus($query, 'In Progress');
     }
-    public function scopeDone($query)
-    {
+    public function scopeDone($query){
         return $query->whereHas('status', function ($q) {
             $q->whereIn('status_name', ['Done', 'Feedback']);
         });
     }
-    public function scopeVoid($query)
-    {
+    public function scopeVoid($query){
         return $this->scopeByStatus($query, 'Void');
     }
 
     // ==================== STATISTIK ====================
     // Hitung statistik tiket berdasarkan tanggal request
-    public static function getStatsByRequest($start = null, $end = null)
-    {
+    public static function getStatsByRequest($start = null, $end = null){
         return self::calculateStats(self::betweenRequestDates($start, $end));
     }
 
     // ==================== FUNGSI PERHITUNGAN ====================
-    protected static function calculateStats($query)
-    {
+    protected static function calculateStats($query){
         $waiting    = (clone $query)->waiting()->count();
         $pending    = (clone $query)->pending()->count();
         $inProgress = (clone $query)->inProgress()->count();
@@ -182,24 +175,24 @@ class Ticket extends Model
         ];
     }
 
-    // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
-    public static function getStatsFiltered($start = null, $end = null, $filterType = 'request')
-    {
-        // Hitung status lain TANPA filter tanggal
-        $waitingCount    = self::waiting()->count();
-        $pendingCount    = self::pending()->count();
-        $inProgressCount = self::inProgress()->count();
-        $voidCount       = self::void()->count();
+   // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
+public static function getStatsFiltered($start = null, $end = null){
+    // Hitung status lain TANPA filter tanggal
+    $waitingCount    = self::waiting()->count();
+    $pendingCount    = self::pending()->count();
+    $inProgressCount = self::inProgress()->count();
+    $voidCount       = self::void()->count();
 
-            $doneCount = self::done()->betweenRequestDates($start, $end)->count();
+    // DONE difilter berdasarkan request_date
+    $doneCount = self::done()->betweenRequestDates($start, $end)->count();
 
+    return [
+        'waiting'     => $waitingCount,
+        'pending'     => $pendingCount,
+        'in_progress' => $inProgressCount,
+        'done'        => $doneCount,
+        'void'        => $voidCount,
+    ];
+}
 
-        return [
-            'waiting' => $waitingCount,
-            'pending' => $pendingCount,
-            'in_progress' => $inProgressCount,
-            'done' => $doneCount,
-            'void' => $voidCount,
-        ];
-    }
 }
