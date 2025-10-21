@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('status', function (Blueprint $table) {
             $table->id();
-            $table->string('status_name');
+            $table->string('status_name', 50);
             $table->timestamps();
             $table->softDeletes();
         });

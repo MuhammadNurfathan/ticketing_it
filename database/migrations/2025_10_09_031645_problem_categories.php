@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('problem_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('problem_category_name');
+            $table->string('problem_category_name', 255);
             $table->timestamps();
             $table->softDeletes();
         });

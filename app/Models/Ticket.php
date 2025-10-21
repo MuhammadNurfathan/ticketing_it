@@ -37,32 +37,25 @@ class Ticket extends Model
     ];
 
     // ==================== RELATIONSHIPS ====================
-    public function user()
-    {
+    public function user(){
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function support()
-    {
+    public function support(){
         return $this->belongsTo(User::class, 'support_id');
     }
-    public function problemCategory()
-    {
+    public function problemCategory(){
         return $this->belongsTo(ProblemCategory::class);
     }
-    public function assets()
-    {
+    public function assets(){
         return $this->belongsTo(Assets::class);
     }
-    public function status()
-    {
+    public function status(){
         return $this->belongsTo(Status::class);
     }
-    public function priority()
-    {
+    public function priority(){
         return $this->belongsTo(Priority::class);
     }
-    public function feedback()
-    {
+    public function feedback(){
         return $this->hasOne(Feedback::class, 'ticket_id');
     }
 
@@ -77,18 +70,12 @@ class Ticket extends Model
         return $query;
     }
 
-    // Filter tiket berdasarkan status
-    public function scopeByStatus($query, $status)
-    {
+    // ==================== FILTER TABLE BY STATUS ====================
+    public function scopeByStatus($query, $status){
         return $query->whereHas('status', fn($q) => $q->where('status_name', $status));
     }
-
-    // Shortcut scope untuk status tertentu
     public function scopeWaiting($query){
         return $this->scopeByStatus($query, 'Waiting');
-    }
-    public function scopePending($query){
-        return $this->scopeByStatus($query, 'Pending');
     }
     public function scopeInProgress($query){
         return $this->scopeByStatus($query, 'In Progress');
@@ -102,45 +89,7 @@ class Ticket extends Model
         return $this->scopeByStatus($query, 'Void');
     }
 
-    // ==================== STATISTIK ====================
-    // Hitung statistik tiket berdasarkan tanggal request
-    public static function getStatsByRequest($start = null, $end = null){
-        return self::calculateStats(self::betweenRequestDates($start, $end));
-    }
-
-    // ==================== FUNGSI PERHITUNGAN ====================
-    protected static function calculateStats($query){
-        $waiting    = (clone $query)->waiting()->count();
-        $pending    = (clone $query)->pending()->count();
-        $inProgress = (clone $query)->inProgress()->count();
-        $done       = (clone $query)->done()->count();
-        $void       = (clone $query)->void()->count();
-        $totalAll   = $waiting + $pending + $inProgress + $done + $void;
-        
-        // ======================== Statistik tambahan ========================
-        // $totalValid = $waiting + $pending + $inProgress + $done;
-        // $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
-        // $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
-        // $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
-        // $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
-        // $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
-
-        return [
-            'total'           => $totalAll,
-            'waiting'         => $waiting,
-            'pending'         => $pending,
-            'in_progress'     => $inProgress,
-            'done'            => $done,
-            'void'            => $void,
-            // 'avg_waiting'     => $avgWaiting,    // rata-rata menunggu
-            // 'avg_time_spent'  => $avgTimeSpent,  // rata-rata penyelesaian
-            // 'sum_time_spent'  => $sumTimeSpent,  // total jam
-            // 'sla'             => $slaPercent,    // persentase SLA
-        ];
-    }
-
     // ==================== FUNGSI GET DATA ====================
-    // MENGAMBIL SEMUA DATA UNTUK CREATE DAN EDIT
     public static function data()
     {
         $lastTicket = self::latest('id')->first();
@@ -179,7 +128,6 @@ class Ticket extends Model
 public static function getStatsFiltered($start = null, $end = null){
     // Hitung status lain TANPA filter tanggal
     $waitingCount    = self::waiting()->count();
-    $pendingCount    = self::pending()->count();
     $inProgressCount = self::inProgress()->count();
     $voidCount       = self::void()->count();
 
@@ -188,7 +136,6 @@ public static function getStatsFiltered($start = null, $end = null){
 
     return [
         'waiting'     => $waitingCount,
-        'pending'     => $pendingCount,
         'in_progress' => $inProgressCount,
         'done'        => $doneCount,
         'void'        => $voidCount,

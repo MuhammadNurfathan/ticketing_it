@@ -28,7 +28,10 @@ class StatusSeeder extends Seeder
             ],
             [
                 'id'=>5,'status_name' => 'Feedback'
-            ]
+            ],
+            [
+                'id'=>6,'status_name' => 'Pending'
+            ],
         ]);
     }
 }

@@ -14,17 +14,17 @@
     </x-sidebar.link>
 
     @if (auth()->user()->role_id == 2)
-        <x-sidebar.link title="Dashboard Project" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
+        <x-sidebar.link title="All Project" href="{{ route('project.index') }}" :isActive="request()->routeIs('project.*')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
         </x-sidebar.link>
 
-        <x-sidebar.link title="Dashboard Ticket" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
+        {{-- <x-sidebar.link title="Dashboard Ticket" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
-        </x-sidebar.link>
+        </x-sidebar.link> --}}
 
         {{-- Master Data Dropdown --}}
         <x-sidebar.dropdown title="Master Data" :active="request()->routeIs('locations.*') ||

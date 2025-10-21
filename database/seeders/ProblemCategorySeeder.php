@@ -13,12 +13,12 @@ class ProblemCategorySeeder extends Seeder
     public function run(): void
     {
         DB::table('problem_categories')->insert([
-            ['problem_category_name' => 'SoftWare - Netsuite', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'SoftWare - Accurate', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'SoftWare - RP', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'SoftWare - FRP', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'SoftWare - Iseller', 'created_at' => now(), 'updated_at' => now()],
-            ['problem_category_name' => 'SoftWare - Lain-lain', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - Netsuite', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - Accurate', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - RP', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - FRP', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - Iseller', 'created_at' => now(), 'updated_at' => now()],
+            ['problem_category_name' => 'Software - Lain-lain', 'created_at' => now(), 'updated_at' => now()],
             ['problem_category_name' => 'HardWare - Monitor/Proyektor/TV', 'created_at' => now(), 'updated_at' => now()],
             ['problem_category_name' => 'HardWare - Laptop/PC', 'created_at' => now(), 'updated_at' => now()],
             ['problem_category_name' => 'HardWare - Handphone', 'created_at' => now(), 'updated_at' => now()],

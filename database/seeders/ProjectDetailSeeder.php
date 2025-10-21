@@ -10,34 +10,93 @@ class ProjectDetailSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ambil semua data project header
-        $projects = DB::table('project_header')->select('id')->get();
+        DB::table('project_detail')->insert([
+            // Project 1
+            [
+                'project_header_id' => 1,
+                'progress_date' => Carbon::now()->subDays(8),
+                'status_id' => 2,
+                'progress_percent' => 20,
+                'memo' => 'Dokumentasi requirement selesai.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 1,
+                'progress_date' => Carbon::now()->subDays(5),
+                'status_id' => 2,
+                'progress_percent' => 50,
+                'memo' => 'Fitur utama sudah jalan.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 1,
+                'progress_date' => Carbon::now()->subDays(2),
+                'status_id' => 2,
+                'progress_percent' => 70,
+                'memo' => 'Menunggu user feedback.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
 
-        foreach ($projects as $project) {
-            $baseDate = Carbon::now()->subDays(rand(20, 40));
-            $startPercent = 50;
-            $endPercent = 100;
+            // Project 2
+            [
+                'project_header_id' => 2,
+                'progress_date' => Carbon::now()->subDays(13),
+                'status_id' => 2,
+                'progress_percent' => 20,
+                'memo' => 'Draft dokumen persetujuan dibuat.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 2,
+                'progress_date' => Carbon::now()->subDays(10),
+                'status_id' => 2,
+                'progress_percent' => 70,
+                'memo' => 'Workflow otomatis selesai.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 2,
+                'progress_date' => Carbon::now()->subDays(5),
+                'status_id' => 3,
+                'progress_percent' => 100,
+                'memo' => 'Sudah diimplementasikan dan dites.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
 
-            for ($p = $startPercent; $p <= $endPercent; $p += 5) {
-                // logika status_id berdasar progress
-                if ($p < 50) {
-                    $statusId = 1; // Waiting
-                } elseif ($p < 100) {
-                    $statusId = 2; // In Progress
-                } else {
-                    $statusId = 3; // Done
-                }
-
-                DB::table('project_detail')->insert([
-                    'project_header_id' => $project->id,
-                    'progress_date' => $baseDate->copy()->addDays(($p - $startPercent) / 5),
-                    'memo' => "Progress project mencapai {$p}%",
-                    'status_id' => $statusId, // ✅ kolom sudah disesuaikan
-                    'progress_percent' => $p,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
+            // Project 3
+            [
+                'project_header_id' => 3,
+                'progress_date' => Carbon::now()->subDays(18),
+                'status_id' => 2,
+                'progress_percent' => 20,
+                'memo' => 'Identifikasi data kinerja developer.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 3,
+                'progress_date' => Carbon::now()->subDays(10),
+                'status_id' => 2,
+                'progress_percent' => 50,
+                'memo' => 'Tampilan utama selesai.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'project_header_id' => 3,
+                'progress_date' => Carbon::now()->subDays(4),
+                'status_id' => 2,
+                'progress_percent' => 60,
+                'memo' => 'Data sumber berubah.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }

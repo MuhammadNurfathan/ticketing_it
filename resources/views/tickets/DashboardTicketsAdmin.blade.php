@@ -395,7 +395,7 @@
                                     {{ $ticket->request_date?->format('Y-m-d') }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->time_spent ?? '-' }}</td>
+                                    {{ $ticket->time_spent ?? '-' }} menit</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{$ticket->feedback->description?? '-' }}</td>
