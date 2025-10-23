@@ -8,21 +8,15 @@ use Illuminate\Support\Facades\Auth;
 
 class TicketsController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $start = $request->start_date;
         $end   = $request->end_date;
         $stats = Ticket::getStatsFiltered($start, $end);
         $doneTicketsQuery = Ticket::betweenRequestDates($start, $end);
-        $doneTickets = $doneTicketsQuery->whereHas('status', function ($q) {
-            $q->whereIn('status_name', ['Done', 'Feedback']);
-        })->with('feedback')->orderBy('updated_at', 'desc')->get();
+        $doneTickets = $doneTicketsQuery->whereHas('status', function ($q) {$q->whereIn('status_name', ['Done', 'Feedback']);})->with('feedback')->orderBy('updated_at', 'desc')->get();
         $waitingTickets = Ticket::waiting()->orderBy('ticket_code', 'asc')->get();
         $inProgressTickets = Ticket::inProgress()->orderBy('ticket_code', 'asc')->get();
-
-        $voidTickets = Ticket::void()
-            ->orderBy('updated_at', 'desc')
-            ->get();
+        $voidTickets = Ticket::void()->orderBy('updated_at', 'desc')->get();
 
         return view('tickets/DashboardTicketsAdmin', compact(
             'stats',
@@ -35,29 +29,15 @@ class TicketsController extends Controller
         ));
     }
 
-    public function indexUser()
-    {
+    public function indexUser(){
         $userId = Auth::id();
-
-        // Ambil semua tiket user, terbaru di atas
-        $myTicket = Ticket::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Ambil data tambahan
+        $myTicket = Ticket::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
         $data = Ticket::data();
         $users = $data['users'];
         $assets = $data['assets'];
         $categories = $data['categories'];
         $generateticket = $data['generateticket'];
-
-        // Cek apakah ada tiket DONE tanpa feedback
-        $hasDoneWithoutFeedback = Ticket::where('user_id', $userId)
-            ->where('status_id', 3)
-            ->doesntHave('feedback')
-            ->exists();
-
-        // Flag untuk men-disable tombol Buat Ticket Baru
+        $hasDoneWithoutFeedback = Ticket::where('user_id', $userId)->where('status_id', 3)->doesntHave('feedback')->exists();
         $hasDoneTicket = $hasDoneWithoutFeedback;
 
         $view = view('tickets.DashboardTicketsUser', compact(
@@ -76,13 +56,10 @@ class TicketsController extends Controller
         return $view;
     }
 
-
-    public function create()
-    {
+    public function create(){
         $data = Ticket::data();
         return view(
-            'tickets.Create',
-            [
+            'tickets.Create', [
                 'users'      => $data['users'],
                 'assets'     => $data['assets'],
                 'statuses'   => $data['statuses'],
@@ -95,8 +72,7 @@ class TicketsController extends Controller
         );
     }
 
-    public function createUser()
-    {
+    public function createUser(){
         $user = Auth::user();
         $hasDoneWithoutFeedback = Ticket::where('user_id', $user->id)->where('status_id', 3)->exists();
 
@@ -114,8 +90,7 @@ class TicketsController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Ticket $ticket)
-    {
+    public function updateStatus(Request $request, Ticket $ticket){
         if ($request->status_id == 4) {
             $ticket->update([
                 'status_id' => $request->status_id,
@@ -131,9 +106,7 @@ class TicketsController extends Controller
             ->with('success', 'Status tiket berhasil diperbarui.');
     }
 
-
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $validated = $request->validate([
             'ticket_code'         => 'nullable',
             'user_id'             => 'nullable',
@@ -149,29 +122,19 @@ class TicketsController extends Controller
             'start_date'          => 'nullable|date',
             'end_date'            => 'nullable|date|after:start_date',
             'time_spent'          => 'nullable|integer',
-            'image'               => 'nullable|file|mimes:jpg,jpeg,png,mp4|max:5000',
-        ]);
-
-        // 🔹 Set tanggal request ke waktu sekarang (Asia/Jakarta)
+            'image'               => 'nullable|file|mimes:jpg,jpeg,png,mp4|max:5000',]);
         $validated['request_date'] = now();
-
-        // 🔹 Waiting_hour awal
         $validated['waiting_hour'] = 0;
-
-        // 🔹 Hitung status keterlambatan
         $validated['is_late'] = isset($validated['time_spent']) && $validated['time_spent'] > 480 ? true : false;
 
-        // 🔹 Upload file jika ada
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $path = $file->store('tickets', 'public');
             $validated['image'] = $path;
         }
 
-        // 🔹 Simpan ke database
         Ticket::create($validated);
 
-        // 🔹 Redirect sesuai asal form
         if ($request->input('from') === 'user') {
             return redirect()->route('DashboardTicketsUser.indexUser')
                 ->with('success', 'Ticket berhasil ditambahkan!');
@@ -181,13 +144,12 @@ class TicketsController extends Controller
         }
     }
 
-
     public function edit($id)
     {
         $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
-        $data = Ticket::data(); // ambil data tambahan seperti users, categories, etc
+        $data = Ticket::data(); 
 
-        return view('tickets.Edit', [ // bisa bikin view baru tickets.edit
+        return view('tickets.Edit', [
             'ticket'      => $ticket,
             'users'       => $data['users'],
             'assets'      => $data['assets'],
@@ -195,7 +157,7 @@ class TicketsController extends Controller
             'categories'  => $data['categories'],
             'developers'  => $data['developers'],
             'priorities'  => $data['priorities'],
-            'generateticket' => $data['generateticket'], // opsional, untuk ticket code default
+            'generateticket' => $data['generateticket'],
         ]);
     }
 

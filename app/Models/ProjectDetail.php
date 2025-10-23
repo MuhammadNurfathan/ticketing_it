@@ -16,6 +16,7 @@ class ProjectDetail extends Model
         'memo',
         'status_id',
         'progress_percent',
+        'developer_name',
     ];
 
     protected $dates = [

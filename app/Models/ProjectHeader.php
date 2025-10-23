@@ -21,7 +21,11 @@ class ProjectHeader extends Model
         'progress_percent',
         'progress_date',
         'start_date',
-        'end_date'
+        'end_date',
+        'actual_start_date',
+        'actual_end_date',
+        'effective_end_date',
+        'is_late',
     ];
 
     protected $date = [

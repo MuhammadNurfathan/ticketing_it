@@ -14,7 +14,7 @@ return new class extends Migration
             Schema::create('project_detail', function (Blueprint $table) {
                   $table->id();
                   $table->foreignId('project_header_id')->constrained('project_header')->onUpdate('cascade')->onDelete('cascade');
-                  $table->foreignId('dev_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+                  $table->string('developer_name', 255)->nullable();
                   $table->datetime('progress_date')->nullable();
                   $table->foreignId('status_id')->constrained('status')->onUpdate('cascade')->onDelete('restrict');
                   $table->float('progress_percent')->default(0);

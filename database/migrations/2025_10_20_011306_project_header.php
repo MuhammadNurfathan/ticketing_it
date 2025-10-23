@@ -20,13 +20,14 @@ Schema::create('project_header', function (Blueprint $table) {
     $table->foreignId('status_id')->constrained('status')->onUpdate('cascade')->onDelete('restrict');
     $table->foreignId('priority_id')->constrained('priority')->onUpdate('cascade')->onDelete('restrict');
     $table->unsignedTinyInteger('progress_percent')->default(0);
+    $table->datetime('progress_date')->nullable();
     $table->text('description')->nullable();
     $table->text('notes')->nullable();
     $table->datetime('start_date')->nullable();
     $table->datetime('end_date')->nullable();
     $table->datetime('actual_start_date')->nullable();
     $table->datetime('actual_end_date')->nullable();
-    $table->integer('total_pending_days')->default(0);
+    $table->integer('total_pending_minutes')->default(0);
     $table->datetime('effective_end_date')->nullable();
     $table->boolean('is_late')->default(false);
     $table->softDeletes();
