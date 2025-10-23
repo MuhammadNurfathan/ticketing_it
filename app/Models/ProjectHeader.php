@@ -94,4 +94,31 @@ class ProjectHeader extends Model
             'pending' => $voidCount,
         ];
     }
+
+    public static function data()
+    {
+        $lastproject = self::latest('id')->first();
+
+        if ($lastproject) {
+            $lastNumber = (int)substr($lastproject->project_code, 4);
+            $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            $newNumber = '001';
+        }
+
+        $generateticket = "PRJ-{$newNumber}";
+
+        $users      = User::all();
+        $statuses   = Status::all();
+        $developers = User::where('role_id', 1)->get();
+        $priorities = Priority::all();
+
+        return [
+            'users'           => $users,
+            'statuses'        => $statuses,
+            'developers'      => $developers,
+            'priorities'      => $priorities ,
+            'generateticket'  => $generateticket,
+        ];
+    }
 }

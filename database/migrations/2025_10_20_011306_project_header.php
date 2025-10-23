@@ -17,7 +17,6 @@ Schema::create('project_header', function (Blueprint $table) {
     $table->string('project_name', 255)->nullable();
     $table->datetime('request_date')->nullable();
     $table->foreignId('requestor_id')->constrained('users')->onUpdate('cascade')->onDelete('restrict');
-    $table->foreignId('dev_id')->constrained('users')->onUpdate('cascade')->onDelete('restrict');
     $table->foreignId('status_id')->constrained('status')->onUpdate('cascade')->onDelete('restrict');
     $table->foreignId('priority_id')->constrained('priority')->onUpdate('cascade')->onDelete('restrict');
     $table->unsignedTinyInteger('progress_percent')->default(0);

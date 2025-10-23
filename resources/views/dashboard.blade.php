@@ -3,9 +3,8 @@
         <div class="text-center">
             <h2
                 class="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Ticket Management Dashboard
+                SELAMAT DATANG DI TICKETING IT
             </h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your workflow efficiently</p>
         </div>
     </x-slot>
 
@@ -75,7 +74,7 @@
             </div>
 
             {{-- INFO SECTION --}}
-            <div
+            {{-- <div
                 class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl p-12 text-center border border-blue-100 dark:border-gray-700">
                 <div class="max-w-3xl mx-auto">
                     <h2
@@ -87,7 +86,7 @@
                         Track progress, collaborate with your team, and deliver exceptional results effortlessly.
                     </p>
                 </div>
-            </div>
+            </div> --}}
 
         </main>
     </div>

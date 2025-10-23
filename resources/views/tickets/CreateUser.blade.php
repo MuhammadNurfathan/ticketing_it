@@ -5,7 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+    <div
+        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
@@ -23,9 +24,10 @@
                     @endif
 
                     {{-- Form Ticket --}}
-                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
-`                       <input type="hidden" name="from" value="user">
+                        ` <input type="hidden" name="from" value="user">
                         {{-- Ticket Code --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -70,32 +72,18 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>  
+                        </div>
 
                         {{-- Problem --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Problem <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" name="problem" placeholder="Masukkan Kendala..." class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <input type="text" name="problem" placeholder="Masukkan Kendala..."
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         </div>
 
-                        {{-- Priority --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Priority <span class="text-red-500">*</span>
-                            </label>
-                            <select name="priority_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih Priority --</option>
-                                @foreach ($priorities as $prt)
-                                    <option value="{{ $prt->id }}"
-                                        {{ old('priority_id') == $prt->id ? 'selected' : '' }}>
-                                        {{ $prt->priority_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+
 
                         {{-- Upload Media (1 file saja) --}}
                         <div class="mb-6">
@@ -217,7 +205,7 @@
                         document.getElementById('image').addEventListener('change', function(e) {
                             const file = e.target.files[0];
                             const preview = document.getElementById('preview-image');
-                            const maxSize = 2 * 1024 * 1024;
+                            const maxSize = 5 * 1024 * 1024;
                             const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
 
                             if (!file) return preview.classList.add('hidden');

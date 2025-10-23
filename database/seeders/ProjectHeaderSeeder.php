@@ -21,7 +21,6 @@ class ProjectHeaderSeeder extends Seeder
                 'project_name' => 'Sistem Monitoring Pending',
                 'request_date' => Carbon::now()->subDays(10),
                 'requestor_id' => 1,
-                'dev_id' => 2,
                 'status_id' => 2, // in progress
                 'priority_id' => 1,
                 'progress_percent' => 70,
@@ -43,7 +42,6 @@ class ProjectHeaderSeeder extends Seeder
                 'project_name' => 'Sistem Approval Internal',
                 'request_date' => Carbon::now()->subDays(15),
                 'requestor_id' => 1,
-                'dev_id' => 2,
                 'status_id' => 4, // done
                 'priority_id' => 2,
                 'progress_percent' => 100,
@@ -65,7 +63,6 @@ class ProjectHeaderSeeder extends Seeder
                 'project_name' => 'Dashboard Kinerja Developer',
                 'request_date' => Carbon::now()->subDays(20),
                 'requestor_id' => 1,
-                'dev_id' => 2,
                 'status_id' => 2, // in progress
                 'priority_id' => 3,
                 'progress_percent' => 60,

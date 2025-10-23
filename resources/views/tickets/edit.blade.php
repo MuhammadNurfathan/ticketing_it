@@ -40,7 +40,7 @@
                         {{-- User --}}
                         <div class="mb-4 relative">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Pilih User <span class="text-red-500">*</span>
+                                Pilih Requestor <span class="text-red-500">*</span>
                             </label>
 
                             {{-- Input teks untuk search --}}
@@ -244,74 +244,84 @@
 
                     {{-- jQuery --}}
                     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const statusSelect = document.getElementById("status-select");
-                            const startContainer = document.getElementById("start-date-container");
-                            const endContainer = document.getElementById("end-date-container");
-                            const timeContainer = document.getElementById("time-spent-container");
-                            const startInput = document.getElementById("start_datetime");
-                            const endInput = document.getElementById("end_datetime");
-                            const timeInput = document.getElementById("time_spent");
-                            const manualCheckbox = document.getElementById("manual_time");
+                      {{-- Scripts --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-                            // === STATUS TRIGGER ===
-                            statusSelect.addEventListener("change", function() {
-                                const selectedOption = this.options[this.selectedIndex];
-                                const status = selectedOption.getAttribute("data-name");
 
-                                startContainer.classList.add("hidden");
-                                endContainer.classList.add("hidden");
-                                timeContainer.classList.add("hidden");
+    <script>
+    {{-- Status Field Trigger --}}
+   document.addEventListener("DOMContentLoaded", function() {
+    const statusSelect = document.getElementById("status-select");
+    const startContainer = document.getElementById("start-date-container");
+    const endContainer = document.getElementById("end-date-container");
+    const timeContainer = document.getElementById("time-spent-container");
+    const startInput = document.getElementById("start_datetime");
+    const endInput = document.getElementById("end_datetime");
+    const timeInput = document.getElementById("time_spent");
+    const manualCheckbox = document.getElementById("manual_time");
 
-                                if (status === "in progress") {
-                                    startContainer.classList.remove("hidden");
-                                } else if (status === "done") {
-                                    startContainer.classList.remove("hidden");
-                                    endContainer.classList.remove("hidden");
-                                    timeContainer.classList.remove("hidden");
-                                }
-                            });
+    statusSelect.addEventListener("change", function() {
+        const status = this.options[this.selectedIndex].getAttribute("data-name");
+        startContainer.classList.add("hidden");
+        endContainer.classList.add("hidden");
+        timeContainer.classList.add("hidden");
 
-                            // === AUTO CALCULATE TIME SPENT (menit) ===
-                            function hitungTimeSpent() {
-                                if (manualCheckbox.checked) return; // kalau manual, skip auto hitung
+        if (status === "in progress") {
+            startContainer.classList.remove("hidden");
+        } else if (status === "done") {
+            startContainer.classList.remove("hidden");
+            endContainer.classList.remove("hidden");
+            timeContainer.classList.remove("hidden");
+        }
+    });
 
-                                const start = new Date(startInput.value);
-                                const end = new Date(endInput.value);
+    // 🔒 Batasi end date
+    function updateEndDateMin() {
+        if (startInput.value) {
+            endInput.min = startInput.value;
+            if (endInput.value && endInput.value < startInput.value) {
+                endInput.value = '';
+                timeInput.value = '';
+            }
+        } else {
+            endInput.removeAttribute('min');
+        }
+    }
 
-                                if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end > start) {
-                                    const diffMs = end - start;
-                                    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-                                    timeInput.value = diffMinutes;
-                                } else {
-                                    timeInput.value = "";
-                                }
-                            }
+    startInput.addEventListener('change', updateEndDateMin);
+    startInput.addEventListener('input', updateEndDateMin);
+    updateEndDateMin();
 
-                            startInput.addEventListener("change", hitungTimeSpent);
-                            endInput.addEventListener("change", hitungTimeSpent);
+    // Hitung time spent otomatis
+    function hitungTimeSpent() {
+        if (manualCheckbox.checked) return;
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        if (!isNaN(start) && !isNaN(end) && end > start) {
+            timeInput.value = Math.floor((end - start) / 60000);
+        } else {
+            timeInput.value = "";
+        }
+    }
 
-                            // === TOGGLE MANUAL MODE ===
-                            manualCheckbox.addEventListener("change", function() {
-                                const notesContainer = document.getElementById("notes-container");
+    endInput.addEventListener("change", hitungTimeSpent);
+    startInput.addEventListener("change", hitungTimeSpent);
 
-                                if (this.checked) {
-                                    // Aktifkan manual input + tampilkan notes
-                                    timeInput.removeAttribute("readonly");
-                                    timeInput.classList.remove("bg-gray-100");
-                                    notesContainer.classList.remove("hidden");
-                                } else {
-                                    // Nonaktifkan manual input + sembunyikan notes
-                                    timeInput.setAttribute("readonly", true);
-                                    timeInput.classList.add("bg-gray-100");
-                                    hitungTimeSpent(); // langsung hitung ulang otomatis
-                                    notesContainer.classList.add("hidden");
-                                }
-                            });
-
-                        });
-                    </script>
+    manualCheckbox.addEventListener("change", function() {
+        const notesContainer = document.getElementById("notes-container");
+        if (this.checked) {
+            timeInput.removeAttribute("readonly");
+            timeInput.classList.remove("bg-gray-100");
+            notesContainer.classList.remove("hidden");
+        } else {
+            timeInput.setAttribute("readonly", true);
+            timeInput.classList.add("bg-gray-100");
+            hitungTimeSpent();
+            notesContainer.classList.add("hidden");
+        }
+    });
+});
+</script>
 
 
                     {{-- Script: User Search --}}
@@ -373,7 +383,7 @@
 
                             input.addEventListener("change", function(e) {
                                 const file = e.target.files[0];
-                                const maxSize = 10 * 1024 * 1024; // 10 MB
+                                const maxSize = 5 * 1024 * 1024; // 5 mb
                                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4'];
 
                                 if (!file) return;

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
             $table->integer('time_spent')->nullable();
+            $table->boolean('is_late')->default(false)->comment('false = On Time, true = Late');
             $table->timestamps();
             $table->softDeletes();
         });

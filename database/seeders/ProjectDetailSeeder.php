@@ -14,6 +14,7 @@ class ProjectDetailSeeder extends Seeder
             // Project 1
             [
                 'project_header_id' => 1,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(8),
                 'status_id' => 2,
                 'progress_percent' => 20,
@@ -23,6 +24,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 1,
+                'dev_id' => 3,
                 'progress_date' => Carbon::now()->subDays(5),
                 'status_id' => 2,
                 'progress_percent' => 50,
@@ -32,6 +34,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 1,
+                'dev_id' => 4,
                 'progress_date' => Carbon::now()->subDays(2),
                 'status_id' => 2,
                 'progress_percent' => 70,
@@ -43,6 +46,7 @@ class ProjectDetailSeeder extends Seeder
             // Project 2
             [
                 'project_header_id' => 2,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(13),
                 'status_id' => 2,
                 'progress_percent' => 20,
@@ -52,6 +56,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 2,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(10),
                 'status_id' => 2,
                 'progress_percent' => 70,
@@ -61,6 +66,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 2,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(5),
                 'status_id' => 3,
                 'progress_percent' => 100,
@@ -72,6 +78,7 @@ class ProjectDetailSeeder extends Seeder
             // Project 3
             [
                 'project_header_id' => 3,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(18),
                 'status_id' => 2,
                 'progress_percent' => 20,
@@ -81,6 +88,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 3,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(10),
                 'status_id' => 2,
                 'progress_percent' => 50,
@@ -90,6 +98,7 @@ class ProjectDetailSeeder extends Seeder
             ],
             [
                 'project_header_id' => 3,
+                'dev_id' => 2,
                 'progress_date' => Carbon::now()->subDays(4),
                 'status_id' => 2,
                 'progress_percent' => 60,

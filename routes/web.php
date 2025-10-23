@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AssetsController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectHeaderController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TicketsController;
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::resource('project', ProjectHeaderController::class);
+    Route::resource('project', ProjectController::class);
 });
 
 Route::middleware('auth')->group(function () {
@@ -97,6 +97,9 @@ Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->na
 Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
 Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
 Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
+Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
+Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
+
 
 
 
