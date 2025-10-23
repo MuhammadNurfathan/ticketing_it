@@ -76,11 +76,31 @@
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Nama
+                                Requestor Date
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor
+                                Requestor Name
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Priority
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Progress Percent
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Progress Date
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Description
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Notes
                             </th>
 
                             <th
@@ -93,14 +113,17 @@
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Percent
+                                Actual Start Date
+                            </th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Total Pending Minutes
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
                                 Action
                             </th>
                         </tr>
-
                     </thead>
                     <tbody class="bg-white dark:bg-dark-eval-1">
                         @foreach ($inProgressProject as $project)
@@ -114,6 +137,21 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->requestor->name ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->priority->priority_name}}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->progress_percent ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->progress_date ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->description ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->notes ?? '-' }}</td>
 
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -123,25 +161,38 @@
                                     {{ $project->end_date ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_percent ?? '-' }} %</td>
+                                    {{ $project->actual_start_date ?? '-' }} %</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $project->total_pending_minutes ?? '-' }} %</td>
 
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
-                                    <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
-                                        data-code="{{ $project->project_code }}"
-                                        data-name="{{ $project->project_name }}"
-                                        data-progress="{{ $project->progress_percent }}"
-                                        data-status="{{ $project->status_id }}"
-                                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                        Update Progress
-                                    </button>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                    <div class="flex gap-1 justify-center items-center">
+                                        <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                            data-code="{{ $project->project_code }}"
+                                            data-name="{{ $project->project_name }}"
+                                            data-progress="{{ $project->progress_percent }}"
+                                            data-status="{{ $project->status_id }}"
+                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                                            Update Progress
+                                        </button>
 
-                                    <button onclick="openPendingModal({{ $project->id }})"
-                                        class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                                        Pending
-                                    </button>
+                                        <button onclick="openPendingModal({{ $project->id }})"
+                                            class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                                            Pending
+                                        </button>
 
-
+                                        <form action="{{ route('project.updateStatus', $project->id) }}" method="POST"
+                                            class="inline-flex">
+                                            @csrf
+                                            <input type="hidden" name="status_id" value="4">
+                                            <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                                Void
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -166,7 +217,7 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Nama
+                                    Project Name
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -176,15 +227,17 @@
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Requestor
                                 </th>
-
-
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Priority
+                                     Priority
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Description
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    notes
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -225,27 +278,37 @@
                                         {{ $project->description ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        {{ $project->notes ?? '-' }}</td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->start_date ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->end_date ?? '-' }}</td>
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                        <form action="{{ route('project.updateStatus', $project->id) }}" method="POST"
-                                            class="inline">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="4">
-                                            <button
-                                                class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Void</button>
-                                        </form>
+                                        <div class="flex gap-2 justify-center">
+                                            <form action="{{ route('project.updateStatus', $project->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="4">
+                                                <button
+                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">
+                                                    Void
+                                                </button>
+                                            </form>
 
-                                        <form action="{{ route('project.updateProgress', $project->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="2">
-                                            <button type="submit"
-                                                class="px-3 py-1 bg-blue-600 text-white rounded">Pilih</button>
-                                        </form>
+                                            <form action="{{ route('project.updateProgress', $project->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="2">
+                                                <button type="submit"
+                                                    class="px-3 py-1 bg-blue-600 text-white rounded">
+                                                    Pilih
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -337,12 +400,17 @@
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->end_date ?? '-' }}</td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
-                                        <button type="button"
-                                            class="doneBtn bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
-                                            data-start="{{ $project->start_date ?? '-' }}">
-                                            Done
-                                        </button>
+                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                        <form action="{{ route('project.updateStatus', $project->id) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="status_id" value="2">
+                                            <button
+                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+                                                onclick="return confirm('Apakah Anda Yakin?')">
+                                                Cancel
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -367,7 +435,11 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Nama
+                                    Project Nmae
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    Request Date
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -375,7 +447,23 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Developer
+                                    Priority
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Progress Percent
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Progress Date
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    Description
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    Pending Reason
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -422,12 +510,12 @@
                                         {{ $project->progress_percent ?? '-' }} %</td>
 
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                        <form action="{{ route('project.continueProgress', $project ->id) }}"
+                                        <form action="{{ route('project.continueProgress', $project->id) }}"
                                             method="POST" class="inline">
                                             @csrf
                                             <input type="hidden" name="status_id" value="2">
                                             <button
-                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
                                                 onclick="return confirm('Apakah Anda Yakin?')">
                                                 continue
                                             </button>
@@ -441,7 +529,7 @@
             </div>
 
             {{-- ========================================================= VOID TABLE ========================================================= --}}
-            {{-- <div
+            <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
                     class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
@@ -487,10 +575,7 @@
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     End Date
                                 </th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                    Action
-                                </th>
+
                             </tr>
 
                         </thead>
@@ -524,19 +609,13 @@
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->end_date ?? '-' }}</td>
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
-                                        <button type="button"
-                                            class="doneBtn bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
-                                            data-start="{{ $project->start_date ?? '-' }}">
-                                            Done
-                                        </button>
-                                    </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div> --}}
+            </div>
         </div>
 
 
@@ -678,8 +757,11 @@
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <option value="">-- Pilih Status --</option>
                         @foreach ($statuses as $status)
-                            <option value="{{ $status->id }}">{{ $status->status_name }}</option>
+                            @if (in_array($status->id, [2, 3]))
+                                <option value="{{ $status->id }}">{{ $status->status_name }}</option>
+                            @endif
                         @endforeach
+
                     </select>
                 </div>
 

@@ -200,8 +200,6 @@ class ProjectController extends Controller
             ->with('success', 'Progress project berhasil diperbarui dan disimpan ke detail.');
     }
 
-
-
     public function updateStatus(Request $request, ProjectHeader $project)
     {
         $project->update([

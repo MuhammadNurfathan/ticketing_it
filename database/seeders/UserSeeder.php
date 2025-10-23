@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
                 'department_id' => 3,
                 'role_id' => 2,
                 'email' => 'yuli@piagam.id',
-                'password' => Hash::make('yuli123'), // password default
+                'password' => Hash::make('yuli123'),
                 'phone' => '081234567890',
                 'job_position' => 'System Administrator',
                 'status' => 'Active',

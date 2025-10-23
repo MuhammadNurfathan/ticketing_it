@@ -22,8 +22,6 @@ class DatabaseSeeder extends Seeder
             AssetsSeeder::class,
             TicketsSeeder::class,
             ProjectHeaderSeeder::class,
-            ProjectDetailSeeder::class,
-            ProjectPendingLogSeeder::class,
         ]);
     }
 }

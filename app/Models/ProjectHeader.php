@@ -26,7 +26,8 @@ class ProjectHeader extends Model
         'actual_end_date',
         'effective_end_date',
         'is_late',
-        'total_pending_minutes'
+        'total_pending_minutes',
+        'notes'
     ];
 
     protected $date = [
@@ -50,6 +51,9 @@ class ProjectHeader extends Model
 
     public function developer(){
         return $this->belongsTo(User::class,'dev_id');
+    }
+    public function priority(){
+        return $this->belongsTo(Priority::class,'priority_id');
     }
     // app/Models/ProjectHeader.php
 public function pendings()
