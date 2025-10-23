@@ -100,6 +100,11 @@ Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedba
 Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
 Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
 
+Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
+Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
+
+
+
 
 
 

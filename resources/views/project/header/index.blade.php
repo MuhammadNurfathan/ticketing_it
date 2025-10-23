@@ -14,8 +14,6 @@
         @endauth
     </x-slot>
 
-
-
     <div class="p-6 space-y-6">
         {{-- FILTER DATE UNTUK STATUS DONE  --}}
         <form method="GET" action="{{ route('project.index') }}"
@@ -129,12 +127,20 @@
 
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
                                     <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
-                                        data-code="{{ $project->project_code }}" data-name="{{ $project->project_name }}"
+                                        data-code="{{ $project->project_code }}"
+                                        data-name="{{ $project->project_name }}"
                                         data-progress="{{ $project->progress_percent }}"
                                         data-status="{{ $project->status_id }}"
                                         class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                                         Update Progress
                                     </button>
+
+                                    <button onclick="openPendingModal({{ $project->id }})"
+                                        class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                                        Pending
+                                    </button>
+
+
                                 </td>
                             </tr>
                         @endforeach
@@ -239,8 +245,6 @@
                                             <button type="submit"
                                                 class="px-3 py-1 bg-blue-600 text-white rounded">Pilih</button>
                                         </form>
-
-
                                     </td>
                                 </tr>
                             @endforeach
@@ -348,7 +352,7 @@
             </div>
 
             {{-- ========================================================= PENDING TABLE ========================================================= --}}
-            {{-- <div
+            <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
                     class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
@@ -417,20 +421,24 @@
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->progress_percent ?? '-' }} %</td>
 
-                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center space-x-1">
-                                        <button type="button"
-                                            class="doneBtn bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs"
-                                            data-start="{{ $project->start_date ?? '-' }}">
-                                            Done
-                                        </button>
-
+                                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                        <form action="{{ route('project.continueProgress', $project ->id) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="status_id" value="2">
+                                            <button
+                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+                                                onclick="return confirm('Apakah Anda Yakin?')">
+                                                continue
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div> --}}
+            </div>
 
             {{-- ========================================================= VOID TABLE ========================================================= --}}
             {{-- <div
@@ -531,207 +539,245 @@
             </div> --}}
         </div>
 
-        {{-- ============================================ Modal Form Edit ============================================ --}}
-        {{-- Modal hanya muncul kalau $project ada --}}
-{{-- MODAL DINAMIS - Letakkan di LUAR loop, biasanya di bawah table --}}
-<x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
-    <form id="editProgressForm" method="POST">
-        @csrf
-        @method('PUT')
 
-        {{-- Project Code (readonly) --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Project Code
-            </label>
-            <input type="text" id="modal_project_code" readonly
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-        </div>
+        {{-- ============================================ Modal Form Pending ============================================ --}}
+        <x-modal-form id="pendingModal" title="Tambah Pending" size="max-w-md">
+            <form id="pendingForm" method="POST">
+                @csrf
+                <input type="hidden" name="id_project_header" id="pending_project_id">
 
-        {{-- Project Name (readonly) --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Project Name
-            </label>
-            <input type="text" id="modal_project_name" readonly
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-        </div>
 
-        {{-- Developer Name --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Developer Name
-            </label>
-
-            <div id="selected-developers"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer flex justify-between items-center"
-                onclick="toggleDropdown()">
-                <span id="selected-text" class="truncate">Pilih Developer...</span>
-                <svg id="dropdown-icon" class="w-4 h-4 transform transition-transform duration-200"
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 9l-7 7-7-7" />
-                </svg>
-            </div>
-
-            <input type="hidden" name="developer_name" id="developer_name">
-
-            <div id="developer-dropdown"
-                class="hidden mt-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shadow-lg max-h-48 overflow-y-auto p-2">
-                @foreach ($developers as $dev)
-                    <label class="flex items-center space-x-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
-                        <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
-                        <span>{{ $dev->name }}</span>
+                {{-- Reason --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Reason <span class="text-red-500">*</span>
                     </label>
-                @endforeach
-            </div>
-        </div>
+                    <input type="text" name="reason" required placeholder="Tulis alasan pending..."
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2
+                            bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                            focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
 
-        {{-- Progress Date --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Progress Date
-            </label>
-            <input type="datetime-local" name="progress_date" id="modal_progress_date"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                {{-- Tombol --}}
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('pendingModal')"
+                        class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan
+                        Pending</button>
+                </div>
+            </form>
+
+            <script>
+                function openPendingModal(projectId) {
+                    document.getElementById('pending_project_id').value = projectId;
+                    // set dynamic form action
+                    document.getElementById('pendingForm').action = '/project/' + projectId + '/pending';
+                    openModal('pendingModal');
+                }
+            </script>
+        </x-modal-form>
+
+
+        {{-- ============================================ Modal Form Edit ============================================ --}}
+        <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
+            <form id="editProgressForm" method="POST">
+                @csrf
+                @method('PUT')
+
+                {{-- Project Code (readonly) --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Project Code
+                    </label>
+                    <input type="text" id="modal_project_code" readonly
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+
+                {{-- Project Name (readonly) --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Project Name
+                    </label>
+                    <input type="text" id="modal_project_name" readonly
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+
+                {{-- Developer Name --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Developer Name
+                    </label>
+
+                    <div id="selected-developers"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer flex justify-between items-center"
+                        onclick="toggleDropdown()">
+                        <span id="selected-text" class="truncate">Pilih Developer...</span>
+                        <svg id="dropdown-icon" class="w-4 h-4 transform transition-transform duration-200"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+
+                    <input type="hidden" name="developer_name" id="developer_name">
+
+                    <div id="developer-dropdown"
+                        class="hidden mt-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shadow-lg max-h-48 overflow-y-auto p-2">
+                        @foreach ($developers as $dev)
+                            <label
+                                class="flex items-center space-x-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
+                                <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
+                                <span>{{ $dev->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                {{-- Progress Date --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Progress Date
+                    </label>
+                    <input type="datetime-local" name="progress_date" id="modal_progress_date"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-        </div>
+                </div>
 
-        {{-- Progress Percent --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Progress Percent <span class="text-red-500">*</span>
-            </label>
-            <input type="number" name="progress_percent" id="modal_progress_percent" 
-                min="0" max="100" step="1"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                {{-- Progress Percent --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Progress Percent <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" name="progress_percent" id="modal_progress_percent" min="0"
+                        max="100" step="1"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required>
-        </div>
+                        required>
+                </div>
 
-        {{-- Memo --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Memo
-            </label>
-            <textarea name="memo" id="modal_memo" rows="3"
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                {{-- Memo --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Memo
+                    </label>
+                    <textarea name="memo" id="modal_memo" rows="3"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
-        </div>
+                </div>
 
-        {{-- Status --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Status <span class="text-red-500">*</span>
-            </label>
-            <select name="status_id" id="modal_status_id" required
-                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 
+                {{-- Status --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <select name="status_id" id="modal_status_id" required
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <option value="">-- Pilih Status --</option>
-                @foreach ($statuses as $status)
-                    <option value="{{ $status->id }}">{{ $status->status_name }}</option>
-                @endforeach
-            </select>
-        </div>
+                        <option value="">-- Pilih Status --</option>
+                        @foreach ($statuses as $status)
+                            <option value="{{ $status->id }}">{{ $status->status_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-        {{-- Tombol --}}
-        <div class="flex justify-end">
-            <button type="button" onclick="closeModal('editProgressModal')"
-                class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Batal</button>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Simpan Perubahan
-            </button>
-        </div>
-    </form>
-</x-modal-form>
+                {{-- Tombol --}}
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('editProgressModal')"
+                        class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </x-modal-form>
 
-{{-- Script --}}
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script>
-function openEditModal(button) {
-    // Ambil data dari button yang diklik
-    const projectId = $(button).data('id');
-    const projectCode = $(button).data('code');
-    const projectName = $(button).data('name');
-    const progress = $(button).data('progress');
-    const statusId = $(button).data('status');
-    const developerName = $(button).data('developer');
-    const memo = $(button).data('memo');
-    
-    console.log('Loading project ID:', projectId); // Debug untuk cek ID
-    
-    // Reset form dulu
-    $('#editProgressForm')[0].reset();
-    $('.dev-checkbox').prop('checked', false);
-    $('#dropdown-icon').removeClass('rotate-180');
-    $('#developer-dropdown').addClass('hidden');
-    
-    // Set form action URL
-    $('#editProgressForm').attr('action', `/project/${projectId}`);
-    
-    // Isi data ke form
-    $('#modal_project_code').val(projectCode);
-    $('#modal_project_name').val(projectName);
-    $('#modal_progress_percent').val(progress);
-    $('#modal_status_id').val(statusId);
-    $('#modal_memo').val(memo);
-    
-    // Set developer checkboxes
-    if (developerName) {
-        const developers = developerName.split(' | ');
-        developers.forEach(devName => {
-            const trimmed = devName.trim();
-            $(`.dev-checkbox[value="${trimmed}"]`).prop('checked', true);
-        });
-        $('#selected-text').text(developerName);
-        $('#developer_name').val(developerName);
-    } else {
-        $('#selected-text').text('Pilih Developer...');
-        $('#developer_name').val('');
-    }
-    
-    // Set progress date ke sekarang
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    $('#modal_progress_date').val(`${year}-${month}-${day}T${hours}:${minutes}`);
-    
-    // Buka modal
-    openModal('editProgressModal');
-}
+        {{-- Script --}}
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script>
+            function openEditModal(button) {
+                // Ambil data dari button yang diklik
+                const projectId = $(button).data('id');
+                const projectCode = $(button).data('code');
+                const projectName = $(button).data('name');
+                const progress = $(button).data('progress');
+                const statusId = $(button).data('status');
+                const developerName = $(button).data('developer');
+                const memo = $(button).data('memo');
 
-// 🔹 Toggle dropdown
-function toggleDropdown() {
-    $('#developer-dropdown').toggleClass('hidden');
-    $('#dropdown-icon').toggleClass('rotate-180');
-}
+                console.log('Loading project ID:', projectId); // Debug untuk cek ID
 
-// 🔹 Close dropdown on outside click
-$(document).on('click', function(e) {
-    if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
-        $('#developer-dropdown').addClass('hidden');
-        $('#dropdown-icon').removeClass('rotate-180');
-    }
-});
+                // Reset form dulu
+                $('#editProgressForm')[0].reset();
+                $('.dev-checkbox').prop('checked', false);
+                $('#dropdown-icon').removeClass('rotate-180');
+                $('#developer-dropdown').addClass('hidden');
 
-// 🔹 Handle checkbox changes
-$('.dev-checkbox').on('change', function() {
-    const selected = [];
-    $('.dev-checkbox:checked').each(function() {
-        selected.push($(this).val());
-    });
+                // Set form action URL
+                $('#editProgressForm').attr('action', `/project/${projectId}`);
 
-    const result = selected.join(' | ') || 'Pilih Developer...';
-    $('#selected-text').text(result);
-    $('#developer_name').val(selected.join(' | '));
-});
-</script>
+                // Isi data ke form
+                $('#modal_project_code').val(projectCode);
+                $('#modal_project_name').val(projectName);
+                $('#modal_progress_percent').val(progress);
+                $('#modal_status_id').val(statusId);
+                $('#modal_memo').val(memo);
+
+                // Set developer checkboxes
+                if (developerName) {
+                    const developers = developerName.split(' | ');
+                    developers.forEach(devName => {
+                        const trimmed = devName.trim();
+                        $(`.dev-checkbox[value="${trimmed}"]`).prop('checked', true);
+                    });
+                    $('#selected-text').text(developerName);
+                    $('#developer_name').val(developerName);
+                } else {
+                    $('#selected-text').text('Pilih Developer...');
+                    $('#developer_name').val('');
+                }
+
+                // Set progress date ke sekarang
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                $('#modal_progress_date').val(`${year}-${month}-${day}T${hours}:${minutes}`);
+
+                // Buka modal
+                openModal('editProgressModal');
+            }
+
+            // 🔹 Toggle dropdown
+            function toggleDropdown() {
+                $('#developer-dropdown').toggleClass('hidden');
+                $('#dropdown-icon').toggleClass('rotate-180');
+            }
+
+            // 🔹 Close dropdown on outside click
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
+                    $('#developer-dropdown').addClass('hidden');
+                    $('#dropdown-icon').removeClass('rotate-180');
+                }
+            });
+
+            // 🔹 Handle checkbox changes
+            $('.dev-checkbox').on('change', function() {
+                const selected = [];
+                $('.dev-checkbox:checked').each(function() {
+                    selected.push($(this).val());
+                });
+
+                const result = selected.join(' | ') || 'Pilih Developer...';
+                $('#selected-text').text(result);
+                $('#developer_name').val(selected.join(' | '));
+            });
+        </script>
 
         {{-- ============================================ Modal Form Tambah ============================================ --}}
         <x-modal-form id="projectModal" title="Tambah Project" size="max-w-4xl">

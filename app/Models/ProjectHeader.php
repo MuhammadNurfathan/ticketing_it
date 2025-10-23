@@ -26,6 +26,7 @@ class ProjectHeader extends Model
         'actual_end_date',
         'effective_end_date',
         'is_late',
+        'total_pending_minutes'
     ];
 
     protected $date = [
@@ -50,6 +51,12 @@ class ProjectHeader extends Model
     public function developer(){
         return $this->belongsTo(User::class,'dev_id');
     }
+    // app/Models/ProjectHeader.php
+public function pendings()
+{
+    return $this->hasMany(Pending::class, 'id_project_header');
+}
+
 
     public function scopeBetweenRequestDates($query, $start, $end){
         if ($start && $end) {

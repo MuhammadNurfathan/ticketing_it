@@ -1,4 +1,3 @@
-{{-- resources/views/components/modal-form.blade.php --}}
 @props(['id' => 'projectModal', 'title' => 'Form Project', 'size' => 'max-w-4xl'])
 
 <div id="{{ $id }}" 
