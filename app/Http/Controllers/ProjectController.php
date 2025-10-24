@@ -14,6 +14,8 @@ class ProjectController extends Controller
     {
         $start = $request->start_date;
         $end = $request->end_date;
+
+        // Filter utama
         $filter = ProjectHeader::betweenRequestDates($start, $end);
         $stats = ProjectHeader::statistik($start, $end);
 
@@ -32,20 +34,24 @@ class ProjectController extends Controller
         $developers     = $data['developers'];
         $generateticket = $data['generateticket'];
 
-        // 🔹 Ambil data project yang mau di-edit (GANTI JADI $project)
+        // 🔹 Jika ada project ID yang dikirim (misalnya untuk modal/detail)
         $project = null;
         $projectDetail = null;
+        $pendings = collect();
+        $details = collect();
 
-        if ($request->has('id')) {
-            $project = ProjectHeader::with('projectDetails')->find($request->id);
+      if ($request->has('id')) {
+    $project = ProjectHeader::with('projectDetails')->find($request->id);
 
-            if ($project) {
-                // Ambil detail terakhir untuk isi developer_name dan memo
-                $projectDetail = $project->projectDetails()->latest()->first();
-            }
-        }
+    if ($project) {
+        $pendings = Pending::where('id_project_header', $project->id)->orderBy('created_at', 'ASC')->get();
 
-        return view('project.header.index', compact(
+        $details  = ProjectDetail::where('project_header_id', $project->id)->orderBy('created_at', 'ASC')->get();
+    }
+}
+
+
+        return view('project.index', compact(
             'stats',
             'waitingProject',
             'pendingProject',
@@ -58,9 +64,11 @@ class ProjectController extends Controller
             'statuses',
             'priorities',
             'generateticket',
-            'project',        // ✅ Ganti dari projectheader
-            'projectDetail',  // ✅ Tambahkan ini
-            'developers'
+            'project',
+            'projectDetail',
+            'developers',
+            'details',
+            'pendings'
         ));
     }
 
@@ -113,7 +121,6 @@ class ProjectController extends Controller
         return back()->with('success', 'Project dilanjutkan, pending selesai dan durasi tercatat.');
     }
 
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -134,7 +141,6 @@ class ProjectController extends Controller
 
         return redirect()->route('project.index')->with('success', 'Project berhasil ditambahkan.');
     }
-
 
     public function update(Request $request, ProjectHeader $project)
     {
@@ -202,11 +208,19 @@ class ProjectController extends Controller
 
     public function updateStatus(Request $request, ProjectHeader $project)
     {
-        $project->update([
+        // Data dasar yang selalu diupdate
+        $data = [
             'status_id' => $request->status_id,
-        ]);
+        ];
 
-        return redirect()->route('project.index');
+        // Kalau status_id = 4 (void), tambahkan notes juga
+        if ($request->status_id == 4) {
+            $data['notes'] = $request->notes;
+        }
+
+        $project->update($data);
+
+        return redirect()->route('project.index')->with('success', 'Status project berhasil diupdate!');
     }
 
     public function updateProgress(Request $request, ProjectHeader $project)
@@ -218,7 +232,14 @@ class ProjectController extends Controller
         return redirect()->route('project.index');
     }
 
+    public function history(ProjectHeader $project)
+    {
+        $pendings = Pending::where('id_project_header', $project->id)->orderBy('created_at', 'ASC')->get();
 
-    public function create() {}
-    public function edit() {}
+        $details = ProjectDetail::where('project_header_id', $project->id)
+        ->orderBy('progress_date', 'ASC') // urut dari paling lama ke terbaru
+        ->get();
+        
+        return view('project.history', compact('pendings', 'details','project'));
+    }
 }

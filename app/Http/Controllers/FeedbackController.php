@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\feedback;
 use App\Models\Ticket;
 
@@ -8,18 +9,12 @@ use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $feedback = feedback::latest()->paginate(10);
-        return view('feedback.index',compact('feedback'));
+        return view('feedback.index', compact('feedback'));
     }
-
-    public function edit($ticket_code){
-       
-        $ticket = Ticket::where('ticket_code', $ticket_code)->firstOrFail();
-        return view('master.feedback.index', compact('ticket'));
-
-    }
-     public function form($ticket_id)
+    public function form($ticket_id)
     {
         // Ambil tiket
         $ticket = Ticket::findOrFail($ticket_id);
@@ -27,32 +22,30 @@ class FeedbackController extends Controller
         // Ambil feedback (null kalau belum ada)
         $feedback = Feedback::where('ticket_id', $ticket->id)->first();
 
-        return view('master.feedback.create', compact('ticket', 'feedback'));
+        return view('feedback.create', compact('ticket', 'feedback'));
     }
 
     // Simpan feedback (create atau update)
- public function save(Request $request)
-{
-    $data = $request->validate([
-        'ticket_id' => 'required|exists:tickets,id',
-        'description' => 'required|string',
-        'rating' => 'required|integer|min:1|max:5',
-    ]);
+    public function save(Request $request)
+    {
+        $data = $request->validate([
+            'ticket_id' => 'required|exists:tickets,id',
+            'description' => 'required|string',
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
 
-    // Buat feedback baru
-    Feedback::create([
-        'ticket_id' => $data['ticket_id'],
-        'description' => $data['description'],
-        'rating' => $data['rating'],
-    ]);
+        // Buat feedback baru
+        Feedback::create([
+            'ticket_id' => $data['ticket_id'],
+            'description' => $data['description'],
+            'rating' => $data['rating'],
+        ]);
 
-    // Update status tiket menjadi 5
-    $ticket = Ticket::findOrFail($data['ticket_id']);
-    $ticket->update(['status_id' => 5]);
+        // Update status tiket menjadi 5
+        $ticket = Ticket::findOrFail($data['ticket_id']);
+        $ticket->update(['status_id' => 5]);
 
-    return redirect()->route('DashboardTicketsUser.indexUser')
-                     ->with('success', 'Feedback berhasil disimpan dan status tiket diperbarui!');
-}
-
-
+        return redirect()->route('DashboardTicketsUser.indexUser')
+            ->with('success', 'Feedback berhasil disimpan dan status tiket diperbarui!');
+    }
 }

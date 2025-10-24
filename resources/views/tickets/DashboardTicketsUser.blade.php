@@ -134,6 +134,9 @@
                             <th class="border border-gray-300 dark:border-gray-600 p-2">Masalah</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2">Status</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2">Tanggal Req</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Start Date</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">End Date</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2">Solution</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2">Feedback</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2">Image</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-center">Action</th>
@@ -173,6 +176,15 @@
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2">
                                     {{ $ticket->request_date ?? '-' }}
+                                </td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                    {{ $ticket->start_date ?? '-' }}
+                                </td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                    {{ $ticket->end_date ?? '-' }}
+                                </td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2">
+                                    {{ $ticket->solution ?? '-' }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2">
                                     <span title="{{ $ticket->feedback->description ?? '-' }}">

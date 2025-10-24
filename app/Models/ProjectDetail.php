@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectDetail extends Model
 {
-  use HasFactory,SoftDeletes;
+  use HasFactory;
     protected $table = 'project_detail';
     protected $fillable = [
         'project_header_id',
@@ -31,4 +31,6 @@ class ProjectDetail extends Model
     public function status(){
         return $this->belongsTo(Status::class,'status_id');
     }
+
+
 }

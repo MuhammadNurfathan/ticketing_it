@@ -348,7 +348,7 @@
                                                 {{-- Tombol Pilih --}}
                                                 <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
                                                     class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block transition-all duration-200">
-                                                    Pilih
+                                                    Kerjakan
                                                 </a>
 
                                                 {{-- Modal Overlay --}}
@@ -414,6 +414,7 @@
                     </table>
                 </div>
             </div>
+        </div>
 
             {{-- ================= TABLE DONE / CLOSED ================= --}}
             <div

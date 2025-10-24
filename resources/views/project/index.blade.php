@@ -6,7 +6,7 @@
                 <div class="flex justify-between items-center">
                     <h2 class="font-bold text-2xl text-light-text dark:text-dark-text">Project</h2>
                     <button onclick="openModal('projectModal')"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-green-700">
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         Tambah Project
                     </button>
                 </div>
@@ -15,7 +15,7 @@
     </x-slot>
 
     <div class="p-6 space-y-6">
-        {{-- FILTER DATE UNTUK STATUS DONE  --}}
+        {{-- ========================================================= FILTER DATE ========================================================= --}}
         <form method="GET" action="{{ route('project.index') }}"
             class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
             <div>
@@ -34,39 +34,57 @@
             </div>
 
             <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition duration-300">
+                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded transition duration-300">
                 Filter
             </button>
         </form>
+
         {{-- ========================================================= STATISTIK CARDS ========================================================= --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 ">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             @php
                 $statusColors = [
                     'Waiting' => 'blue',
                     'In Progress' => 'purple',
                     'Done' => 'green',
                     'Void' => 'red',
-                    'Pending' => 'yellow',
+                    'Pending' => 'orange',
+                ];
+
+                $statusIcons = [
+                    'Waiting' => '⏳',
+                    'In Progress' => '⚙️',
+                    'Done' => '✅',
+                    'Void' => '❌',
+                    'Pending' => '🕘',
                 ];
             @endphp
+
             @foreach ($statusColors as $key => $color)
                 <div
-                    class="bg-light-eval-1 dark:bg-dark-eval-1 p-5 rounded shadow hover:scale-105 transform transition duration-300 text-center border border-gray-200 dark:border-gray-700">
-                    <div class="text-3xl font-bold text-light-text dark:text-dark-text">
-                        {{ $stats[strtolower(str_replace(' ', '_', $key))] }}</div>
-                    <div class="font-semibold text-light-text-secondary dark:text-dark-text-secondary mt-2">
-                        {{ $key }}</div>
+                    class="relative bg-light-eval-1 dark:bg-dark-eval-1 p-5 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
+
+                    <!-- Icon kecil di pojok kiri atas, di dalam border -->
+                    <div class="absolute top-2 left-2 text-xl text-gray-400 dark:text-gray-500">
+                        {{ $statusIcons[$key] }}
+                    </div>
+
+                    <div class="text-3xl font-bold text-light-text dark:text-dark-text text-center">
+                        {{ $stats[strtolower(str_replace(' ', '_', $key))] }}
+                    </div>
+                    <div class="font-semibold text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
+                        {{ $key }}
+                    </div>
                 </div>
             @endforeach
         </div>
 
         {{-- ========================================================= PROGRESS TABLE ========================================================= --}}
         <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700 p-6 space-y-6">
+            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
             <h3
-                class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                class="inline bg-blue-500 px-2 py-1 to-blue-50 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
                 Project In Progress</h3>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto py-4">
                 <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
@@ -120,6 +138,10 @@
                                 Total Pending Minutes
                             </th>
                             <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                History
+                            </th>
+                            <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
                                 Action
                             </th>
@@ -139,10 +161,10 @@
                                     {{ $project->requestor->name ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name}}</td>
+                                    {{ $project->priority->priority_name }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_percent ?? '-' }}</td>
+                                    {{ $project->progress_percent ?? '-' }}%</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->progress_date ?? '-' }}</td>
@@ -161,53 +183,58 @@
                                     {{ $project->end_date ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->actual_start_date ?? '-' }} %</td>
+                                    {{ $project->actual_start_date ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->total_pending_minutes ?? '-' }} %</td>
+                                    {{ $project->total_pending_minutes ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    <button onclick="showProjectModal({{ $project->id }})"
+                                        class="text-blue-500 hover:underline">
+                                        Lihat Detail
+                                    </button>
+                                </td>
 
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <div class="flex gap-1 justify-center items-center">
+                                    <div class="flex gap-2 justify-center items-center">
+                                        <!-- Update Progress -->
                                         <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
                                             data-code="{{ $project->project_code }}"
                                             data-name="{{ $project->project_name }}"
                                             data-progress="{{ $project->progress_percent }}"
                                             data-status="{{ $project->status_id }}"
-                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                            Update Progress
+                                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors duration-200">
+                                            Update
                                         </button>
 
+                                        <!-- Pending -->
                                         <button onclick="openPendingModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                                            class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors duration-200">
                                             Pending
                                         </button>
 
-                                        <form action="{{ route('project.updateStatus', $project->id) }}" method="POST"
-                                            class="inline-flex">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="4">
-                                            <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                                                Void
-                                            </button>
-                                        </form>
+                                        <!-- Void -->
                                     </div>
-                                </td>
+                                    <button onclick="openVoidModal({{ $project->id }})"
+                                        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200">
+                                        Void
+                                    </button>
 
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-
-
+        </div>
 
             {{-- ========================================================= WAITING TABLE ========================================================= --}}
             <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
-                    class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                    class="inline bg-yellow-500 px-2 py-1 to-blue-50 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
                     Project Waiting</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto py-4">
                     <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                         <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                             <tr>
@@ -229,7 +256,7 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                     Priority
+                                    Priority
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -287,15 +314,10 @@
                                         {{ $project->end_date ?? '-' }}</td>
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                         <div class="flex gap-2 justify-center">
-                                            <form action="{{ route('project.updateStatus', $project->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                <input type="hidden" name="status_id" value="4">
-                                                <button
-                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">
-                                                    Void
-                                                </button>
-                                            </form>
+                                            <button onclick="openVoidModal({{ $project->id }})"
+                                                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200">
+                                                Void
+                                            </button>
 
                                             <form action="{{ route('project.updateProgress', $project->id) }}"
                                                 method="POST">
@@ -305,6 +327,7 @@
                                                     class="px-3 py-1 bg-blue-600 text-white rounded">
                                                     Pilih
                                                 </button>
+
                                             </form>
                                         </div>
                                     </td>
@@ -320,9 +343,9 @@
             <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
-                    class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                    class="inline bg-green-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
                     Project Done</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto py-4">
                     <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                         <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                             <tr>
@@ -362,6 +385,10 @@
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     End Date
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    History
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
@@ -400,6 +427,13 @@
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->end_date ?? '-' }}</td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        <button onclick="showProjectModal({{ $project->id }})"
+                                            class="text-blue-500 hover:underline">
+                                            Lihat Detail
+                                        </button>
+                                    </td>
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                         <form action="{{ route('project.updateStatus', $project->id) }}"
                                             method="POST" class="inline">
@@ -423,9 +457,9 @@
             <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
-                    class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                    class="inline bg-orange-600 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
                     Project Pending</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto py-4">
                     <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                         <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                             <tr>
@@ -451,19 +485,15 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Percent
+                                    Progress Percent
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Date
+                                    Progress Date
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Description
-                                </th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Pending Reason
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -475,7 +505,7 @@
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Progress Percent
+                                    History
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
@@ -495,20 +525,38 @@
                                         {{ $project->project_name ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        {{ $project->request_date ?? '-' }}</td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->requestor->name ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $project->developer->name ?? '-' }}</td>
+                                        {{ $project->priority->priority_name ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $project->start_date ?? '-' }}</td>
+                                        {{ $project->progress_percent ?? '-' }}%</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $project->end_date ?? '-' }}</td>
+                                        {{ $project->progress_date ?? '-' }} </td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $project->progress_percent ?? '-' }} %</td>
-
+                                        {{ $project->description ?? '-' }} </td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        {{ $project->start_date ?? '-' }} </td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        {{ $project->end_date ?? '-' }} </td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                         <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    <button onclick="showProjectModal({{ $project->id }})"
+                                        class="text-blue-500 hover:underline">
+                                        Lihat Detail
+                                    </button>
+                                </td>
+                                    </td>
                                     <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                         <form action="{{ route('project.continueProgress', $project->id) }}"
                                             method="POST" class="inline">
@@ -532,9 +580,9 @@
             <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <h3
-                    class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                    class="inline bg-red-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
                     Project Void</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto py-4">
                     <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                         <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                             <tr>
@@ -566,6 +614,10 @@
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Description
+                                </th>
+                                <th
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    notes
                                 </th>
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -605,6 +657,9 @@
                                         {{ $project->description ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                        {{ $project->notes ?? '-' }}</td>
+                                    <td
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $project->start_date ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -618,8 +673,213 @@
             </div>
         </div>
 
+        <x-modal-table name="project-detail" title="Detail Project -  {{ $project->project_code }}">
+            <div id="projectModalBody">
+                <div class="p-6 text-center text-gray-500">
+                    <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    Loading...
+                </div>
+            </div>
+        </x-modal-table>
 
-        {{-- ============================================ Modal Form Pending ============================================ --}}
+        <script>
+            function showProjectModal(projectId) {
+                // tampilkan modal dulu (biar ada efek transisi)
+                window.dispatchEvent(new CustomEvent('open-modal', {
+                    detail: 'project-detail'
+                }));
+
+                // tampilkan indikator loading
+                const modalBody = document.getElementById('projectModalBody');
+                modalBody.innerHTML = `
+        <div class="p-6 text-center text-gray-500">
+            <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            Loading...
+        </div>
+    `;
+
+                // ambil konten dari route history
+                fetch(`/projects/${projectId}/history`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Gagal memuat data');
+                        return response.text();
+                    })
+                    .then(html => {
+                        modalBody.innerHTML = html;
+                    })
+                    .catch(err => {
+                        modalBody.innerHTML = `
+                <div class="p-6 text-center text-red-500">
+                    ⚠️ Gagal memuat data project (${err.message})
+                </div>
+            `;
+                    });
+            }
+        </script>
+
+
+
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                const isDark = document.documentElement.classList.contains('dark');
+
+                // =================== Developer Dropdown ===================
+                $(document).on('click', '#selected-developers', function() {
+                    $('#developer-dropdown').toggleClass('hidden');
+                    $('#dropdown-icon').toggleClass('rotate-180');
+                });
+
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
+                        $('#developer-dropdown').addClass('hidden');
+                        $('#dropdown-icon').removeClass('rotate-180');
+                    }
+                });
+
+                $(document).on('change', '.dev-checkbox', function() {
+                    const selected = [];
+                    $('.dev-checkbox:checked').each(function() {
+                        selected.push($(this).val());
+                    });
+                    const result = selected.join(' | ') || 'Pilih Developer...';
+                    $('#selected-text').text(result);
+                    $('#developer_name').val(selected.join(' | '));
+                });
+
+                // =================== Edit Modal ===================
+                window.openEditModal = function(button) {
+                    const projectId = $(button).data('id');
+                    const projectCode = $(button).data('code');
+                    const projectName = $(button).data('name');
+                    const progress = $(button).data('progress');
+                    const statusId = $(button).data('status');
+                    const developerName = $(button).data('developer');
+                    const memo = $(button).data('memo');
+
+                    $('#editProgressForm')[0].reset();
+                    $('.dev-checkbox').prop('checked', false);
+                    $('#dropdown-icon').removeClass('rotate-180');
+                    $('#developer-dropdown').addClass('hidden');
+
+                    $('#editProgressForm').attr('action', `/project/${projectId}`);
+                    $('#modal_project_code').val(projectCode);
+                    $('#modal_project_name').val(projectName);
+                    $('#modal_progress_percent').val(progress);
+                    $('#modal_status_id').val(statusId);
+                    $('#modal_memo').val(memo);
+
+                    if (developerName) {
+                        developerName.split(' | ').forEach(devName => {
+                            $(`.dev-checkbox[value="${devName.trim()}"]`).prop('checked', true);
+                        });
+                        $('#selected-text').text(developerName);
+                        $('#developer_name').val(developerName);
+                    } else {
+                        $('#selected-text').text('Pilih Developer...');
+                        $('#developer_name').val('');
+                    }
+
+                    const now = new Date();
+                    const datetime =
+                        `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                    $('#modal_progress_date').val(datetime);
+
+                    openModal('editProgressModal');
+                };
+
+                // =================== Pending Modal ===================
+                window.openPendingModal = function(projectId) {
+                    $('#pending_project_id').val(projectId);
+                    $('#pendingForm').attr('action', '/project/' + projectId + '/pending');
+                    openModal('pendingModal');
+                };
+
+                // =================== User Search ===================
+                const $input = $('#user-search');
+                const $results = $('#search-results');
+                const $hidden = $('#user-id');
+
+                if ($input.length) {
+                    $input.on('focus', () => $results.show());
+                    $input.on('input', function() {
+                        const val = $(this).val().toLowerCase();
+                        let visible = false;
+                        $results.children('li').each(function() {
+                            const match = $(this).text().toLowerCase().includes(val);
+                            $(this).toggle(match);
+                            if (match) visible = true;
+                        });
+                        $results.toggle(visible);
+                    });
+
+                    $results.on('click', 'li', function() {
+                        $input.val($(this).text());
+                        $hidden.val($(this).data('id'));
+                        $results.hide();
+                    });
+
+                    $(document).on('click', (e) => {
+                        if (!$(e.target).closest('#user-search, #search-results').length) {
+                            $results.hide();
+                        }
+                    });
+                }
+
+                // Tambahkan di dalam $(document).ready() bersama function lainnya
+
+                // =================== Void Modal ===================
+                window.openVoidModal = function(projectId) {
+                    // Reset form
+                    $('#voidForm')[0].reset();
+
+                    // Set action dengan route yang benar
+                    const actionUrl = "{{ route('project.updateStatus', ':id') }}".replace(':id', projectId);
+                    $('#voidForm').attr('action', actionUrl);
+
+                    // Buka modal
+                    openModal('voidModal');
+                };
+
+                // =================== Dark Mode Toggle Observer ===================
+                const observer = new MutationObserver(() => {
+                    const dark = document.documentElement.classList.contains('dark');
+                    // Update DataTable inputs, selects, pagination, info text
+                    $('div.dataTables_filter input, div.dataTables_length select').removeClass().addClass(
+                        `rounded-md border px-2 py-1 text-sm transition ${dark ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400' : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400'}`
+                    );
+                    $('div.dataTables_paginate a').each(function() {
+                        $(this).removeClass().addClass(
+                            `px-3 py-1 border rounded-md mx-1 text-sm font-medium transition ${dark ? 'border-gray-700 text-gray-100 hover:bg-gray-700' : 'border-gray-300 text-gray-800 hover:bg-gray-100'}`
+                        );
+                    });
+                    $('div.dataTables_info').removeClass().addClass(dark ? 'text-gray-400 text-sm mt-2' :
+                        'text-gray-600 text-sm mt-2');
+                });
+                observer.observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            });
+        </script>
+
+
+        <x-modal-table name="project-history-1" title="Project History" max-width="7xl">
+            @include('project.history')
+        </x-modal-table>
+
+        {{-- ============================================ MODAL FORM PENDING ============================================ --}}
         <x-modal-form id="pendingModal" title="Tambah Pending" size="max-w-md">
             <form id="pendingForm" method="POST">
                 @csrf
@@ -645,19 +905,9 @@
                         Pending</button>
                 </div>
             </form>
-
-            <script>
-                function openPendingModal(projectId) {
-                    document.getElementById('pending_project_id').value = projectId;
-                    // set dynamic form action
-                    document.getElementById('pendingForm').action = '/project/' + projectId + '/pending';
-                    openModal('pendingModal');
-                }
-            </script>
         </x-modal-form>
 
-
-        {{-- ============================================ Modal Form Edit ============================================ --}}
+        {{-- ============================================ MODAL FORM EDIT ============================================ --}}
         <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
             <form id="editProgressForm" method="POST">
                 @csrf
@@ -776,92 +1026,7 @@
             </form>
         </x-modal-form>
 
-        {{-- Script --}}
-        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-        <script>
-            function openEditModal(button) {
-                // Ambil data dari button yang diklik
-                const projectId = $(button).data('id');
-                const projectCode = $(button).data('code');
-                const projectName = $(button).data('name');
-                const progress = $(button).data('progress');
-                const statusId = $(button).data('status');
-                const developerName = $(button).data('developer');
-                const memo = $(button).data('memo');
-
-                console.log('Loading project ID:', projectId); // Debug untuk cek ID
-
-                // Reset form dulu
-                $('#editProgressForm')[0].reset();
-                $('.dev-checkbox').prop('checked', false);
-                $('#dropdown-icon').removeClass('rotate-180');
-                $('#developer-dropdown').addClass('hidden');
-
-                // Set form action URL
-                $('#editProgressForm').attr('action', `/project/${projectId}`);
-
-                // Isi data ke form
-                $('#modal_project_code').val(projectCode);
-                $('#modal_project_name').val(projectName);
-                $('#modal_progress_percent').val(progress);
-                $('#modal_status_id').val(statusId);
-                $('#modal_memo').val(memo);
-
-                // Set developer checkboxes
-                if (developerName) {
-                    const developers = developerName.split(' | ');
-                    developers.forEach(devName => {
-                        const trimmed = devName.trim();
-                        $(`.dev-checkbox[value="${trimmed}"]`).prop('checked', true);
-                    });
-                    $('#selected-text').text(developerName);
-                    $('#developer_name').val(developerName);
-                } else {
-                    $('#selected-text').text('Pilih Developer...');
-                    $('#developer_name').val('');
-                }
-
-                // Set progress date ke sekarang
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                $('#modal_progress_date').val(`${year}-${month}-${day}T${hours}:${minutes}`);
-
-                // Buka modal
-                openModal('editProgressModal');
-            }
-
-            // 🔹 Toggle dropdown
-            function toggleDropdown() {
-                $('#developer-dropdown').toggleClass('hidden');
-                $('#dropdown-icon').toggleClass('rotate-180');
-            }
-
-            // 🔹 Close dropdown on outside click
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
-                    $('#developer-dropdown').addClass('hidden');
-                    $('#dropdown-icon').removeClass('rotate-180');
-                }
-            });
-
-            // 🔹 Handle checkbox changes
-            $('.dev-checkbox').on('change', function() {
-                const selected = [];
-                $('.dev-checkbox:checked').each(function() {
-                    selected.push($(this).val());
-                });
-
-                const result = selected.join(' | ') || 'Pilih Developer...';
-                $('#selected-text').text(result);
-                $('#developer_name').val(selected.join(' | '));
-            });
-        </script>
-
-        {{-- ============================================ Modal Form Tambah ============================================ --}}
+        {{-- ============================================ MODAL FORM TAMBAH ============================================ --}}
         <x-modal-form id="projectModal" title="Tambah Project" size="max-w-4xl">
             <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -967,42 +1132,36 @@
                         Project</button>
                 </div>
             </form>
-
-            {{-- Script untuk User Search --}}
-            <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-            <script>
-                $(function() {
-                    const $input = $('#user-search');
-                    const $results = $('#search-results');
-                    const $hidden = $('#user-id');
-
-                    $input.on('focus', () => $results.show());
-                    $input.on('input', function() {
-                        const val = $(this).val().toLowerCase();
-                        let visible = false;
-
-                        $results.children('li').each(function() {
-                            const match = $(this).text().toLowerCase().includes(val);
-                            $(this).toggle(match);
-                            if (match) visible = true;
-                        });
-                        $results.toggle(visible);
-                    });
-
-                    $results.on('click', 'li', function() {
-                        $input.val($(this).text());
-                        $hidden.val($(this).data('id'));
-                        $results.hide();
-                    });
-
-                    $(document).on('click', (e) => {
-                        if (!$(e.target).closest('#user-search, #search-results').length) {
-                            $results.hide();
-                        }
-                    });
-                });
-            </script>
-
         </x-modal-form>
 
+        {{-- ============================================ MODAL FORM VOID ============================================ --}}
+        <x-modal-form id="voidModal" title="Void Project" size="max-w-md">
+            <form id="voidForm" method="POST">
+                @csrf
+                <input type="hidden" name="status_id" value="4">
+
+                {{-- Notes --}}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Notes <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="notes" required placeholder="Tulis alasan void..." rows="4"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2
+                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                    focus:outline-none focus:ring-red-500 focus:border-red-500 resize-none"></textarea>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('voidModal')"
+                        class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                        Void Project
+                    </button>
+                </div>
+            </form>
+        </x-modal-form>
 </x-app-layout>

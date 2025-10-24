@@ -97,12 +97,12 @@ Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->na
 Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
 Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
 Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
+Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');
 Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
 Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
 Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
 Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
-
-
+Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
 
 
 
