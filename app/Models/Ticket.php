@@ -39,25 +39,32 @@ class Ticket extends Model
     ];
 
     // ==================== RELATIONSHIPS ====================
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function support(){
+    public function support()
+    {
         return $this->belongsTo(User::class, 'support_id');
     }
-    public function problemCategory(){
+    public function problemCategory()
+    {
         return $this->belongsTo(ProblemCategory::class);
     }
-    public function assets(){
+    public function assets()
+    {
         return $this->belongsTo(Assets::class);
     }
-    public function status(){
+    public function status()
+    {
         return $this->belongsTo(Status::class);
     }
-    public function priority(){
+    public function priority()
+    {
         return $this->belongsTo(Priority::class);
     }
-    public function feedback(){
+    public function feedback()
+    {
         return $this->hasOne(Feedback::class, 'ticket_id');
     }
 
@@ -73,21 +80,26 @@ class Ticket extends Model
     }
 
     // ==================== FILTER TABLE BY STATUS ====================
-    public function scopeByStatus($query, $status){
+    public function scopeByStatus($query, $status)
+    {
         return $query->whereHas('status', fn($q) => $q->where('status_name', $status));
     }
-    public function scopeWaiting($query){
+    public function scopeWaiting($query)
+    {
         return $this->scopeByStatus($query, 'Waiting');
     }
-    public function scopeInProgress($query){
+    public function scopeInProgress($query)
+    {
         return $this->scopeByStatus($query, 'In Progress');
     }
-    public function scopeDone($query){
+    public function scopeDone($query)
+    {
         return $query->whereHas('status', function ($q) {
-            $q->whereIn('status_name', ['Done', 'Feedback']);
+             $q->whereIn('id', [3,5]);
         });
     }
-    public function scopeVoid($query){
+    public function scopeVoid($query)
+    {
         return $this->scopeByStatus($query, 'Void');
     }
 
@@ -114,6 +126,7 @@ class Ticket extends Model
         $developers = User::where('role_id', 1)->get();
         $priorities = Priority::all();
 
+
         return [
             'locations'       => $locations,
             'users'           => $users,
@@ -126,22 +139,49 @@ class Ticket extends Model
         ];
     }
 
-   // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
-public static function getStatsFiltered($start = null, $end = null){
-    // Hitung status lain TANPA filter tanggal
-    $waitingCount    = self::waiting()->count();
-    $inProgressCount = self::inProgress()->count();
-    $voidCount       = self::void()->count();
+    // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
+    public static function getStatsFiltered($start = null, $end = null)
+    {
+        // Hitung status lain TANPA filter tanggal
+        $waitingCount    = self::waiting()->count();
+        $inProgressCount = self::inProgress()->count();
+        $voidCount       = self::void()->count();
 
-    // DONE difilter berdasarkan request_date
-    $doneCount = self::done()->betweenRequestDates($start, $end)->count();
+        // DONE difilter berdasarkan request_date
+        $doneCount = self::done()->betweenRequestDates($start, $end)->count();
 
-    return [
-        'waiting'     => $waitingCount,
-        'in_progress' => $inProgressCount,
-        'done'        => $doneCount,
-        'void'        => $voidCount,
-    ];
-}
+        return [
+            'waiting'     => $waitingCount,
+            'in_progress' => $inProgressCount,
+            'done'        => $doneCount,
+            'void'        => $voidCount,
+        ];
+    }
 
+    public static function Statistik($query)
+    {
+        $waiting    = (clone $query)->waiting()->count();
+        $inProgress = (clone $query)->inProgress()->count();
+        $done       = (clone $query)->done()->count();
+        $void       = (clone $query)->void()->count();
+        $totalAll   = $waiting + $inProgress + $done + $void;
+        $totalValid = $waiting  + $inProgress + $done;
+
+        // ======================== Statistik tambahan ========================
+        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
+        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
+        $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
+
+        $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
+        $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
+
+        return [
+            'avg_waiting'     => $avgWaiting,
+            'avg_time_spent'  => $avgTimeSpent,
+            'sum_time_spent'  => $sumTimeSpent,
+            'sla'             => $slaPercent,
+        ];
+    }
+
+ 
 }

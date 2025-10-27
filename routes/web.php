@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -104,7 +105,10 @@ Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'st
 Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
 Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
 
-
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reports/ticket-category', function () {
+        return view('reports.ExcecutiveTicketsInsight');
+    })->name('reports.ticket-category');
+});
 
 require __DIR__ . '/auth.php';

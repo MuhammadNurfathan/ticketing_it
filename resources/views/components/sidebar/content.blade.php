@@ -1,4 +1,3 @@
-
 <x-perfect-scrollbar as="nav" aria-label="main" class="flex flex-col flex-1 gap-4 px-3">
     {{-- Dashboard --}}
     <x-sidebar.link title="Dashboard" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
@@ -6,17 +5,20 @@
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
-      {{-- Dashboard Ticket --}}
-        <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.indexUser') }}" :isActive="request()->routeIs('DashboardTicketsUser.indexUser')">
-            <x-slot name="icon">
-                <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-            </x-slot>
-        </x-sidebar.link>
-        <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
-            <x-slot name="icon">
-                <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-            </x-slot>
-        </x-sidebar.link>
+
+
+
+    {{-- Dashboard Ticket --}}
+    <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.indexUser') }}" :isActive="request()->routeIs('DashboardTicketsUser.indexUser')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
+    <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
 
     {{-- Dashboard Ticket --}}
     <x-sidebar.link title="All Tickets" href="{{ route('DashboardTicketsAdmin.index') }}" :isActive="request()->routeIs('DashboardTicketsAdmin.index')">
@@ -31,12 +33,16 @@
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
         </x-sidebar.link>
-
-        {{-- <x-sidebar.link title="Dashboard Ticket" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
+        <x-sidebar.dropdown title="Tickets Reports" :active="request()->routeIs('reports.ticket-category.*')" :open="request()->routeIs('reports.ticket-category.*')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
-        </x-sidebar.link> --}}
+            <x-sidebar.link title="Excecutive Tickets Insight" href="{{ route('reports.ticket-category') }}"
+                :isActive="request()->routeIs('reports.ticket-category')" />
+
+        </x-sidebar.dropdown>
+
+
 
         {{-- Master Data Dropdown --}}
         <x-sidebar.dropdown title="Master Data" :active="request()->routeIs('locations.*') ||
@@ -103,7 +109,7 @@
     @endif
 
 
-      
+
 
 
 </x-perfect-scrollbar>

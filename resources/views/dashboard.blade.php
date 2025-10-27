@@ -73,20 +73,6 @@
                 <div class="w-full h-full hidden lg:block"></div>
             </div>
 
-            {{-- INFO SECTION --}}
-            {{-- <div
-                class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl p-12 text-center border border-blue-100 dark:border-gray-700">
-                <div class="max-w-3xl mx-auto">
-                    <h2
-                        class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-4">
-                        Manage Everything In One Place 🎯
-                    </h2>
-                    <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-                        Streamline your workflow with our powerful ticket management system.
-                        Track progress, collaborate with your team, and deliver exceptional results effortlessly.
-                    </p>
-                </div>
-            </div> --}}
 
         </main>
     </div>
