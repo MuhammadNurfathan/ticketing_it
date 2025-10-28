@@ -25,7 +25,7 @@ module.exports = {
                     "text-muted": "#6B7280",
                 },
                 light: {
-                    bg: "#FFFFFF",
+                    bg: "red-500",
                     "eval-1": "#F7F8FA",
                     "eval-2": "#F0F2F5",
                     "eval-3": "#E8EAED",
