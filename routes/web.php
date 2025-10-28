@@ -106,9 +106,14 @@ Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'c
 Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/reports/ticket-category', function () {
+    Route::get('/reports/ExcecutiveTicketsInsight', function () {
         return view('reports.ExcecutiveTicketsInsight');
-    })->name('reports.ticket-category');
+    })->name('reports.ExcecutiveTicketsInsight');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reports/TeamPerformanceTracker', function () {
+        return view('reports.TeamPerformanceTracker');
+    })->name('reports.TeamPerformanceTracker');
+});
 require __DIR__ . '/auth.php';

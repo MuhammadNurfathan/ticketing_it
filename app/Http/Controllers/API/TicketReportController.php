@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\API;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
@@ -158,103 +160,344 @@ class TicketReportController extends Controller
     }
 }
 
-
-public function chartTicketsByDev()
+public function chartTicketsByDev(Request $request)
 {
-    // Ambil semua user dengan role_id = 1 (developer)
-    $developers = User::where('role_id', 1)->get();
+    $year = $request->input('year', now()->year);
 
-    // Buat daftar 6 bulan terakhir, format 'Y-m'
-    $months = collect(range(0, 5))
-        ->map(function($i) {
-            return now()->subMonths($i)->format('Y-m');
-        })
-        ->reverse();
+    $tickets = Ticket::selectRaw('support_id, MONTH(end_date) as month, COUNT(*) as total')
+        ->whereYear('end_date', $year)
+        ->done()
+        ->groupBy('support_id', 'month')
+        ->get();
 
-    // Ubah ke format bulan untuk label chart, misal 'Oct 2025'
-    $labels = $months->map(function($month) {
-        return \Carbon\Carbon::parse($month.'-01')->format('M Y');
-    })->values()->toArray();
+    $months = range(1, 12);
+    $supports = User::whereHas('role', fn($q) => $q->where('id', 1))->get();
 
     $datasets = [];
-
-    // Loop tiap developer
-    foreach ($developers as $user) {
+    foreach ($supports as $support) {
         $data = [];
-
-        // Loop tiap bulan
-        foreach ($months as $month) {
-            [$year, $mon] = explode('-', $month);
-
-            // Hitung tiket yang sudah Done atau Feedback
-            $ticketCount = Ticket::where('support_id', $user->id)
-                ->done() // scope Done sudah termasuk Feedback
-                ->whereYear('request_date', $year)
-                ->whereMonth('request_date', $mon)
-                ->count();
-
-            $data[] = $ticketCount;
+        foreach ($months as $m) {
+            $count = $tickets->where('support_id', $support->id)
+                ->where('month', $m)
+                ->sum('total');
+            $data[] = $count;
         }
-
-        // Tambahkan ke datasets
         $datasets[] = [
-            'label' => $user->name, // nama developer
-            'data' => $data,        // jumlah tiket per bulan
-            'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
-            'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
-            'borderWidth' => 1
-        ];
-    }
-
-    // Kembalikan response JSON untuk Chart.js
-    return response()->json([
-        'labels' => $labels,   // horizontal: bulan
-        'datasets' => $datasets // tiap developer satu dataset
-    ]);
-}
-
-
-public function chartTimeSpentByDev()
-{
-    $developers = User::where('role_id', 1)->get();
-
-    $months = collect(range(0, 5))
-        ->map(fn($i) => now()->subMonths($i)->format('Y-m'))
-        ->reverse();
-
-    $labels = $months->map(fn($m) => \Carbon\Carbon::parse($m.'-01')->format('M Y'))->values()->toArray();
-
-    $datasets = [];
-
-    foreach ($developers as $user) {
-        $data = [];
-        foreach ($months as $month) {
-            [$year, $mon] = explode('-', $month);
-
-            $totalTime = Ticket::where('support_id', $user->id)
-                ->done() // Done atau Feedback
-                ->whereYear('request_date', $year)
-                ->whereMonth('request_date', $mon)
-                ->sum('time_spent');
-
-            $data[] = $totalTime;
-        }
-
-        $datasets[] = [
-            'label' => $user->name,
+            'label' => $support->name,
             'data' => $data,
-            'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
-            'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
-            'borderWidth' => 1
+            'backgroundColor' => 'rgba(' . rand(0,255) . ',' . rand(0,255) . ',' . rand(0,255) . ', 0.6)',
         ];
     }
 
     return response()->json([
-        'labels' => $labels,
-        'datasets' => $datasets
+        'success' => true,
+        'data' => [
+            'labels' => ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+            'datasets' => $datasets
+        ]
     ]);
 }
 
+public function chartTimeSpentByDev(Request $request)
+{
+    $year = $request->input('year', now()->year);
 
+    $tickets = Ticket::selectRaw('support_id, MONTH(end_date) as month, SUM(time_spent) as total_minutes')
+        ->whereYear('end_date', $year)
+        ->done()
+        ->groupBy('support_id', 'month')
+        ->get();
+
+    $months = range(1, 12);
+    $supports = User::whereHas('role', fn($q) => $q->where('id', 1))->get();
+
+    $datasets = [];
+    foreach ($supports as $support) {
+        $data = [];
+        foreach ($months as $m) {
+            $minutes = $tickets->where('support_id', $support->id)
+                ->where('month', $m)
+                ->sum('total_minutes');
+            $data[] = round($minutes / 60, 2); // convert to hours
+        }
+        $datasets[] = [
+            'label' => $support->name,
+            'data' => $data,
+            'backgroundColor' => 'rgba(' . rand(0,255) . ',' . rand(0,255) . ',' . rand(0,255) . ', 0.6)',
+        ];
+    }
+
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'labels' => ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+            'datasets' => $datasets
+        ]
+    ]);
+}
+
+public function ticketsBySupport (Request $request){
+    $date = $request->query('date'); // contoh: 2025-10-28
+
+    $ticketsAzi = Ticket::where('support_id', 2)
+        ->where('status_id', 3)
+        ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        ->select('ticket_code', 'problem', 'solution')
+        ->get();
+
+    $ticketsApri = Ticket::where('support_id', 3)
+        ->where('status_id', 3)
+        ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        ->select('ticket_code', 'problem', 'solution')
+        ->get();
+
+    $ticketsBayu = Ticket::where('support_id', 4)
+        ->where('status_id', 3)
+        ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        ->select('ticket_code', 'problem', 'solution')
+        ->get();
+
+    $ticketsFatih = Ticket::where('support_id', 5)
+        ->where('status_id', 3)
+        ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        ->select('ticket_code', 'problem', 'solution')
+        ->get();
+
+    return response()->json([
+        'data' => [
+            'ticketsAzi' => $ticketsAzi,
+            'ticketsApri' => $ticketsApri,
+            'ticketsBayu' => $ticketsBayu,
+            'ticketsFatih' => $ticketsFatih,
+        ],
+        'filter' => [
+            'date' => $date,
+        ],
+    ]);
 
 }
+
+public function export(Request $request): StreamedResponse
+{
+    $startDate = $request->query('start_date');
+    $endDate   = $request->query('end_date');
+
+    // Ambil semua tiket berdasarkan tanggal dibuat
+    $tickets = Ticket::with(['user', 'support', 'status'])
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->orderBy('created_at', 'asc')
+        ->get([
+            'ticket_code',
+            'user_id',
+            'support_id',
+            'problem_category_id',
+            'status_id',
+            'problem',
+            'solution',
+            'notes',
+            'start_date',
+            'end_date',
+            'time_spent',
+            'is_late',
+            'created_at',
+        ]);
+
+    $filename = "Data Ticket {$startDate} - {$endDate}.csv";
+
+    $headers = [
+        "Content-Type"        => "text/csv",
+        "Content-Disposition" => "attachment; filename={$filename}",
+        "Pragma"              => "no-cache",
+        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        "Expires"             => "0",
+    ];
+
+    // Kolom CSV
+    $columns = [
+        'Ticket Code',
+        'Requestor Name',
+        'Support Name',
+        'Problem',
+        'Solution',
+        'Notes',
+        'Status ID',
+        'Start Date',
+        'End Date',
+        'Time Spent (Minutes)',
+        'Is Late',
+        'Created At',
+    ];
+
+    // Stream CSV ke browser
+    $callback = function () use ($tickets, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+
+        foreach ($tickets as $ticket) {
+            fputcsv($file, [
+                $ticket->ticket_code,
+                optional($ticket->user)->name,
+                optional($ticket->support)->name,
+                $ticket->problem,
+                $ticket->solution,
+                $ticket->notes,
+                $ticket->status_id,
+                $ticket->start_date,
+                $ticket->end_date,
+                $ticket->time_spent,
+                $ticket->is_late ? 'Yes' : 'No',
+                $ticket->created_at,
+            ]);
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
+
+ public function preview(Request $request)
+    {
+        $startDate = $request->query('start_date');
+        $endDate   = $request->query('end_date');
+
+        if (!$startDate || !$endDate) {
+            return response()->json(['error' => 'Tanggal mulai dan akhir wajib diisi'], 400);
+        }
+
+        $tickets = Ticket::with(['user', 'support', 'status'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc')
+            ->limit(50) // biar ringan
+            ->get([
+                'ticket_code',
+                'user_id',
+                'support_id',
+                'problem',
+                'solution',
+                'notes',
+                'status_id',
+                'start_date',
+                'end_date',
+                'time_spent',
+                'is_late',
+                'created_at',
+            ])
+            ->map(function ($t) {
+                return [
+                    'ticket_code' => $t->ticket_code,
+                    'requestor_name' => optional($t->user)->name ?? '-',
+                    'support_name' => optional($t->support)->name ?? '-',
+                    'problem' => $t->problem ?? '-',
+                    'solution' => $t->solution ?? '-',
+                    'notes' => $t->notes ?? '-',
+                    'status' => optional($t->status)->name ?? '-',
+                    'start_date' => $t->start_date ? $t->start_date->format('Y-m-d H:i') : '-',
+                    'end_date' => $t->end_date ? $t->end_date->format('Y-m-d H:i') : '-',
+                    'time_spent' => $t->time_spent ?? 0,
+                    'is_late' => $t->is_late ? 'Yes' : 'No',
+                    'created_at' => $t->created_at ? $t->created_at->format('Y-m-d H:i') : '-',
+                ];
+            });
+
+        return response()->json(['data' => $tickets]);
+    }
+
+}
+
+// public function chartTicketsByDev()
+// {
+//     // Ambil semua user dengan role_id = 1 (developer)
+//     $developers = User::where('role_id', 1)->get();
+
+//     // Buat daftar 6 bulan terakhir, format 'Y-m'
+//     $months = collect(range(0, 5))
+//         ->map(function($i) {
+//             return now()->subMonths($i)->format('Y-m');
+//         })
+//         ->reverse();
+
+//     // Ubah ke format bulan untuk label chart, misal 'Oct 2025'
+//     $labels = $months->map(function($month) {
+//         return \Carbon\Carbon::parse($month.'-01')->format('M Y');
+//     })->values()->toArray();
+
+//     $datasets = [];
+
+//     // Loop tiap developer
+//     foreach ($developers as $user) {
+//         $data = [];
+
+//         // Loop tiap bulan
+//         foreach ($months as $month) {
+//             [$year, $mon] = explode('-', $month);
+
+//             // Hitung tiket yang sudah Done atau Feedback
+//             $ticketCount = Ticket::where('support_id', $user->id)
+//                 ->done() // scope Done sudah termasuk Feedback
+//                 ->whereYear('request_date', $year)
+//                 ->whereMonth('request_date', $mon)
+//                 ->count();
+
+//             $data[] = $ticketCount;
+//         }
+
+//         // Tambahkan ke datasets
+//         $datasets[] = [
+//             'label' => $user->name, // nama developer
+//             'data' => $data,        // jumlah tiket per bulan
+//             'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
+//             'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
+//             'borderWidth' => 1
+//         ];
+//     }
+
+//     // Kembalikan response JSON untuk Chart.js
+//     return response()->json([
+//         'labels' => $labels,   // horizontal: bulan
+//         'datasets' => $datasets // tiap developer satu dataset
+//     ]);
+// }
+
+
+// public function chartTimeSpentByDev()
+// {
+//     $developers = User::where('role_id', 1)->get();
+
+//     $months = collect(range(0, 5))
+//         ->map(fn($i) => now()->subMonths($i)->format('Y-m'))
+//         ->reverse();
+
+//     $labels = $months->map(fn($m) => \Carbon\Carbon::parse($m.'-01')->format('M Y'))->values()->toArray();
+
+//     $datasets = [];
+
+//     foreach ($developers as $user) {
+//         $data = [];
+//         foreach ($months as $month) {
+//             [$year, $mon] = explode('-', $month);
+
+//             $totalTime = Ticket::where('support_id', $user->id)
+//                 ->done() // Done atau Feedback
+//                 ->whereYear('request_date', $year)
+//                 ->whereMonth('request_date', $mon)
+//                 ->sum('time_spent');
+
+//             $data[] = $totalTime;
+//         }
+
+//         $datasets[] = [
+//             'label' => $user->name,
+//             'data' => $data,
+//             'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
+//             'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
+//             'borderWidth' => 1
+//         ];
+//     }
+
+//     return response()->json([
+//         'labels' => $labels,
+//         'datasets' => $datasets
+//     ]);
+// }
+

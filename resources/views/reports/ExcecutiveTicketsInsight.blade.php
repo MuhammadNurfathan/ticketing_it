@@ -147,54 +147,12 @@
                     </div>
                 </div>
             </div>
-        
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <div class="p-6">
-                <div class="chart-container" style="max-width: 600px;">
-                    <canvas id="myBarChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-            <div class="p-6">
-                <div class="chart-container" style="max-width: 600px;">
-                    <canvas id="timeSpentChart"></canvas>
-                </div>
-            </div>
-        </div>
+
+
         </div>
     </div>
 
-<canvas id="myBarChart"></canvas>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('myBarChart').getContext('2d');
 
-    fetch('/api/chart-tickets-by-Dev')
-      .then(res => res.json())
-    .then(res => {
-        const ctx = document.getElementById('myBarChart').getContext('2d');
-        window.initBarChart(ctx, res.labels, res.datasets);
-    });
-});
-</script>
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('timeSpentChart').getContext('2d');
-
-    fetch('/api/chart-time-spent-by-dev')
-        .then(res => res.json())
-        .then(res => {
-            const ctx = document.getElementById('timeSpentChart').getContext('2d');
-            window.initBarChart(ctx, res.labels, res.datasets);
-        });
-});
-</script>
 
 
 

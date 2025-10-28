@@ -6,8 +6,6 @@
         </x-slot>
     </x-sidebar.link>
 
-
-
     {{-- Dashboard Ticket --}}
     <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.indexUser') }}" :isActive="request()->routeIs('DashboardTicketsUser.indexUser')">
         <x-slot name="icon">
@@ -20,12 +18,6 @@
         </x-slot>
     </x-sidebar.link>
 
-    {{-- Dashboard Ticket --}}
-    <x-sidebar.link title="All Tickets" href="{{ route('DashboardTicketsAdmin.index') }}" :isActive="request()->routeIs('DashboardTicketsAdmin.index')">
-        <x-slot name="icon">
-            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-        </x-slot>
-    </x-sidebar.link>
 
     @if (auth()->user()->role_id == 2)
         <x-sidebar.link title="All Project" href="{{ route('project.index') }}" :isActive="request()->routeIs('project.*')">
@@ -33,15 +25,18 @@
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
         </x-sidebar.link>
-        <x-sidebar.dropdown title="Tickets Reports" :active="request()->routeIs('reports.ticket-category.*')" :open="request()->routeIs('reports.ticket-category.*')">
+        <x-sidebar.dropdown title="Tickets Monitoring" :active="request()->routeIs('reports.ExcecutiveTicketsInsight', 'reports.TeamPerformanceTracker','DashboardTicketsAdmin.index')" :open="request()->routeIs('reports.ExcecutiveTicketsInsight', 'reports.TeamPerformanceTracker','DashboardTicketsAdmin.index')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
-            <x-sidebar.link title="Excecutive Tickets Insight" href="{{ route('reports.ticket-category') }}"
-                :isActive="request()->routeIs('reports.ticket-category')" />
 
+            <x-sidebar.link title="Tickets Overview" href="{{ route('DashboardTicketsAdmin.index') }}"
+                :isActive="request()->routeIs('DashboardTicketsAdmin.index')" />
+            <x-sidebar.link title="Excecutive Tickets Insight" href="{{ route('reports.ExcecutiveTicketsInsight') }}"
+                :isActive="request()->routeIs('reports.ExcecutiveTicketsInsight')" />
+            <x-sidebar.link title="Team Performance Tracker" href="{{ route('reports.TeamPerformanceTracker') }}"
+                :isActive="request()->routeIs('reports.TeamPerformanceTracker')" />
         </x-sidebar.dropdown>
-
 
 
         {{-- Master Data Dropdown --}}
