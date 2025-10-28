@@ -357,6 +357,113 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
+<style>
+
+/* === WRAPPER / CONTAINER === */
+div.dataTables_wrapper {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background-color: var(--dt-bg);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* === MODE VARIABLE === */
+:root {
+    --dt-bg: #f9fafb; /* Light default */
+    --dt-text: #1f2937;
+    --dt-border: #e5e7eb;
+    --dt-hover: rgba(59, 130, 246, 0.08);
+    --dt-head-bg: #f3f4f6;
+    --dt-head-text: #374151;
+}
+
+.dark {
+    --dt-bg: #1f2937;
+    --dt-text: #f3f4f6;
+    --dt-border: #374151;
+    --dt-hover: rgba(59, 130, 246, 0.15);
+    --dt-head-bg: #111827;
+    --dt-head-text: #d1d5db;
+}
+
+/* === DATATABLE ELEMENT SPACING === */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    margin-bottom: 1rem;
+    color: var(--dt-text);
+}
+
+/* === FILTER & LENGTH === */
+.dataTables_wrapper .dataTables_filter {
+    margin-right: 1rem;
+}
+.dataTables_wrapper .dataTables_length {
+    margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_length label {
+    padding: 0.25rem 0.5rem;
+}
+
+/* === TABLE CORE === */
+table.dataTable {
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    width: 100% !important;
+    border-spacing: 0 !important;
+    color: var(--dt-text);
+    border-color: var(--dt-border);
+    background-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* === HEADER === */
+table.dataTable thead {
+    background-color: var(--dt-head-bg);
+    color: var(--dt-head-text);
+}
+
+table.dataTable th {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border-bottom: 2px solid var(--dt-border);
+    font-weight: 600;
+}
+
+/* === BODY === */
+table.dataTable td {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--dt-border);
+}
+
+/* === HOVER EFFECT === */
+table.dataTable tbody tr {
+    transition: background-color 0.2s ease;
+}
+table.dataTable tbody tr:hover {
+    background-color: var(--dt-hover);
+}
+
+/* === PAGINATION === */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: transparent;
+    color: var(--dt-text) !important;
+    border: 1px solid var(--dt-border);
+    border-radius: 0.375rem;
+    padding: 0.3rem 0.6rem;
+    margin: 0 2px;
+    transition: all 0.
+
+</style>
+
     {{-- SCRIPTS --}}
     <script>
         $(document).ready(function() {

@@ -133,7 +133,6 @@ class ProjectController extends Controller
             'description'    => 'nullable|string',
             'start_date'     => 'nullable|date',
             'end_date'       => 'nullable|date|after_or_equal:start_date',
-            'notes'          => 'nullable|string',
         ]);
         $validated['request_date'] = now();
 

@@ -29,7 +29,7 @@
             <div class="overflow-x-auto">
                 <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                     <div class="flex gap-4 text-sm mb-4 text-gray-600 dark:text-gray-400">
-                        <div>Total: {{ $feedback->count() }}</div>
+                        <div>Total: {{ $feedback->count() }} | Average Rate: {{ $Rate}}</div>
                     </div>
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
@@ -40,6 +40,9 @@
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Requestor</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                IT Support</th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Deskripsi</th>
@@ -62,11 +65,15 @@
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $f->ticket->support->name }}
+                                </td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $f->description }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $f->rating }}
+                                    {{ $f->rating }}/5
                                 </td>
                             </tr>
                         @endforeach
