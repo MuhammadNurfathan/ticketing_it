@@ -1,31 +1,43 @@
 <x-perfect-scrollbar as="nav" aria-label="main" class="flex flex-col flex-1 gap-4 px-3">
-    {{-- Dashboard --}}
+
     <x-sidebar.link title="Dashboard" href="{{ route('dashboard') }}" :isActive="request()->routeIs('dashboard')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
 
-    {{-- Dashboard Ticket --}}
     <x-sidebar.link title="My Tickets" href="{{ route('DashboardTicketsUser.indexUser') }}" :isActive="request()->routeIs('DashboardTicketsUser.indexUser')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
+
     <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
         </x-slot>
     </x-sidebar.link>
 
-
     @if (auth()->user()->role_id == 2)
+        <x-sidebar.link title="Project Monitoring" href="{{ route('reports.ProjectMonitoring') }}" :isActive="request()->routeIs('reports.ProjectMonitoring')">
+            <x-slot name="icon">
+                <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+            </x-slot>
+        </x-sidebar.link>
         <x-sidebar.link title="All Project" href="{{ route('project.index') }}" :isActive="request()->routeIs('project.*')">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
         </x-sidebar.link>
-        <x-sidebar.dropdown title="Tickets Monitoring" :active="request()->routeIs('reports.ExcecutiveTicketsInsight', 'reports.TeamPerformanceTracker','DashboardTicketsAdmin.index')" :open="request()->routeIs('reports.ExcecutiveTicketsInsight', 'reports.TeamPerformanceTracker','DashboardTicketsAdmin.index')">
+        <x-sidebar.dropdown title="Tickets Monitoring" :active="request()->routeIs(
+            'reports.ExcecutiveTicketsInsight',
+            'reports.TeamPerformanceTracker',
+            'DashboardTicketsAdmin.index',
+        )" :open="request()->routeIs(
+            'reports.ExcecutiveTicketsInsight',
+            'reports.TeamPerformanceTracker',
+            'DashboardTicketsAdmin.index',
+        )">
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
@@ -38,8 +50,6 @@
                 :isActive="request()->routeIs('reports.TeamPerformanceTracker')" />
         </x-sidebar.dropdown>
 
-
-        {{-- Master Data Dropdown --}}
         <x-sidebar.dropdown title="Master Data" :active="request()->routeIs('locations.*') ||
             request()->routeIs('departments.*') ||
             request()->routeIs('users.*') ||
@@ -55,6 +65,7 @@
             request()->routeIs('status.*') ||
             request()->routeIs('priority.*') ||
             request()->routeIs('assets.*')">
+
             <x-slot name="icon">
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
@@ -102,9 +113,5 @@
             <x-sidebar.link title="Assets" href="{{ route('assets.index') }}" :isActive="request()->routeIs('assets.*')" />
         </x-sidebar.dropdown>
     @endif
-
-
-
-
 
 </x-perfect-scrollbar>

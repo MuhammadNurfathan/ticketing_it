@@ -116,4 +116,9 @@ Route::middleware(['auth'])->group(function () {
         return view('reports.TeamPerformanceTracker');
     })->name('reports.TeamPerformanceTracker');
 });
+Route::middleware(['auth'])->group(function () {
+    Route::get('/reports/ProjectMonitoring', function () {
+        return view('reports.ProjectMonitoring');
+    })->name('reports.ProjectMonitoring');
+});
 require __DIR__ . '/auth.php';

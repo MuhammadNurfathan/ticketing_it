@@ -1,8 +1,8 @@
 <?php
 // routes/api.php
 
+use App\Http\Controllers\api\ProjectReportController;
 use App\Http\Controllers\API\TicketReportController;
-use App\Models\Ticket;
 use Illuminate\Support\Facades\Route;
 
 // Pie Chart - Tickets by Category
@@ -17,4 +17,5 @@ Route::get('/chart-time-spent-by-dev', [TicketReportController::class, 'chartTim
 Route::get('/tickets-by-support', [TicketReportController::class, 'ticketsBySupport']);
 Route::get('/tickets/preview', [TicketReportController::class, 'preview']);
 Route::get('/tickets/export', [TicketReportController::class, 'export']);
-
+Route::get('/ProjectQueue', [ProjectReportController::class, 'ProjectQueue']);
+Route::get('/ProjectMonitorGraph', [ProjectReportController::class, 'gantChart']);

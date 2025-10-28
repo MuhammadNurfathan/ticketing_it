@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-
-
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
@@ -404,100 +402,3 @@ public function export(Request $request): StreamedResponse
     }
 
 }
-
-// public function chartTicketsByDev()
-// {
-//     // Ambil semua user dengan role_id = 1 (developer)
-//     $developers = User::where('role_id', 1)->get();
-
-//     // Buat daftar 6 bulan terakhir, format 'Y-m'
-//     $months = collect(range(0, 5))
-//         ->map(function($i) {
-//             return now()->subMonths($i)->format('Y-m');
-//         })
-//         ->reverse();
-
-//     // Ubah ke format bulan untuk label chart, misal 'Oct 2025'
-//     $labels = $months->map(function($month) {
-//         return \Carbon\Carbon::parse($month.'-01')->format('M Y');
-//     })->values()->toArray();
-
-//     $datasets = [];
-
-//     // Loop tiap developer
-//     foreach ($developers as $user) {
-//         $data = [];
-
-//         // Loop tiap bulan
-//         foreach ($months as $month) {
-//             [$year, $mon] = explode('-', $month);
-
-//             // Hitung tiket yang sudah Done atau Feedback
-//             $ticketCount = Ticket::where('support_id', $user->id)
-//                 ->done() // scope Done sudah termasuk Feedback
-//                 ->whereYear('request_date', $year)
-//                 ->whereMonth('request_date', $mon)
-//                 ->count();
-
-//             $data[] = $ticketCount;
-//         }
-
-//         // Tambahkan ke datasets
-//         $datasets[] = [
-//             'label' => $user->name, // nama developer
-//             'data' => $data,        // jumlah tiket per bulan
-//             'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
-//             'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
-//             'borderWidth' => 1
-//         ];
-//     }
-
-//     // Kembalikan response JSON untuk Chart.js
-//     return response()->json([
-//         'labels' => $labels,   // horizontal: bulan
-//         'datasets' => $datasets // tiap developer satu dataset
-//     ]);
-// }
-
-
-// public function chartTimeSpentByDev()
-// {
-//     $developers = User::where('role_id', 1)->get();
-
-//     $months = collect(range(0, 5))
-//         ->map(fn($i) => now()->subMonths($i)->format('Y-m'))
-//         ->reverse();
-
-//     $labels = $months->map(fn($m) => \Carbon\Carbon::parse($m.'-01')->format('M Y'))->values()->toArray();
-
-//     $datasets = [];
-
-//     foreach ($developers as $user) {
-//         $data = [];
-//         foreach ($months as $month) {
-//             [$year, $mon] = explode('-', $month);
-
-//             $totalTime = Ticket::where('support_id', $user->id)
-//                 ->done() // Done atau Feedback
-//                 ->whereYear('request_date', $year)
-//                 ->whereMonth('request_date', $mon)
-//                 ->sum('time_spent');
-
-//             $data[] = $totalTime;
-//         }
-
-//         $datasets[] = [
-//             'label' => $user->name,
-//             'data' => $data,
-//             'backgroundColor' => 'rgba('.rand(0,255).','.rand(0,255).','.rand(0,255).',0.2)',
-//             'borderColor' => 'rgb('.rand(0,255).','.rand(0,255).','.rand(0,255).')',
-//             'borderWidth' => 1
-//         ];
-//     }
-
-//     return response()->json([
-//         'labels' => $labels,
-//         'datasets' => $datasets
-//     ]);
-// }
-

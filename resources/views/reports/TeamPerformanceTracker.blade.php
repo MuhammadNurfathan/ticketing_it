@@ -197,7 +197,6 @@
     </div>
 
     {{-- Script --}}
-
     <script>
         document.getElementById('previewBtn').addEventListener('click', async function() {
             const start = document.getElementById('start_date').value;
@@ -255,7 +254,6 @@
         });
     </script>
 
-
     <script>
         document.getElementById('filterBtn').addEventListener('click', loadTickets);
 
@@ -301,6 +299,7 @@
 
         loadTickets(); // Load pertama kali
     </script>
+
     <script>
         let barChart, timeChart;
 
@@ -396,4 +395,5 @@
             }
         });
     </script>
+
 </x-app-layout>
