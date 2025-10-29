@@ -195,35 +195,31 @@
                                     </button>
                                 </td>
 
-                               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-    <div class="flex justify-center items-center gap-2">
-        <!-- Update Progress -->
-        <button 
-            onclick="openEditModal(this)"
-            data-id="{{ $project->id }}"
-            data-code="{{ $project->project_code }}"
-            data-name="{{ $project->project_name }}"
-            data-progress="{{ $project->progress_percent }}"
-            data-status="{{ $project->status_id }}"
-            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200">
-            Update
-        </button>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                    <div class="flex justify-center items-center gap-2">
+                                        <!-- Update Progress -->
+                                        <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                            data-code="{{ $project->project_code }}"
+                                            data-name="{{ $project->project_name }}"
+                                            data-progress="{{ $project->progress_percent }}"
+                                            data-status="{{ $project->status_id }}"
+                                            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200">
+                                            Update
+                                        </button>
 
-        <!-- Pending -->
-        <button 
-            onclick="openPendingModal({{ $project->id }})"
-            class="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200">
-            Pending
-        </button>
+                                        <!-- Pending -->
+                                        <button onclick="openPendingModal({{ $project->id }})"
+                                            class="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200">
+                                            Pending
+                                        </button>
 
-        <!-- Void -->
-        <button 
-            onclick="openVoidModal({{ $project->id }})"
-            class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
-            Void
-        </button>
-    </div>
-</td>
+                                        <!-- Void -->
+                                        <button onclick="openVoidModal({{ $project->id }})"
+                                            class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
+                                            Void
+                                        </button>
+                                    </div>
+                                </td>
 
                             </tr>
                         @endforeach
@@ -734,6 +730,88 @@
                     $('#dropdown-icon').removeClass('rotate-180');
                 }
             });
+            
+             const progressInput = $('#modal_progress_percent');
+    const statusSelect = $('#modal_status_id');
+
+    let previousProgress = 0; // default, akan di-set saat modal dibuka
+
+    // Fungsi untuk cek progress dan status
+    function checkProgressStatus() {
+        let progressValue = parseInt(progressInput.val()) || 0;
+
+        // Batasi 0 - 100
+        if (progressValue < 0) progressValue = 0;
+        if (progressValue > 100) progressValue = 100;
+
+        // Jangan boleh kurang dari previousProgress
+        if (progressValue < previousProgress) {
+            progressValue = previousProgress;
+            alert(`Progress tidak boleh kurang dari ${previousProgress}%`);
+        }
+
+        progressInput.val(progressValue);
+
+        // Set status otomatis jika 100%
+        if (progressValue === 100) {
+            statusSelect.val("3");
+            statusSelect.prop('disabled', true);
+        } else {
+            statusSelect.prop('disabled', false);
+            if (statusSelect.val() === "3") {
+                statusSelect.val("");
+            }
+        }
+    }
+
+    // Event listener
+    progressInput.on('input', checkProgressStatus);
+
+    // Saat modal dibuka, set previousProgress
+    window.openEditModal = function(button) {
+        const projectId = $(button).data('id');
+        const projectCode = $(button).data('code');
+        const projectName = $(button).data('name');
+        const progress = $(button).data('progress'); // previous progress
+        const statusId = $(button).data('status');
+        const developerName = $(button).data('developer');
+        const memo = $(button).data('memo');
+
+        previousProgress = parseInt(progress) || 0;
+
+        $('#editProgressForm')[0].reset();
+        $('.dev-checkbox').prop('checked', false);
+        $('#dropdown-icon').removeClass('rotate-180');
+        $('#developer-dropdown').addClass('hidden');
+
+        $('#editProgressForm').attr('action', `/project/${projectId}`);
+        $('#modal_project_code').val(projectCode);
+        $('#modal_project_name').val(projectName);
+        $('#modal_progress_percent').val(progress);
+        $('#modal_status_id').val(statusId);
+        $('#modal_memo').val(memo);
+
+        if (developerName) {
+            developerName.split(' | ').forEach(devName => {
+                $(`.dev-checkbox[value="${devName.trim()}"]`).prop('checked', true);
+            });
+            $('#selected-text').text(developerName);
+            $('#developer_name').val(developerName);
+        } else {
+            $('#selected-text').text('Pilih Developer...');
+            $('#developer_name').val('');
+        }
+
+        const now = new Date();
+        const datetime =
+            `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        $('#modal_progress_date').val(datetime);
+
+        // Cek progress & status saat modal dibuka
+        checkProgressStatus();
+
+        openModal('editProgressModal');
+    };
 
             $(document).on('change', '.dev-checkbox', function() {
                 const selected = [];
@@ -859,6 +937,8 @@
                 attributeFilter: ['class']
             });
         });
+
+        
     </script>
 
 

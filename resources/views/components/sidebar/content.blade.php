@@ -12,11 +12,7 @@
         </x-slot>
     </x-sidebar.link>
 
-    <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
-        <x-slot name="icon">
-            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
-        </x-slot>
-    </x-sidebar.link>
+  
 
     @if (auth()->user()->role_id == 2)
         <x-sidebar.link title="Project Monitoring" href="{{ route('reports.ProjectMonitoring') }}" :isActive="request()->routeIs('reports.ProjectMonitoring')">
@@ -29,6 +25,11 @@
                 <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
             </x-slot>
         </x-sidebar.link>
+          <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
         <x-sidebar.dropdown title="Tickets Monitoring" :active="request()->routeIs(
             'reports.ExcecutiveTicketsInsight',
             'reports.TeamPerformanceTracker',
@@ -83,6 +84,11 @@
     @endif
 
     @if (auth()->user()->role_id == 1)
+      <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
         <x-sidebar.dropdown title="Master Data" :active="request()->routeIs('locations.*') ||
             request()->routeIs('departments.*') ||
             request()->routeIs('users.*') ||

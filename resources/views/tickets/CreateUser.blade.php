@@ -27,7 +27,7 @@
                     <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        ` <input type="hidden" name="from" value="user">
+                        <input type="hidden" name="from" value="user">
                         {{-- Ticket Code --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -88,9 +88,10 @@
                         {{-- Upload Media (1 file saja) --}}
                         <div class="mb-6">
                             <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Upload Gambar / Video (Max 10 MB)
+                                Upload Gambar / Video (Max 5 MB)
                             </label>
-                            <input type="file" name="image" id="media" accept="image/*,video/*" capture="environment"
+                            <input type="file" name="image" id="media" accept="image/*,video/*"
+                                capture="environment"
                                 class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700  hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200  dark:hover:file:bg-gray-600">
                             <div id="preview-container"
                                 class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
@@ -98,6 +99,11 @@
 
                         <button type="submit"
                             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Simpan Ticket
+                        </button>
+
+                        <button type="button" onclick="history.back()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                            Kembali
                         </button>
 
                     </form>
