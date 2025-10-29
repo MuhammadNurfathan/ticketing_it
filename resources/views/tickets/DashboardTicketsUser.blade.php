@@ -184,9 +184,7 @@
                                     {{ $ticket->solution ?? '-' }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    <span title="{{ $ticket->feedback->description ?? '-' }}">
                                         {{ $ticket->feedback->description ?? '-' }}
-                                    </span>
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2">
                                     @if ($ticket->image)

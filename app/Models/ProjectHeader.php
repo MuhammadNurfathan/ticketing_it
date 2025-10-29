@@ -124,6 +124,8 @@ class ProjectHeader extends Model
         ];
     }
 
+
+
     public static function data()
     {
         $lastproject = self::latest('id')->first();
@@ -149,6 +151,37 @@ class ProjectHeader extends Model
             'developers'      => $developers,
             'priorities'      => $priorities,
             'generateticket'  => $generateticket,
+        ];
+    }
+
+    public static function summary($year = null)
+    {
+        $query = self::query();
+
+        // jika year diberikan, filter berdasarkan created_at tahun itu
+        if ($year) {
+            $query->whereYear('created_at', $year);
+        }
+
+        // Active = semua yang tidak berstatus "done" (status_id != 3)
+        $active = (clone $query)->where('status_id', '!=', 3)->count();
+
+        // Closed / Done = status_id == 3
+        $closed = (clone $query)->where('status_id', 3)->count();
+
+        // Untuk SLA: hitung dari yang DONE (status_id == 3)
+        $done = $closed;
+        $doneOnTime = (clone $query)
+            ->where('status_id', 3)
+            ->where('is_late', 0)
+            ->count();
+
+        $sla = $done > 0 ? round(($doneOnTime / $done) * 100, 2) : 0;
+
+        return [
+            'active' => $active,
+            'closed' => $closed,
+            'sla'    => $sla,
         ];
     }
 }

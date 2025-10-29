@@ -19,3 +19,4 @@ Route::get('/tickets/preview', [TicketReportController::class, 'preview']);
 Route::get('/tickets/export', [TicketReportController::class, 'export']);
 Route::get('/ProjectQueue', [ProjectReportController::class, 'ProjectQueue']);
 Route::get('/ProjectMonitorGraph', [ProjectReportController::class, 'gantChart']);
+Route::get('/SummaryProject', [ProjectReportController::class, 'summary']);

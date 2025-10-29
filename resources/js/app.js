@@ -1,16 +1,19 @@
 // app.js
 import './bootstrap';
-import Alpine from "alpinejs";
-import collapse from "@alpinejs/collapse";
-import PerfectScrollbar from "perfect-scrollbar";
-import Chart from "chart.js/auto";
+import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
+import PerfectScrollbar from 'perfect-scrollbar';
+import 'perfect-scrollbar/css/perfect-scrollbar.css';
+import Chart from 'chart.js/auto';
 
 // Import Chart components
 import { PieChart, renderPieChart } from './components/chart/tickets-by-category-chart.js';
 import { LineChart, renderLineChart } from './components/chart/tickets-closed-chart.js';
-import { initBarChart } from './components/chart/bar-chart.js'; // pastikan exportnya named export
+import { initBarChart } from './components/chart/bar-chart.js';
 
-// Make chart functions available globally
+// Make libraries and functions available globally
+window.PerfectScrollbar = PerfectScrollbar;
+window.Chart = Chart;
 window.initBarChart = initBarChart;
 window.PieChart = PieChart;
 window.renderPieChart = renderPieChart;
@@ -18,42 +21,52 @@ window.LineChart = LineChart;
 window.renderLineChart = renderLineChart;
 
 // Alpine.js setup
-document.addEventListener("alpine:init", () => {
-    Alpine.data("mainState", () => {
+document.addEventListener('alpine:init', () => {
+    Alpine.data('mainState', () => {
         let lastScrollTop = 0;
 
         const init = function () {
-            window.addEventListener("scroll", () => {
-                let st = window.pageYOffset || document.documentElement.scrollTop;
-                this.scrollingDown = st > lastScrollTop;
+            // Scroll detection
+            window.addEventListener('scroll', () => {
+                const st = window.pageYOffset || document.documentElement.scrollTop;
+                
+                this.scrollingDown = st > lastScrollTop && st > 0;
                 this.scrollingUp = st < lastScrollTop;
+                
                 if (st === 0) {
                     this.scrollingDown = false;
                     this.scrollingUp = false;
                 }
+                
                 lastScrollTop = Math.max(st, 0);
             });
         };
 
         const getTheme = () => {
-            if (window.localStorage.getItem("dark")) {
-                return JSON.parse(window.localStorage.getItem("dark"));
+            const darkMode = window.localStorage.getItem('dark');
+            if (darkMode !== null) {
+                return JSON.parse(darkMode);
             }
-            return !!window.matchMedia &&
-                window.matchMedia("(prefers-color-scheme: dark)").matches;
+            // Fallback to system preference
+            return window.matchMedia && 
+                   window.matchMedia('(prefers-color-scheme: dark)').matches;
         };
 
         const setTheme = (value) => {
-            window.localStorage.setItem("dark", value);
+            window.localStorage.setItem('dark', value);
         };
 
         return {
             init,
+            
+            // Theme
             isDarkMode: getTheme(),
             toggleTheme() {
                 this.isDarkMode = !this.isDarkMode;
                 setTheme(this.isDarkMode);
             },
+            
+            // Sidebar
             isSidebarOpen: window.innerWidth > 1024,
             isSidebarHovered: false,
             handleSidebarHover(value) {
@@ -63,11 +76,14 @@ document.addEventListener("alpine:init", () => {
             handleWindowResize() {
                 this.isSidebarOpen = window.innerWidth > 1024;
             },
+            
+            // Scroll state
             scrollingDown: false,
             scrollingUp: false,
         };
     });
 });
 
+// Initialize Alpine with plugins
 Alpine.plugin(collapse);
 Alpine.start();

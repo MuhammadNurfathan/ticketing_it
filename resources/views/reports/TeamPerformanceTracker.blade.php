@@ -281,12 +281,12 @@
                     ${
                         tickets.length
                             ? tickets.map(t => `
-                                                <div class="bg-white p-2 border rounded-md">
-                                                <p class="text-sm text-gray-700"><b>Kode:</b> ${t.ticket_code}</p>
-                                                <p class="text-sm text-gray-700"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                                <p class="text-sm text-gray-700"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                                </div>
-                                            `).join('')
+                                                            <div class="bg-white p-2 border rounded-md">
+                                                                <p class="text-sm text-gray-700"><b>Kode:</b> ${t.ticket_code}</p>
+                                                                <p class="text-sm text-gray-700"><b>Problem:</b> ${t.problem ?? '-'}</p>
+                                                                <p class="text-sm text-gray-700"><b>Solution:</b> ${t.solution ?? '-'}</p>
+                                                            </div>
+                                                        `).join('')
                             : '<p class="text-center text-gray-400 italic">Tidak ada tiket</p>'
                     }
                 </div>

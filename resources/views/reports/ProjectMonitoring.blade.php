@@ -13,16 +13,35 @@
     <div class="py-6 space-y-8">
         {{-- SECTION: PROJECT QUEUE TABLE --}}
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 transition-colors">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 p-4 rounded-lg">
+                    <!-- Title -->
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4 sm:mb-0">
                         Daftar Project Queue
                     </h3>
-                    <button id="refreshBtn"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2">
-                        <span id="refreshIcon" class="transition-transform duration-300">🔄</span> Refresh
-                    </button>
+
+                    <!-- Filter Section -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Filter Tahun -->
+                        <div class="flex items-center gap-2">
+                            <select id="filter-year"
+                                class="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-36">
+                                <option value="">Pilih Tahun</option>
+                            </select>
+                        </div>
+
+                        <!-- Tombol Tampilkan -->
+                        <button id="filterBtn"
+                            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700  transition-all duration-200 shadow-sm">
+                            <span>🔍</span>
+                            <span>Tampilkan</span>
+                        </button>
+
+
+                    </div>
                 </div>
+
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm text-left border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -58,11 +77,55 @@
                 <div id="gantt"></div>
             </div>
         </div>
-    </div>
 
-    {{-- Frappe Gantt --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+        {{-- SECTION: PROJECT SUMMARY --}}
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 transition-colors duration-300">
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                    Project Summary
+                </h3>
+
+                <div id="summary-container" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <!-- Active Projects -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            Active Projects
+                        </h4>
+                        <p id="active-projects"
+                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+
+                    <!-- Closed Projects -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            Closed Projects
+                        </h4>
+                        <p id="closed-projects"
+                            class="text-4xl font-bold text-green-700 dark:text-green-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+
+                    <!-- SLA -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            SLA (%)
+                        </h4>
+                        <p id="sla-value"
+                            class="text-4xl font-bold text-yellow-700 dark:text-yellow-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <style>
         #gantt {
@@ -92,6 +155,7 @@
             from {
                 transform: rotate(0deg);
             }
+
             to {
                 transform: rotate(360deg);
             }
@@ -107,7 +171,8 @@
         }
 
         .dark .gantt text {
-            fill: #f3f4f6 !important;
+            fill: #ffffff !important;
+            font-weight: bold;
         }
 
         .dark .gantt .tick {
@@ -126,113 +191,173 @@
             fill: #10b981;
         }
     </style>
+    <!-- Day.js harus di atas sebelum script main -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.12.0/dayjs.min.js"></script>
 
-    {{-- SCRIPTS --}}
+    <!-- Frappe Gantt -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+
     <script>
-        // === DARK MODE TOGGLE ===
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const htmlElement = document.documentElement;
+        document.addEventListener("DOMContentLoaded", async () => {
+            const yearSelect = document.getElementById('filter-year');
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadProjectQueue();
-            loadGanttChart();
+            // === Inisialisasi Dropdown Tahun ===
+            const currentYear = new Date().getFullYear();
+            const startYear = 2020;
+            const endYear = currentYear + 5;
 
-            const refreshBtn = document.getElementById('refreshBtn');
-            const refreshIcon = document.getElementById('refreshIcon');
+            for (let y = endYear; y >= startYear; y--) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
 
-            refreshBtn.addEventListener('click', async () => {
-                refreshIcon.classList.add('spin');
-                await Promise.all([loadProjectQueue(), loadGanttChart()]);
-                setTimeout(() => refreshIcon.classList.remove('spin'), 300);
+            // === Load Data Awal (tahun sekarang) ===
+            await loadAll(currentYear);
+
+            // === Tombol Filter ===
+            document.getElementById('filterBtn').addEventListener("click", async () => {
+                const year = yearSelect.value || currentYear;
+                await loadAll(year);
             });
-        });
 
-        // === PROJECT QUEUE ===
-        async function loadProjectQueue() {
-            const tbody = document.getElementById('projectQueueTableBody');
-            tbody.innerHTML =
-                `<tr><td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-4 italic">Loading data...</td></tr>`;
+            // === Fungsi Gabungan ===
+            async function loadAll(year) {
+                await Promise.all([
+                    loadSummary(year),
+                    loadProjectQueue(year),
+                    loadGanttChart(year)
+                ]);
+            }
 
-            try {
-                const res = await fetch('/api/ProjectQueue');
-                const json = await res.json();
-                const data = json.data?.ProjectQueue || [];
-
-                if (data.length === 0) {
-                    tbody.innerHTML =
-                        `<tr><td colspan="7" class="text-center text-gray-400 dark:text-gray-500 py-4 italic">Tidak ada project queue.</td></tr>`;
-                    return;
+            // === Load Summary ===
+            async function loadSummary(year) {
+                try {
+                    const res = await fetch(`{{ url('/api/SummaryProject') }}?year=${year}`);
+                    if (!res.ok) throw new Error("Gagal ambil data summary");
+                    const data = await res.json();
+                    document.getElementById('active-projects').textContent = data.active ?? '-';
+                    document.getElementById('closed-projects').textContent = data.closed ?? '-';
+                    document.getElementById('sla-value').textContent = data.sla ? `${data.sla}%` : '-';
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('active-projects').textContent = '-';
+                    document.getElementById('closed-projects').textContent = '-';
+                    document.getElementById('sla-value').textContent = '-';
                 }
+            }
 
-                tbody.innerHTML = '';
-                data.forEach((item, index) => {
-                    tbody.insertAdjacentHTML('beforeend', `
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${index + 1}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_code ?? '-'}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_name ?? '-'}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.priority?.priority_name ?? '-'}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.requestor?.name ?? '-'}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.description ?? '-'}</td>
-                            <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${new Date(item.created_at).toLocaleString('id-ID')}</td>
-                        </tr>
-                    `);
-                });
-
-            } catch (error) {
-                console.error(error);
+            // === Load Project Queue ===
+            async function loadProjectQueue(year) {
+                const tbody = document.getElementById('projectQueueTableBody');
                 tbody.innerHTML =
-                    `<tr><td colspan="7" class="text-center text-red-500 dark:text-red-400 py-4">Gagal memuat data</td></tr>`;
-            }
-        }
+                    `<tr><td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-4 italic">Loading data...</td></tr>`;
 
-        // === GANTT CHART ===
-        async function loadGanttChart() {
-            const ganttContainer = document.getElementById('gantt');
-            ganttContainer.innerHTML = `<p class="text-gray-500 dark:text-gray-400 italic text-center mt-4">Loading Gantt chart...</p>`;
+                try {
+                    const res = await fetch(`/api/ProjectQueue?year=${year}`);
+                    const json = await res.json();
+                    const data = json.data?.ProjectQueue || [];
 
-            try {
-                const res = await fetch('/api/ProjectMonitorGraph');
-                if (!res.ok) throw new Error("Gagal mengambil data Gantt Chart");
+                    if (data.length === 0) {
+                        tbody.innerHTML =
+                            `<tr><td colspan="7" class="text-center text-gray-400 dark:text-gray-500 py-4 italic">Tidak ada project queue.</td></tr>`;
+                        return;
+                    }
 
-                const projects = await res.json();
-                console.log("📊 Data Gantt:", projects);
-
-                if (!projects.length) {
-                    ganttContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 italic text-center mt-4">Tidak ada data proyek untuk ditampilkan.</p>`;
-                    return;
+                    tbody.innerHTML = '';
+                    data.forEach((item, index) => {
+                        tbody.insertAdjacentHTML('beforeend', `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${index + 1}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_code ?? '-'}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_name ?? '-'}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.priority?.priority_name ?? '-'}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.requestor?.name ?? '-'}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.description ?? '-'}</td>
+                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${new Date(item.created_at).toLocaleString('id-ID')}</td>
+                    </tr>
+                `);
+                    });
+                } catch (error) {
+                    console.error(error);
+                    tbody.innerHTML =
+                        `<tr><td colspan="7" class="text-center text-red-500 dark:text-red-400 py-4">Gagal memuat data</td></tr>`;
                 }
-
-                ganttContainer.innerHTML = '';
-
-                const tasks = projects.map(p => ({
-                    id: p.id,
-                    name: p.name,
-                    start: p.start,
-                    end: p.end,
-                    progress: p.progress,
-                    custom_class: p.progress >= 80 ? "bar-success" : "bar-progress"
-                }));
-
-                new Gantt("#gantt", tasks, {
-                    view_mode: "Week",
-                    date_format: "YYYY-MM-DD",
-                    custom_popup_html: task => `
-                        <div class='popup-content'>
-                            <strong>${task.name}</strong><br>
-                            ${task.start} → ${task.end}<br>
-                            Progress: <b>${task.progress}%</b>
-                        </div>
-                    `
-                });
-
-            } catch (err) {
-                console.error("❌ Error load Gantt:", err);
-                ganttContainer.innerHTML =
-                    `<p class="text-red-500 dark:text-red-400 italic text-center mt-4">Gagal memuat data Gantt Chart.</p>`;
             }
-        }
+
+            // === Load Gantt Chart ===
+            async function loadGanttChart(year) {
+                const ganttContainer = document.getElementById('gantt');
+                ganttContainer.innerHTML =
+                    `<p class="text-gray-500 dark:text-gray-400 italic text-center mt-4">Loading Gantt chart...</p>`;
+
+                try {
+                    const res = await fetch(`/api/ProjectMonitorGraph?year=${year}`);
+                    if (!res.ok) throw new Error("Gagal mengambil data Gantt Chart");
+                    const projects = await res.json();
+
+                    if (!projects.length) {
+                        ganttContainer.innerHTML =
+                            `<p class="text-gray-400 dark:text-gray-500 italic text-center mt-4">Tidak ada data proyek untuk ditampilkan.</p>`;
+                        return;
+                    }
+
+                    ganttContainer.innerHTML = '';
+
+                    const tasks = projects.map(p => {
+                        // Cutoff tanggal ke tahun yang dipilih
+                        const start = new Date(year, Number(p.month_start) - 1, Number(p
+                            .day_start));
+                        const end = new Date(year, Number(p.month_end) - 1, Number(p.day_end));
+
+                        // Format YYYY-MM-DD
+                        const formatDate = d => d.toISOString().slice(0, 10);
+
+                        return {
+                            id: p.id,
+                            name: `${p.name} [${p.status_name}]`,
+                            start: formatDate(start),
+                            end: formatDate(end),
+                            progress: p.progress,
+                            status_id: p.status_id,
+                            status_name: p.status_name
+                        };
+                    });
+
+                    new Gantt("#gantt", tasks, {
+                        view_mode: "Week",
+                        date_format: "YYYY-MM-DD",
+                        custom_popup_html: task => {
+                            const formatDDMMMYYYY = d => {
+                                const date = new Date(d);
+                                return date.toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: 'short',
+                                    year: 'numeric'
+                                });
+                            };
+                            return `
+                    <div class='popup-content text-sm p-2'>
+                        <strong>${task.name}</strong><br>
+                        ${formatDDMMMYYYY(task.start)} → ${formatDDMMMYYYY(task.end)}<br>
+                        Progress: <b>${task.progress}%</b><br>
+                        Status: ${task.status_name}
+                    </div>
+                `;
+                        }
+                    });
+
+                } catch (err) {
+                    console.error("❌ Error load Gantt:", err);
+                    ganttContainer.innerHTML =
+                        `<p class="text-red-500 dark:text-red-400 italic text-center mt-4">Gagal memuat data Gantt Chart.</p>`;
+                }
+            }
+
+        });
     </script>
+
 
 </x-app-layout>
