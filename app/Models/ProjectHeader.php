@@ -154,34 +154,45 @@ class ProjectHeader extends Model
         ];
     }
 
-    public static function summary($year = null)
-    {
-        $query = self::query();
+public static function summary($year = null)
+{
+    $query = self::query();
 
-        // jika year diberikan, filter berdasarkan created_at tahun itu
-        if ($year) {
-            $query->whereYear('created_at', $year);
-        }
-
-        // Active = semua yang tidak berstatus "done" (status_id != 3)
-        $active = (clone $query)->where('status_id', '!=', 3)->count();
-
-        // Closed / Done = status_id == 3
-        $closed = (clone $query)->where('status_id', 3)->count();
-
-        // Untuk SLA: hitung dari yang DONE (status_id == 3)
-        $done = $closed;
-        $doneOnTime = (clone $query)
-            ->where('status_id', 3)
-            ->where('is_late', 0)
-            ->count();
-
-        $sla = $done > 0 ? round(($doneOnTime / $done) * 100, 2) : 0;
-
-        return [
-            'active' => $active,
-            'closed' => $closed,
-            'sla'    => $sla,
-        ];
+    // filter berdasarkan start_date jika year diberikan
+    if ($year) {
+        $query->whereYear('start_date', $year);
     }
+
+    // Active = semua yang tidak berstatus "done" (status_id != 3) dan bukan void (status_id != 4)
+    $active = (clone $query)->where('status_id', 2)->count();
+
+    // Closed / Done = status_id == 3
+    $closed = (clone $query)->where('status_id', 3)->count();
+
+    // Total = semua project kecuali void
+    $total = (clone $query)->where('status_id', '!=', 6)->count();
+    $waiting = (clone $query)->where('status_id', '!=', 1)->count();
+
+    // Void = status_id == 4
+    $void = (clone $query)->where('status_id', 4)->count();
+
+    // SLA: hitung dari yang DONE (status_id == 3)
+    $done = $closed;
+    $doneOnTime = (clone $query)
+        ->where('status_id', 3)
+        ->where('is_late', 0)
+        ->count();
+
+    $sla = $done > 0 ? round(($doneOnTime / $done) * 100, 2) : 0;
+
+    return [
+        'active' => $active,
+        'closed' => $closed,
+        'sla'    => $sla,
+        'void'   => $void,
+        'total'  => $total,
+        'waiting'  => $waiting,
+    ];
+}
+
 }

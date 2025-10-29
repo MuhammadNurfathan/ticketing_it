@@ -13,7 +13,7 @@ class ProjectReportController extends Controller
         $year = $request->query('year', now()->year);
 
         $ProjectQueue = ProjectHeader::with(['priority', 'requestor', 'developer', 'status'])
-            ->whereYear('created_at', $year)
+            ->whereYear('start_date', $year)
             ->where('status_id', 1)
             ->get();
 
@@ -95,13 +95,4 @@ class ProjectReportController extends Controller
         return response()->json($summary);
     }
 
-    public function availableYears()
-    {
-        $years = ProjectHeader::selectRaw('YEAR(created_at) as year')
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
-
-        return response()->json($years);
-    }
 }

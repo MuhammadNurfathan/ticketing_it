@@ -90,6 +90,39 @@
                     <div
                         class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
                         <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            All Project
+                        </h4>
+                        <p id="all-projects"
+                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+                    <!-- Active Projects -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            Waiting Projects
+                        </h4>
+                        <p id="waiting-projects"
+                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+                    <!-- Active Projects -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                            Void Projects
+                        </h4>
+                        <p id="void-projects"
+                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
+                            -
+                        </p>
+                    </div>
+                    <!-- Active Projects -->
+                    <div
+                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
+                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
                             Active Projects
                         </h4>
                         <p id="active-projects"
@@ -238,11 +271,17 @@
                     const res = await fetch(`{{ url('/api/SummaryProject') }}?year=${year}`);
                     if (!res.ok) throw new Error("Gagal ambil data summary");
                     const data = await res.json();
+                    document.getElementById('all-projects').textContent = data.total ?? '-';
+                    document.getElementById('void-projects').textContent = data.void ?? '-';
+                    document.getElementById('waiting-projects').textContent = data.active ?? '-';
                     document.getElementById('active-projects').textContent = data.active ?? '-';
                     document.getElementById('closed-projects').textContent = data.closed ?? '-';
                     document.getElementById('sla-value').textContent = data.sla ? `${data.sla}%` : '-';
                 } catch (err) {
                     console.error(err);
+                    document.getElementById('all-projects').textContent = '-';
+                    document.getElementById('void-projects').textContent = '-';
+                    document.getElementById('waiting-projects').textContent = '-';
                     document.getElementById('active-projects').textContent = '-';
                     document.getElementById('closed-projects').textContent = '-';
                     document.getElementById('sla-value').textContent = '-';
