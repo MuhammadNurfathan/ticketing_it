@@ -168,13 +168,16 @@ public static function summary($year = null)
 
     // Closed / Done = status_id == 3
     $closed = (clone $query)->where('status_id', 3)->count();
+    $closedOnTime = (clone $query)->where('status_id', 3)->where('is_late',0)->count();
+    $closedLate = (clone $query)->where('status_id', 3)->where('is_late',1)->count();
 
-    // Total = semua project kecuali void
-    $total = (clone $query)->where('status_id', '!=', 6)->count();
-    $waiting = (clone $query)->where('status_id', '!=', 1)->count();
+    // Total = semua project kecuali pending
+    $total = (clone $query)->where('status_id', '!=', 5)->count();
+    $waiting = (clone $query)->where('status_id', 1)->count();
 
     // Void = status_id == 4
     $void = (clone $query)->where('status_id', 4)->count();
+    $pending = (clone $query)->where('status_id', 6)->count();
 
     // SLA: hitung dari yang DONE (status_id == 3)
     $done = $closed;
@@ -183,7 +186,7 @@ public static function summary($year = null)
         ->where('is_late', 0)
         ->count();
 
-    $sla = $done > 0 ? round(($doneOnTime / $done) * 100, 2) : 0;
+    $sla = $done > 0 ? round(($doneOnTime / ($done+$pending+$waiting+$active)) * 100, 2) : 0;
 
     return [
         'active' => $active,
@@ -192,6 +195,9 @@ public static function summary($year = null)
         'void'   => $void,
         'total'  => $total,
         'waiting'  => $waiting,
+        'waiting'  => $waiting,
+        'closedOnTime'  => $closedOnTime,
+        'closedLate'  => $closedLate,
     ];
 }
 

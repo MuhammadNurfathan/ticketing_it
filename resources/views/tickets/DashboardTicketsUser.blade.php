@@ -1,651 +1,569 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard Tickets User') }}
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            {{ __('My Tickets') }}
         </h2>
     </x-slot>
 
-    <div class="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+    <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
 
-        @if (session('error'))
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Tidak bisa membuat tiket baru!',
-                        text: '{{ session('error') }}',
-                        confirmButtonColor: isDark ? '#3b82f6' : '#2563eb',
-                        background: isDark ? '#1f2937' : '#ffffff',
-                        color: isDark ? '#f3f4f6' : '#111827',
-                        iconColor: isDark ? '#facc15' : '#eab308',
-                        customClass: {
-                            popup: 'rounded-2xl shadow-lg',
-                            confirmButton: 'font-semibold px-4 py-2 rounded'
-                        }
+            {{-- Alert Error --}}
+            @if (session('error'))
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Tidak bisa membuat tiket baru!',
+                            text: '{{ session('error') }}',
+                            confirmButtonColor: '#6b7280',
+                            background: isDark ? '#222738' : '#ffffff',
+                            color: isDark ? '#f3f4f6' : '#111827',
+                            customClass: {
+                                popup: 'rounded-xl shadow-2xl',
+                                confirmButton: 'font-medium px-6 py-2.5 rounded-lg'
+                            }
+                        });
                     });
-                });
-            </script>
-        @endif
+                </script>
+            @endif
 
-        {{-- BUTTON TAMBAH TICKET --}}
-        @if (!$hasDoneTicket)
-            <button onclick="openModal('ticketModal')"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                Buat Ticket Baru
-            </button>
-        @endif
-
-        {{-- Panggil modal --}}
-        <x-modal-form id="ticketModal" title="Buat Ticket Baru" size="max-w-4xl">
-            {{-- Masukkan konten form di sini --}}
-            <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <input type="hidden" name="from" value="user">
-
-                {{-- Ticket Code --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Ticket Code <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="ticket_code" value="{{ $generateticket }}" readonly
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            {{-- Header Section --}}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Ticket Management</h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Track and manage your support requests</p>
                 </div>
 
-                {{-- User --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User</label>
-                    <input type="text" value="{{ Auth::user()->name }}" readonly
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-                </div>
-
-                {{-- Hidden Status --}}
-                <input type="hidden" name="status_id" value="1">
-
-                {{-- Category --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Category <span class="text-red-500">*</span>
-                    </label>
-                    <select name="problem_category_id"
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        <option hidden>-- Pilih Category --</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}"
-                                {{ old('problem_category_id') == $cat->id ? 'selected' : '' }}>
-                                {{ $cat->problem_category_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Problem --}}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Problem <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="problem" placeholder="Masukkan Kendala..."
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                </div>
-
-                {{-- Upload Media --}}
-                <div class="mb-6">
-                    <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Upload Gambar / Video (Max 10 MB)
-                    </label>
-                    <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4"
-                        class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100
-                       file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
-                       file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700
-                       hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200
-                       dark:hover:file:bg-gray-600">
-                    <div id="preview-container" class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
-                </div>
-
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                    Simpan Ticket
-                </button>
-            </form>
-        </x-modal-form>
-
-
-        {{-- MY TICKET SECTION --}}
-        <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700 mt-4">
-            <h3
-                class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-gray-800 dark:text-gray-200">
-                My Tickets
-            </h3>
-
-            {{-- DESKTOP VIEW (TABLE) --}}
-            <div class="hidden md:block overflow-x-auto">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-gray-100 dark:bg-gray-700 text-left text-gray-700 dark:text-gray-200">
-                        <tr>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Ticket Code</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Nama</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Kategori</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Masalah</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Status</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Tanggal Req</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Start Date</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">End Date</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Solution</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Feedback</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2">Image</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                        @php
-                            // Urutkan: yang ada feedback button (status_id == 3) di atas
-                            $sortedTickets = $myTicket->sortByDesc(function ($ticket) {
-                                return $ticket->status_id == 3 ? 1 : 0;
-                            });
-                        @endphp
-                        @foreach ($sortedTickets as $ticket)
-                            <tr
-                                class="hover:bg-gray-50 dark:hover:bg-gray-700 {{ $ticket->status_id == 3 ? 'bg-green-50 dark:bg-green-900/10 border-l-4 border-l-green-500' : '' }}">
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ $ticket->ticket_code }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    <span title="{{ $ticket->user->name ?? '-' }}">
-                                        {{ $ticket->user->name ?? '-' }}
-                                    </span>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    <span title="{{ $ticket->problemCategory?->problem_category_name ?? '-' }}">
-                                        {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
-                                    </span>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    <span title="{{ $ticket->problem }}">
-                                        {{ $ticket->problem }}
-                                    </span>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    <span title="{{ $ticket->status->status_name }}">
-                                        {{ $ticket->status->status_name }}
-                                    </span>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    {{ $ticket->request_date ?? '-' }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    {{ $ticket->start_date ?? '-' }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    {{ $ticket->end_date ?? '-' }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    {{ $ticket->solution ?? '-' }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                        {{ $ticket->feedback->description ?? '-' }}
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2">
-                                    @if ($ticket->image)
-                                        <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
-                                            class="text-blue-600 dark:text-blue-400 underline">Lihat File</a>
-                                    @else
-                                        <span class="text-gray-500 dark:text-gray-400 text-sm italic">No media</span>
-                                    @endif
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    @if ($ticket->status_id == 3)
-                                        <a href="{{ route('feedback.form', $ticket->id) }}"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs inline-block transition-colors">
-                                            Feedback
-                                        </a>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                @if (!$hasDoneTicket)
+                    <button onclick="openModal('ticketModal')"
+                        class="inline-flex items-center justify-center px-4 py-2.5 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors font-medium text-sm shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        New Ticket
+                    </button>
+                @endif
             </div>
 
-            {{-- MOBILE VIEW (CARDS) --}}
-            <div class="md:hidden">
-                {{-- Search & Filter untuk Mobile --}}
-                <div class="mb-4">
-                    <div class="flex gap-2 mb-4">
-                        <input type="text" id="mobileSearch" placeholder="Cari tiket..."
-                            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
-
-                        <select id="mobilePerPage"
-                            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm">
-                            <option value="5" selected>5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="all">Semua</option>
-                        </select>
+            {{-- Stats Cards --}}
+            <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+                <div class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">Done</div>
+                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                        {{ $myTicket->whereIn('status_id', [3, 5])->count() }}
                     </div>
+                </div>
+                <div class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">Feedback</div>
+                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                        {{ $myTicket->where('status_id', 5)->count() }}
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">Total</div>
+                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                        {{ $myTicket->count() }}
+                    </div>
+                </div>
+            </div>
 
-                    <div id="mobileCards" class="space-y-4">
-                        @php
-                            // Urutkan: yang ada feedback button (status_id == 3) di atas
-                            $sortedTicketsMobile = $myTicket->sortByDesc(function ($ticket) {
-                                return $ticket->status_id == 3 ? 1 : 0;
-                            });
-                        @endphp
-                        @foreach ($sortedTicketsMobile as $ticket)
-                            <div class="ticket-card bg-gray-50 dark:bg-gray-700 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-600 {{ $ticket->status_id == 3 ? 'ring-2 ring-green-400 dark:ring-green-500 bg-green-50 dark:bg-green-900/10' : '' }}"
-                                data-code="{{ strtolower($ticket->ticket_code) }}"
-                                data-name="{{ strtolower($ticket->user->name ?? '') }}"
-                                data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
-                                data-problem="{{ strtolower($ticket->problem) }}"
-                                data-status="{{ strtolower($ticket->status->status_name) }}"
-                                data-priority="{{ $ticket->status_id == 3 ? '1' : '0' }}">
+            {{-- Tickets Table/List --}}
+            <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
 
-                                {{-- Header Card --}}
-                                <div class="flex justify-between items-start mb-3">
-                                    <div>
-                                        <div class="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                                            {{ $ticket->ticket_code }}
-                                        </div>
-                                        <div class="text-sm font-medium text-gray-800 dark:text-gray-200 mt-1">
-                                            {{ $ticket->user->name ?? '-' }}
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col items-end gap-1">
-                                        <span
-                                            class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded">
+                {{-- Desktop Table --}}
+                <div class="hidden lg:block overflow-x-auto">
+                    <table class="datatable w-full text-gray-900 dark:text-gray-100">
+                        <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Ticket</th>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Category</th>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Problem</th>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Solution</th>
+                                <th class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @php
+                                $sortedTickets = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
+                            @endphp
+                            @foreach ($sortedTickets as $ticket)
+                                <tr class="transition-colors hover:bg-gray-100 dark:hover:bg-dark-eval-2 {{ $ticket->status_id == 3 ? 'bg-gray-50 dark:bg-dark-eval-2/50' : '' }}">
+                                    <td class="px-4 py-4">
+                                        <div class="font-medium text-gray-900 dark:text-white">{{ $ticket->ticket_code }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $ticket->user->name ?? '-' }}</div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->problem }}
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
+                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->solution ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
-                                            <span
-                                                class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded font-medium">
-                                                Perlu Feedback
-                                            </span>
+                                            <a href="{{ route('feedback.form', $ticket->id) }}"
+                                                class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
+                                                Berikan Feedback
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Mobile Cards --}}
+                <div class="lg:hidden">
+                    <div class="p-4 space-y-3">
+                        {{-- Search & Filter --}}
+                        <div class="flex gap-2">
+                            <input type="text" id="mobileSearch" placeholder="Search tickets..."
+                                class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:border-transparent">
+                            <select id="mobilePerPage"
+                                class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="all">All</option>
+                            </select>
+                        </div>
+
+                        {{-- Cards Container --}}
+                        <div id="mobileCards" class="space-y-3">
+                            @php
+                                $sortedMobile = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
+                            @endphp
+                            @foreach ($sortedMobile as $ticket)
+                                <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-lg p-4 border border-gray-200 dark:border-gray-700 
+                                    {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
+                                    data-code="{{ strtolower($ticket->ticket_code) }}"
+                                    data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
+                                    data-problem="{{ strtolower($ticket->problem) }}"
+                                    data-status="{{ strtolower($ticket->status->status_name) }}"
+                                    data-priority="{{ $ticket->status_id == 3 ? '1' : '0' }}">
+
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ $ticket->ticket_code }}</div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $ticket->user->name ?? '-' }}</div>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
+                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                                            {{ $ticket->status->status_name }}
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex">
+                                            <span class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Category:</span>
+                                            <span class="text-gray-900 dark:text-white text-xs font-medium">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</span>
+                                        </div>
+                                        <div class="flex">
+                                            <span class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Problem:</span>
+                                            <span class="text-gray-900 dark:text-white text-xs">{{ Str::limit($ticket->problem, 60) }}</span>
+                                        </div>
+                                        <div class="flex">
+                                            <span class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Date:</span>
+                                            <span class="text-gray-900 dark:text-white text-xs">{{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}</span>
+                                        </div>
+                                        @if ($ticket->solution)
+                                            <div class="flex">
+                                                <span class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Solution:</span>
+                                                <span class="text-gray-900 dark:text-white text-xs">{{ Str::limit($ticket->solution, 60) }}</span>
+                                            </div>
                                         @endif
                                     </div>
+
+                                    @if ($ticket->status_id == 3)
+                                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                            <a href="{{ route('feedback.form', $ticket->id) }}"
+                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                                Give Feedback
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
+                            @endforeach
+                        </div>
 
-                                {{-- Content Card --}}
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex">
-                                        <span
-                                            class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Kategori:</span>
-                                        <span
-                                            class="text-gray-800 dark:text-gray-200 font-medium break-words overflow-hidden">
-                                            {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
-                                        </span>
-                                    </div>
-                                    <div class="flex">
-                                        <span
-                                            class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Masalah:</span>
-                                        <span
-                                            class="text-gray-800 dark:text-gray-200 break-words overflow-hidden">{{ $ticket->problem }}</span>
-                                    </div>
-                                    <div class="flex">
-                                        <span
-                                            class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Tanggal:</span>
-                                        <span
-                                            class="text-gray-800 dark:text-gray-200 break-words overflow-hidden">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</span>
-                                    </div>
-                                    <div class="flex">
-                                        <span
-                                            class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 font-medium">Feedback:</span>
-                                        <span class="text-gray-800 dark:text-gray-200 break-words overflow-hidden">
-                                            {{ $ticket->feedback->description ?? '-' }}
-                                        </span>
-                                    </div>
-                                    <div class="flex">
-                                        <span class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Rating</span>
-                                        <span
-                                            class="text-gray-800 dark:text-gray-200 break-words overflow-hidden">{{ $ticket->feedback->rating ?? '-' }}/5</span>
-                                    </div>
-                                </div>
-
-                                {{-- Action Button --}}
-                                @if ($ticket->status_id == 3)
-                                    <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                        <a href="{{ route('feedback.form', $ticket->id) }}"
-                                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm inline-block transition-colors w-full text-center font-medium">
-                                            Berikan Feedback
-                                        </a>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-
-                    {{-- Mobile Pagination --}}
-                    <div id="mobilePagination" class="flex flex-wrap justify-between items-center mt-4 gap-2">
-                        <div id="mobileInfo" class="text-sm text-gray-600 dark:text-gray-400"></div>
-                        <div id="mobilePaginationButtons" class="flex gap-1"></div>
+                        {{-- Pagination --}}
+                        <div id="mobilePagination" class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium"></div>
+                            <div id="mobilePaginationButtons" class="flex gap-1 flex-wrap justify-center"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        {{-- MODAL FORM --}}
-        <div id="ticketModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-96 max-w-full mx-4 relative">
-                <button id="closeModal"
-                    class="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white text-2xl">&times;</button>
-                <h3 class="font-bold text-lg mb-4 text-gray-800 dark:text-gray-200">Update Ticket</h3>
-                <form method="POST" id="ticketForm">
-                    @csrf
-                    <input type="hidden" name="ticket_id" id="modalTicketId">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Time Spent
-                            (hours)</label>
-                        <input type="number" step="0.01" name="time_spent" id="timeSpentInput"
-                            class="w-full border border-gray-300 dark:border-gray-600 rounded p-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                            required>
-                    </div>
-                    <button type="submit"
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full transition-colors">Submit</button>
-                </form>
+        </div>
+    </div>
+
+    {{-- Create Ticket Modal --}}
+    <x-modal-form id="ticketModal" title="Create New Ticket" size="max-w-2xl">
+        <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <input type="hidden" name="from" value="user">
+            <input type="hidden" name="status_id" value="1">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Ticket Code <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="ticket_code" value="{{ $generateticket }}" readonly
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm">
             </div>
-        </div>
 
-        {{-- CDN --}}
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User</label>
+                <input type="text" value="{{ Auth::user()->name }}" readonly
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm">
+                <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+            </div>
 
-        <style>
-            /* === WRAPPER / CONTAINER === */
-            div.dataTables_wrapper {
-                margin-top: 1.5rem;
-                margin-bottom: 1.5rem;
-                padding: 1.25rem;
-                border-radius: 0.75rem;
-                background-color: var(--dt-bg);
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-                transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            }
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Category <span class="text-red-500">*</span>
+                </label>
+                <select name="problem_category_id" required
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500">
+                    <option value="">-- Select Category --</option>
+                    @foreach ($categories as $cat)
+                        <option value="{{ $cat->id }}">{{ $cat->problem_category_name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-            /* === MODE VARIABLE === */
-            :root {
-                --dt-bg: #f9fafb;
-                /* Light default */
-                --dt-text: #1f2937;
-                --dt-border: #e5e7eb;
-                --dt-hover: rgba(59, 130, 246, 0.08);
-                --dt-head-bg: #f3f4f6;
-                --dt-head-text: #374151;
-            }
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Problem Description <span class="text-red-500">*</span>
+                </label>
+                <textarea name="problem" rows="3" required placeholder="Describe your issue..."
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500"></textarea>
+            </div>
 
-            .dark {
-                --dt-bg: #1f2937;
-                --dt-text: #f3f4f6;
-                --dt-border: #374151;
-                --dt-hover: rgba(59, 130, 246, 0.15);
-                --dt-head-bg: #111827;
-                --dt-head-text: #d1d5db;
-            }
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Attachment (Image/Video, Max 10MB)
+                </label>
+                <input type="file" name="image" accept=".jpg,.jpeg,.png,.mp4"
+                    class="block w-full text-sm text-gray-900 dark:text-gray-100
+                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                    file:text-sm file:font-medium file:bg-gray-900 dark:file:bg-gray-100
+                    file:text-white dark:file:text-gray-900 hover:file:bg-gray-800 dark:hover:file:bg-gray-200
+                    file:cursor-pointer cursor-pointer">
+            </div>
 
-            /* === DATATABLE ELEMENT SPACING === */
-            .dataTables_wrapper .dataTables_filter,
-            .dataTables_wrapper .dataTables_length,
-            .dataTables_wrapper .dataTables_info,
-            .dataTables_wrapper .dataTables_paginate {
-                margin-bottom: 1rem;
-                color: var(--dt-text);
-            }
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" onclick="closeModal('ticketModal')"
+                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-eval-2 text-sm font-medium transition-colors">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 text-sm font-medium transition-colors">
+                    Create Ticket
+                </button>
+            </div>
+        </form>
+    </x-modal-form>
 
-            /* === FILTER & LENGTH === */
-            .dataTables_wrapper .dataTables_filter {
-                margin-right: 1rem;
-            }
+    {{-- DataTables CSS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
-            .dataTables_wrapper .dataTables_length {
-                margin-left: 0.5rem;
-            }
+    <style>
+        /* DataTables Custom Styling */
+        table.dataTable {
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            width: 100%;
+        }
 
-            .dataTables_wrapper .dataTables_filter label,
-            .dataTables_wrapper .dataTables_length label {
-                padding: 0.25rem 0.5rem;
-            }
+        .dark table.dataTable {
+            border-color: #4b5563;
+            background-color: #1f2937;
+        }
 
-            /* === TABLE CORE === */
-            table.dataTable {
-                margin-top: 0.75rem !important;
-                margin-bottom: 0.75rem !important;
-                width: 100% !important;
-                border-spacing: 0 !important;
-                color: var(--dt-text);
-                border-color: var(--dt-border);
-                background-color: transparent;
-                transition: background-color 0.3s ease, color 0.3s ease;
-            }
+        table.dataTable thead th {
+            background-color: #f3f4f6;
+            color: #111827;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 2px solid #d1d5db;
+        }
 
-            /* === HEADER === */
-            table.dataTable thead {
-                background-color: var(--dt-head-bg);
-                color: var(--dt-head-text);
-            }
+        .dark table.dataTable thead th {
+            background-color: #374151;
+            color: #f9fafb;
+            border-bottom-color: #4b5563;
+        }
 
-            table.dataTable th {
-                padding: 0.75rem 1rem;
-                text-align: center;
-                border-bottom: 2px solid var(--dt-border);
-                font-weight: 600;
-            }
+        table.dataTable tbody tr:hover {
+            background-color: #f3f4f6;
+        }
 
-            /* === BODY === */
-            table.dataTable td {
-                padding: 0.75rem 1rem;
-                text-align: center;
-                vertical-align: middle;
-                border-bottom: 1px solid var(--dt-border);
-            }
+        .dark table.dataTable tbody tr:hover {
+            background-color: #374151;
+        }
 
-            /* === HOVER EFFECT === */
-            table.dataTable tbody tr {
-                transition: background-color 0.2s ease;
-            }
+        table.dataTable tbody td {
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-            table.dataTable tbody tr:hover {
-                background-color: var(--dt-hover);
-            }
+        .dark table.dataTable tbody td {
+            border-bottom-color: #4b5563;
+        }
 
-            /* === PAGINATION === */
-            .dataTables_wrapper .dataTables_paginate .paginate_button {
-                background: transparent;
-                color: var(--dt-text) !important;
-                border: 1px solid var(--dt-border);
-                border-radius: 0.375rem;
-                padding: 0.3rem 0.6rem;
-                margin: 0 2px;
-                transition: all 0.
-            }
-        </style>
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            padding: 1rem;
+            color: inherit;
+        }
 
-        {{-- SCRIPTS --}}
-        <script>
-            $(document).ready(function() {
-                // DESKTOP DATATABLE
-                if (window.innerWidth >= 768) {
-                    if ($.fn.DataTable.isDataTable('.datatable')) {
-                        $('.datatable').DataTable().destroy();
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            background-color: #ffffff;
+            color: #111827;
+            font-size: 0.875rem;
+        }
+
+        .dark .dataTables_wrapper .dataTables_filter input,
+        .dark .dataTables_wrapper .dataTables_length select {
+            border-color: #4b5563;
+            background-color: #374151;
+            color: #f9fafb;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            background-color: #f3f4f6;
+            color: #111827 !important;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none !important;
+            margin: 0 2px;
+        }
+
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background-color: #374151;
+            color: #f9fafb !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:not(.disabled):hover {
+            background-color: #e5e7eb !important;
+            color: #111827 !important;
+            border: none !important;
+        }
+
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:not(.disabled):hover {
+            background-color: #4b5563 !important;
+            color: #f9fafb !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #2563eb !important;
+            color: #f9fafb !important;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Desktop DataTable
+            if (window.innerWidth >= 1024) {
+                $('.datatable').DataTable({
+                    responsive: true,
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    order: [],
+                    language: {
+                        search: "Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ tickets",
+                        infoEmpty: "No tickets available",
+                        zeroRecords: "No matching tickets found",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "›",
+                            previous: "‹"
+                        }
                     }
+                });
+            }
 
-                    $('.datatable').DataTable({
-                        responsive: true,
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        info: true,
-                        pageLength: 10,
-                        lengthMenu: [
-                            [5, 10, 25, 50, -1],
-                            [5, 10, 25, 50, "Semua"]
-                        ],
-                        order: [], // Jangan override urutan baris (sudah diurutkan dari backend)
-                        language: {
-                            search: "Cari:",
-                            searchPlaceholder: "Cari data...",
-                            lengthMenu: "Tampilkan _MENU_ data per halaman",
-                            info: "Menampilkan _START_ - _END_ dari _TOTAL_ tiket",
-                            infoEmpty: "Tidak ada data",
-                            infoFiltered: "(difilter dari _MAX_ total tiket)",
-                            emptyTable: "Tidak ada data tersedia di tabel ini",
-                            zeroRecords: "Tidak ada data yang cocok",
-                            paginate: {
-                                first: "Pertama",
-                                last: "Terakhir",
-                                next: "›",
-                                previous: "‹"
-                            },
-                        },
-                    });
+            // Mobile Pagination
+            let currentPage = 1;
+            let perPage = 10;
+            let filteredCards = [];
+
+            function filterCards() {
+                const searchTerm = $('#mobileSearch').val().toLowerCase();
+                const allCards = $('.ticket-card');
+
+                filteredCards = allCards.filter(function() {
+                    const card = $(this);
+                    const searchText = [
+                        card.data('code'),
+                        card.data('category'),
+                        card.data('problem'),
+                        card.data('status')
+                    ].join(' ');
+                    return searchText.includes(searchTerm);
+                }).toArray();
+
+                // Sort by priority
+                filteredCards.sort((a, b) => {
+                    return parseInt($(b).data('priority')) - parseInt($(a).data('priority'));
+                });
+
+                filteredCards = $(filteredCards);
+                currentPage = 1;
+                displayCards();
+            }
+
+            function displayCards() {
+                const allCards = $('.ticket-card');
+                allCards.hide();
+
+                if ($('#mobilePerPage').val() === 'all') {
+                    filteredCards.show();
+                    $('#mobilePagination').hide();
+                    return;
                 }
 
-                // MOBILE PAGINATION
-                let currentPage = 1;
-                let perPage = 10;
-                let filteredCards = [];
+                const start = (currentPage - 1) * perPage;
+                const end = start + perPage;
+                filteredCards.slice(start, end).show();
 
-                function filterCards() {
-                    const searchTerm = $('#mobileSearch').val().toLowerCase();
-                    const allCards = $('.ticket-card');
+                updatePagination();
+                updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
+                $('#mobilePagination').show();
+            }
 
-                    // Filter cards berdasarkan search
-                    let searchResults = allCards.filter(function() {
-                        const card = $(this);
-                        const searchText =
-                            card.data('code') + ' ' +
-                            card.data('name') + ' ' +
-                            card.data('category') + ' ' +
-                            card.data('problem') + ' ' +
-                            card.data('status');
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredCards.length / perPage);
+                const buttons = $('#mobilePaginationButtons');
+                buttons.empty();
 
-                        return searchText.includes(searchTerm);
-                    });
-
-                    // Urutkan: yang perlu feedback (priority=1) di atas
-                    filteredCards = searchResults.sort(function(a, b) {
-                        const priorityA = parseInt($(a).data('priority')) || 0;
-                        const priorityB = parseInt($(b).data('priority')) || 0;
-                        return priorityB - priorityA;
-                    });
-
-                    currentPage = 1;
-                    displayCards();
+                if (totalPages <= 1) {
+                    buttons.hide();
+                    return;
                 }
+                buttons.show();
 
-                function displayCards() {
-                    const allCards = $('.ticket-card');
-                    allCards.hide();
+                const isDark = document.documentElement.classList.contains('dark');
+                const btnBaseClass = 'px-3 py-1.5 text-xs rounded-lg font-medium transition-colors';
+                const btnNormalClass = isDark 
+                    ? 'border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3' 
+                    : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100';
+                const btnActiveClass = isDark
+                    ? 'bg-gray-100 text-gray-900 border-none'
+                    : 'bg-gray-900 text-white border-none';
 
-                    if ($('#mobilePerPage').val() === 'all') {
-                        filteredCards.show();
-                        $('#mobilePagination').hide();
-                        updateInfo(1, filteredCards.length, filteredCards.length);
-                        return;
-                    }
-
-                    const start = (currentPage - 1) * perPage;
-                    const end = start + perPage;
-                    const cardsToShow = filteredCards.slice(start, end);
-
-                    cardsToShow.show();
-                    updatePagination();
-                    updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
-                    $('#mobilePagination').show();
-                }
-
-                function updatePagination() {
-                    const totalPages = Math.ceil(filteredCards.length / perPage);
-                    const buttons = $('#mobilePaginationButtons');
-                    buttons.empty();
-
-                    if (totalPages <= 1) {
-                        buttons.hide();
-                        return;
-                    }
-                    buttons.show();
-
-                    // Previous button
-                    buttons.append(`
-                    <button class="px-3 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}" 
-                        ${currentPage === 1 ? 'disabled' : ''} 
-                        onclick="changePage(${currentPage - 1})">
+                // Previous button
+                const prevBtn = $(`
+                    <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" 
+                        ${currentPage === 1 ? 'disabled' : ''}>
                         ‹
                     </button>
                 `);
+                if (currentPage > 1) {
+                    prevBtn.on('click', function() { changePage(currentPage - 1); });
+                }
+                buttons.append(prevBtn);
 
-                    // Page numbers (show max 5 pages)
-                    let startPage = Math.max(1, currentPage - 2);
-                    let endPage = Math.min(totalPages, startPage + 4);
+                // Page numbers
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
 
-                    if (endPage - startPage < 4) {
-                        startPage = Math.max(1, endPage - 4);
-                    }
-
-                    for (let i = startPage; i <= endPage; i++) {
-                        buttons.append(`
-                        <button class="px-3 py-1 text-sm rounded border ${i === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600'}" 
-                            onclick="changePage(${i})">
-                            ${i}
-                        </button>
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = $(`
+                        <button class="${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}">${i}</button>
                     `);
+                    if (i !== currentPage) {
+                        pageBtn.on('click', function() { changePage(i); });
                     }
+                    buttons.append(pageBtn);
+                }
 
-                    // Next button
-                    buttons.append(`
-                    <button class="px-3 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}" 
-                        ${currentPage === totalPages ? 'disabled' : ''} 
-                        onclick="changePage(${currentPage + 1})">
+                // Next button
+                const nextBtn = $(`
+                    <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
                         ›
                     </button>
                 `);
+                if (currentPage < totalPages) {
+                    nextBtn.on('click', function() { changePage(currentPage + 1); });
                 }
+                buttons.append(nextBtn);
+            }
 
-                function updateInfo(start, end, total) {
-                    $('#mobileInfo').text(`Menampilkan ${start} - ${end} dari ${total || filteredCards.length} tiket`);
-                }
+            function updateInfo(start, end, total) {
+                $('#mobileInfo').text(`Showing ${start}-${end} of ${total} tickets`);
+            }
 
-                window.changePage = function(page) {
-                    currentPage = page;
-                    displayCards();
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                };
+            function changePage(page) {
+                currentPage = page;
+                displayCards();
+                $('html, body').animate({ scrollTop: 0 }, 300);
+            }
 
-                // Event listeners
-                $('#mobileSearch').on('keyup', filterCards);
-
-                $('#mobilePerPage').on('change', function() {
-                    perPage = parseInt($(this).val());
-                    currentPage = 1;
-                    displayCards();
-                });
-
-                // Initial display
+            // Event listeners
+            $('#mobileSearch').on('keyup', function() {
                 filterCards();
             });
 
-            // MODAL JS
-            document.addEventListener('DOMContentLoaded', () => {
-                const modal = document.getElementById('ticketModal');
-                const closeBtn = document.getElementById('closeModal');
-                const ticketIdInput = document.getElementById('modalTicketId');
-
-                document.querySelectorAll('.openModalBtn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        ticketIdInput.value = btn.dataset.ticketId;
-                        modal.classList.remove('hidden');
-                    });
-                });
-
-                closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.add('hidden');
-                });
+            $('#mobilePerPage').on('change', function() {
+                const val = $(this).val();
+                perPage = val === 'all' ? 999999 : parseInt(val);
+                currentPage = 1;
+                displayCards();
             });
-        </script>
+
+            // Initial load
+            filterCards();
+        });
+    </script>
 </x-app-layout>

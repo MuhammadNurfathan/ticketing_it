@@ -9,8 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- LINE CHART SECTION --}}
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 transition-colors">
                 <div class="p-6 flex flex-col gap-6">
 
                     {{-- Title --}}
@@ -18,21 +17,14 @@
                         📈 Ticket Selesai Per Bulan
                     </h3>
 
-
-
-                    {{-- Custom Year Input --}}
+                    {{-- Year Filter --}}
                     <div class="flex flex-col md:flex-row items-center gap-3 w-full max-w-md">
-                        {{-- Label + Input --}}
                         <div class="flex flex-col md:flex-row items-center gap-2 w-full md:w-1/3">
-                            <label for="line_year" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Pilih Tahun
-                            </label>
+                            <label for="line_year" class="text-sm font-medium text-gray-700 dark:text-gray-300">Pilih Tahun</label>
                             <input type="number" id="line_year" placeholder="2025" min="2020" max="2100"
                                 value="2025"
-                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors">
                         </div>
-
-                        {{-- Buttons --}}
                         <div class="flex gap-2 w-full md:w-2/3">
                             <button id="filterLineBtn"
                                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full transition-colors">
@@ -44,71 +36,47 @@
                             </button>
                         </div>
                     </div>
-
-
-
                 </div>
 
-                {{-- Chart Section --}}
+                {{-- Chart Container --}}
                 <div class="relative flex justify-center items-center min-h-[400px]">
-
-                    {{-- Loading --}}
-                    <div id="lineLoadingIndicator"
-                        class="absolute inset-0 flex flex-col justify-center items-center bg-white/80 dark:bg-gray-900/70 rounded-lg hidden">
+                    <div id="lineLoadingIndicator" class="absolute inset-0 flex flex-col justify-center items-center bg-white/80 dark:bg-gray-900/70 rounded-lg hidden transition-colors">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                         <p class="mt-4 text-gray-600 dark:text-gray-400">Memuat data...</p>
                     </div>
 
-                    {{-- No Data --}}
-                    <div id="lineNoDataMessage"
-                        class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden">
+                    <div id="lineNoDataMessage" class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden">
                         Tidak ada data untuk ditampilkan
                     </div>
 
-                    {{-- Chart Canvas --}}
                     <div id="lineChartContainer" class="w-full max-w-6xl">
                         <canvas id="ticketsDoneChart"></canvas>
                     </div>
                 </div>
-
             </div>
 
             {{-- PIE CHART SECTION --}}
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 transition-colors">
                 <div class="p-6">
-                    <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">
-                        📊 Distribusi Ticket Berdasarkan Kategori
-                    </h3>
+                    <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">📊 Distribusi Ticket Berdasarkan Kategori</h3>
 
-                    {{-- Filter Pie Chart --}}
+                    {{-- Pie Chart Filter --}}
                     <div class="mb-6">
                         <h4 class="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">Filter Pie Chart</h4>
-
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Tanggal Mulai
-                                </label>
-                                <input type="date" id="pie_start_date"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Mulai</label>
+                                <input type="date" id="pie_start_date" 
+                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Tanggal Akhir
-                                </label>
-                                <input type="date" id="pie_end_date"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Akhir</label>
+                                <input type="date" id="pie_end_date" 
+                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
                             </div>
                             <div class="flex items-end gap-2">
-                                <button id="filterPieBtn"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full transition-colors">
-                                    Filter
-                                </button>
-                                <button id="resetPieBtn"
-                                    class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md w-full transition-colors">
-                                    Reset
-                                </button>
+                                <button id="filterPieBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md w-full transition-colors">Filter</button>
+                                <button id="resetPieBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md w-full transition-colors">Reset</button>
                             </div>
                         </div>
                     </div>
@@ -130,215 +98,157 @@
                     </div>
                 </div>
 
+                {{-- Stats --}}
                 <div class="p-6 flex flex-col gap-6">
                     <div class="stats-cards flex gap-4">
-                        <div class="card p-4 bg-white dark:bg-dark-eval-3 rounded-lg shadow w-full">
+                        <div class="card p-4 bg-white dark:bg-gray-700 rounded-lg shadow w-full transition-colors">
                             <h4 class="font-semibold text-gray-700 dark:text-gray-300">Full Resolution Time</h4>
                             <p id="fullResolutionTime" class="text-xl font-bold text-gray-900 dark:text-gray-100">-</p>
                         </div>
-                        <div class="card p-4 bg-white  dark:bg-dark-eval-3 rounded-lg shadow w-full">
+                        <div class="card p-4 bg-white dark:bg-gray-700 rounded-lg shadow w-full transition-colors">
                             <h4 class="font-semibold text-gray-700 dark:text-gray-300">Average Resolution Time</h4>
                             <p id="avgResolutionTime" class="text-xl font-bold text-gray-900 dark:text-gray-100">-</p>
                         </div>
-                        <div class="card p-4 bg-white dark:bg-dark-eval-3 rounded-lg shadow w-full">
+                        <div class="card p-4 bg-white dark:bg-gray-700 rounded-lg shadow w-full transition-colors">
                             <h4 class="font-semibold text-gray-700 dark:text-gray-300">SLA Percentage</h4>
                             <p id="slaPercentage" class="text-xl font-bold text-gray-900 dark:text-gray-100">-</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
 
-
-
-
-
-
-
-
     @vite(['resources/js/app.js'])
 
-
     <script>
+        // ---------------- STATS ----------------
+        async function loadStats(startDate = null, endDate = null) {
+            let apiUrl = '/api/tickets/statistik';
+            const params = new URLSearchParams();
+            if(startDate) params.append('start_date', startDate);
+            if(endDate) params.append('end_date', endDate);
+            if(params.toString()) apiUrl += '?' + params.toString();
+
+            try {
+                const res = await fetch(apiUrl);
+                const data = await res.json();
+                document.getElementById('fullResolutionTime').innerText = data.success ? data.data.fullResolutionTime + ' jam' : '-';
+                document.getElementById('avgResolutionTime').innerText = data.success ? data.data.avgResolutionTime + ' jam' : '-';
+                document.getElementById('slaPercentage').innerText = data.success ? data.data.slaPercentage + ' %' : '-';
+            } catch {
+                document.getElementById('fullResolutionTime').innerText = '-';
+                document.getElementById('avgResolutionTime').innerText = '-';
+                document.getElementById('slaPercentage').innerText = '-';
+            }
+        }
+
+        // ---------------- PIE & LINE CHART ----------------
         document.addEventListener('DOMContentLoaded', function() {
-            fetch('/api/tickets/statistik') // endpoint API
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('fullResolutionTime').innerText = data.data.fullResolutionTime +
-                            ' jam';
-                        document.getElementById('avgResolutionTime').innerText = data.data.avgResolutionTime +
-                            ' jam';
-                        document.getElementById('slaPercentage').innerText = data.data.slaPercentage + ' %';
-                    } else {
-                        console.error('API Error', data);
-                    }
-                })
-                .catch(err => console.error('Fetch Error:', err));
-        });
-    </script>
-    <script>
-        let pieChart;
-        let lineChart;
+            const pieStart = document.getElementById('pie_start_date');
+            const pieEnd = document.getElementById('pie_end_date');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const pieStartDate = document.getElementById('pie_start_date');
-            const pieEndDate = document.getElementById('pie_end_date');
-            const filterPieBtn = document.getElementById('filterPieBtn');
-            const resetPieBtn = document.getElementById('resetPieBtn');
-            const pieLoading = document.getElementById('pieLoadingIndicator');
-            const pieContainer = document.getElementById('pieChartContainer');
-            const pieNoData = document.getElementById('pieNoDataMessage');
-
-            const lineYear = document.getElementById('line_year');
-            const filterLineBtn = document.getElementById('filterLineBtn');
-            const resetLineBtn = document.getElementById('resetLineBtn');
-            const lineLoading = document.getElementById('lineLoadingIndicator');
-            const lineContainer = document.getElementById('lineChartContainer');
-            const lineNoData = document.getElementById('lineNoDataMessage');
-
-            const statsFull = document.getElementById('fullResolutionTime');
-            const statsAvg = document.getElementById('avgResolutionTime');
-            const statsSLA = document.getElementById('slaPercentage');
-
-            // Default Pie Chart 30 hari
+            // Default 30 hari
             const today = new Date();
             const thirtyDaysAgo = new Date(today);
             thirtyDaysAgo.setDate(today.getDate() - 30);
-            pieEndDate.valueAsDate = today;
-            pieStartDate.valueAsDate = thirtyDaysAgo;
+            pieEnd.valueAsDate = today;
+            pieStart.valueAsDate = thirtyDaysAgo;
 
             loadPieChart();
             loadLineChart();
-            loadStats();
+            loadStats(pieStart.value, pieEnd.value);
 
-            // ---------------- PIE CHART ----------------
-            filterPieBtn.addEventListener('click', () => {
+            document.getElementById('filterPieBtn').addEventListener('click', () => {
                 loadPieChart();
-                loadStats();
+                loadStats(pieStart.value, pieEnd.value);
+            });
+            document.getElementById('resetPieBtn').addEventListener('click', () => {
+                pieStart.valueAsDate = thirtyDaysAgo;
+                pieEnd.valueAsDate = today;
+                loadPieChart();
+                loadStats(pieStart.value, pieEnd.value);
             });
 
-            resetPieBtn.addEventListener('click', () => {
-                pieStartDate.value = '';
-                pieEndDate.value = '';
-                loadPieChart();
-                loadStats();
-            });
-
-            function loadPieChart() {
-                const startDate = pieStartDate.value;
-                const endDate = pieEndDate.value;
-
-                if (startDate && endDate && startDate > endDate) {
-                    alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir!');
-                    return;
-                }
-
-                let apiUrl = '/api/reports/tickets-by-category';
-                const params = new URLSearchParams();
-                if (startDate) params.append('start_date', startDate);
-                if (endDate) params.append('end_date', endDate);
-                if (params.toString()) apiUrl += '?' + params.toString();
-
-                pieLoading.classList.remove('hidden');
-                pieContainer.classList.add('hidden');
-                pieNoData.classList.add('hidden');
-
-                if (pieChart) pieChart.destroy();
-
-                fetch(apiUrl)
-                    .then(res => res.json())
-                    .then(res => {
-                        pieLoading.classList.add('hidden');
-                        if (res.data && res.data.length > 0) {
-                            pieContainer.classList.remove('hidden');
-                            pieChart = new window.PieChart('ticketCategoryChart', {
-                                title: 'Distribusi Ticket Berdasarkan Kategori',
-                                labelKey: 'category',
-                                valueKey: 'total'
-                            });
-                            pieChart.render(res.data);
-                        } else {
-                            pieNoData.classList.remove('hidden');
-                        }
-                    })
-                    .catch(() => {
-                        pieLoading.classList.add('hidden');
-                        pieNoData.classList.remove('hidden');
-                    });
-            }
-
-            // ---------------- LINE CHART ----------------
-            filterLineBtn.addEventListener('click', loadLineChart);
-            resetLineBtn.addEventListener('click', () => {
-                lineYear.value = new Date().getFullYear();
+            document.getElementById('filterLineBtn').addEventListener('click', loadLineChart);
+            document.getElementById('resetLineBtn').addEventListener('click', () => {
+                document.getElementById('line_year').value = new Date().getFullYear();
                 loadLineChart();
             });
-
-            function loadLineChart() {
-                const year = lineYear.value || new Date().getFullYear();
-                const apiUrl = `/api/reports/tickets-done-per-month?year=${year}`;
-
-                lineLoading.classList.remove('hidden');
-                lineContainer.classList.add('hidden');
-                lineNoData.classList.add('hidden');
-
-                if (lineChart) lineChart.destroy();
-
-                fetch(apiUrl)
-                    .then(res => res.json())
-                    .then(res => {
-                        lineLoading.classList.add('hidden');
-                        if (res.data && res.data.length > 0) {
-                            lineContainer.classList.remove('hidden');
-                            lineChart = new window.LineChart('ticketsDoneChart', {
-                                title: `Ticket Selesai Per Bulan - ${year}`,
-                                datasetLabel: 'Ticket Selesai',
-                                labelKey: 'month',
-                                valueKey: 'total'
-                            });
-                            lineChart.render(res.data);
-                        } else {
-                            lineNoData.classList.remove('hidden');
-                        }
-                    })
-                    .catch(() => {
-                        lineLoading.classList.add('hidden');
-                        lineNoData.classList.remove('hidden');
-                    });
-            }
-
-            // ---------------- STATS ----------------
-            function loadStats() {
-                let apiUrl = '/api/tickets/statistik';
-                const params = new URLSearchParams();
-                if (pieStartDate.value) params.append('start_date', pieStartDate.value);
-                if (pieEndDate.value) params.append('end_date', pieEndDate.value);
-                if (params.toString()) apiUrl += '?' + params.toString();
-
-                fetch(apiUrl)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            statsFull.innerText = data.data.fullResolutionTime + ' jam';
-                            statsAvg.innerText = data.data.avgResolutionTime + ' jam';
-                            statsSLA.innerText = data.data.slaPercentage + ' %';
-                        } else {
-                            statsFull.innerText = '-';
-                            statsAvg.innerText = '-';
-                            statsSLA.innerText = '-';
-                        }
-                    })
-                    .catch(() => {
-                        statsFull.innerText = '-';
-                        statsAvg.innerText = '-';
-                        statsSLA.innerText = '-';
-                    });
-            }
         });
-    </script>
 
+        let pieChart, lineChart;
+
+        async function loadPieChart() {
+            const start = document.getElementById('pie_start_date').value;
+            const end = document.getElementById('pie_end_date').value;
+            const container = document.getElementById('pieChartContainer');
+            const noData = document.getElementById('pieNoDataMessage');
+            const loading = document.getElementById('pieLoadingIndicator');
+
+            if(start && end && start > end) { alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir!'); return; }
+
+            loading.classList.remove('hidden');
+            container.classList.add('hidden');
+            noData.classList.add('hidden');
+            if(pieChart) pieChart.destroy();
+
+            let url = '/api/reports/tickets-by-category';
+            const params = new URLSearchParams();
+            if(start) params.append('start_date', start);
+            if(end) params.append('end_date', end);
+            if(params.toString()) url += '?' + params.toString();
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                loading.classList.add('hidden');
+                if(data.data && data.data.length) {
+                    container.classList.remove('hidden');
+                    pieChart = new window.PieChart('ticketCategoryChart', {
+                        title: 'Distribusi Ticket Berdasarkan Kategori',
+                        labelKey: 'category',
+                        valueKey: 'total',
+                        darkMode: document.documentElement.classList.contains('dark')
+                    });
+                    pieChart.render(data.data);
+                } else noData.classList.remove('hidden');
+            } catch {
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            }
+        }
+
+        async function loadLineChart() {
+            const year = document.getElementById('line_year').value || new Date().getFullYear();
+            const container = document.getElementById('lineChartContainer');
+            const noData = document.getElementById('lineNoDataMessage');
+            const loading = document.getElementById('lineLoadingIndicator');
+
+            loading.classList.remove('hidden');
+            container.classList.add('hidden');
+            noData.classList.add('hidden');
+            if(lineChart) lineChart.destroy();
+
+            try {
+                const res = await fetch(`/api/reports/tickets-done-per-month?year=${year}`);
+                const data = await res.json();
+                loading.classList.add('hidden');
+                if(data.data && data.data.length) {
+                    container.classList.remove('hidden');
+                    lineChart = new window.LineChart('ticketsDoneChart', {
+                        title: `Ticket Selesai Per Bulan - ${year}`,
+                        datasetLabel: 'Ticket Selesai',
+                        labelKey: 'month',
+                        valueKey: 'total',
+                        darkMode: document.documentElement.classList.contains('dark')
+                    });
+                    lineChart.render(data.data);
+                } else noData.classList.remove('hidden');
+            } catch {
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            }
+        }
+    </script>
 </x-app-layout>

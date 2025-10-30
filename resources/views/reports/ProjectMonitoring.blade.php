@@ -2,63 +2,60 @@
 
     {{-- HEADER --}}
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Monitoring Project Queue
-            </h2>
-        </div>
+        <h2 class="font-semibold text-xl text-gray-900 dark:text-white">
+            Monitoring Project Queue
+        </h2>
     </x-slot>
 
     {{-- MAIN CONTENT --}}
-    <div class="py-6 space-y-8">
-        {{-- SECTION: PROJECT QUEUE TABLE --}}
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 transition-colors">
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 p-4 rounded-lg">
-                    <!-- Title -->
-                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4 sm:mb-0">
-                        Daftar Project Queue
-                    </h3>
+            {{-- SECTION: PROJECT QUEUE TABLE --}}
+            <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                
+                {{-- Header with Filter --}}
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            Daftar Project Queue
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">List of all project queues</p>
+                    </div>
 
-                    <!-- Filter Section -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <!-- Filter Tahun -->
-                        <div class="flex items-center gap-2">
-                            <select id="filter-year"
-                                class="border border-gray-300 dark:border-gray-700 rounded-md p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-36">
-                                <option value="">Pilih Tahun</option>
-                            </select>
-                        </div>
+                    {{-- Filter Section --}}
+                    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <select id="filter-year"
+                            class="flex-1 sm:flex-none px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500">
+                            <option value="">Pilih Tahun</option>
+                        </select>
 
-                        <!-- Tombol Tampilkan -->
                         <button id="filterBtn"
-                            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700  transition-all duration-200 shadow-sm">
+                            class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-blue-800 dark:hover:bg-gray-200 transition-colors text-sm font-medium shadow-sm">
                             <span>🔍</span>
                             <span>Tampilkan</span>
                         </button>
-
-
                     </div>
                 </div>
 
-
+                {{-- Table --}}
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm text-left border border-gray-200 dark:border-gray-700 rounded-lg">
-                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
                             <tr>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">No</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Project Code</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Project Name</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Priority</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Requestor</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Description</th>
-                                <th class="px-4 py-2 border-b dark:border-gray-600">Created At</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">No</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Project Code</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Project Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Priority</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Requestor</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Description</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Start Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">End Date</th>
                             </tr>
                         </thead>
-                        <tbody id="projectQueueTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                        <tbody id="projectQueueTableBody" class="divide-y divide-gray-200 dark:divide-gray-700">
                             <tr>
-                                <td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-4 italic">
+                                <td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-8 italic">
                                     Loading data...
                                 </td>
                             </tr>
@@ -66,132 +63,118 @@
                     </table>
                 </div>
             </div>
-        </div>
 
-        {{-- SECTION: GANTT CHART --}}
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 transition-colors">
-                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
-                    Progress Timeline (Gantt Chart)
-                </h3>
-                <div id="gantt"></div>
+            {{-- SECTION: GANTT CHART --}}
+            <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Progress Timeline (Gantt Chart)
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Visual project timeline</p>
+                </div>
+                <div class="p-4 sm:p-6">
+                    <div id="gantt"></div>
+                </div>
             </div>
-        </div>
 
-        {{-- SECTION: PROJECT SUMMARY --}}
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 transition-colors duration-300">
-                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">
-                    Project Summary
-                </h3>
+            {{-- SECTION: PROJECT SUMMARY --}}
+            <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Project Summary
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Overview of all projects</p>
+                </div>
 
-                <div id="summary-container" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <!-- Active Projects -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            All Project
-                        </h4>
-                        <p id="all-projects"
-                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
-                            -
-                        </p>
-                    </div>
-                    <!-- Active Projects -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            Waiting Projects
-                        </h4>
-                        <p id="waiting-projects"
-                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
-                            -
-                        </p>
-                    </div>
-                    <!-- Active Projects -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            Void Projects
-                        </h4>
-                        <p id="void-projects"
-                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
-                            -
-                        </p>
-                    </div>
-                    <!-- Active Projects -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-blue-50 dark:bg-blue-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            Active Projects
-                        </h4>
-                        <p id="active-projects"
-                            class="text-4xl font-bold text-blue-700 dark:text-blue-300 tracking-tight">
-                            -
-                        </p>
-                    </div>
+                <div class="p-3 sm:p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-9 gap-4">
+                        
+                        {{-- All Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">All Project</div>
+                            <div id="all-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
 
-                    <!-- Closed Projects -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            Closed Projects
-                        </h4>
-                        <p id="closed-projects"
-                            class="text-4xl font-bold text-green-700 dark:text-green-300 tracking-tight">
-                            -
-                        </p>
-                    </div>
+                        {{-- Waiting Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Waiting</div>
+                            <div id="waiting-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
 
-                    <!-- SLA -->
-                    <div
-                        class="p-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/30 flex flex-col items-center shadow-sm hover:shadow-md transition">
-                        <h4 class="text-base font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                            SLA (%)
-                        </h4>
-                        <p id="sla-value"
-                            class="text-4xl font-bold text-yellow-700 dark:text-yellow-300 tracking-tight">
-                            -
-                        </p>
+                        {{-- Void Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Void</div>
+                            <div id="void-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- Active Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Active</div>
+                            <div id="active-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- Pending Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Pending</div>
+                            <div id="pending-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- Closed Projects --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Closed</div>
+                            <div id="closed-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- Closed On Time --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">On Time</div>
+                            <div id="closedOnTime-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- Closed Late --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Late</div>
+                            <div id="closedLate-projects" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
+                        {{-- SLA --}}
+                        <div class="bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">SLA</div>
+                            <div id="sla-value" class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">-</div>
+                        </div>
+
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 
-    <style>
+  <style>
         #gantt {
-            min-height: 450px;
+            min-height: 400px;
             background: #f9fafb;
             border-radius: 8px;
-            border: 1px solid #d1d5db;
-            transition: background-color 0.3s, border-color 0.3s;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
         }
 
         .dark #gantt {
             background: #1f2937;
-            border-color: #374151;
+            border-color: #4b5563;
         }
 
         .popup-content {
-            padding: 6px;
-            font-size: 0.85rem;
+            padding: 8px;
+            font-size: 0.875rem;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Animasi icon saat refresh */
-        .spin {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
+        .dark .popup-content {
+            background: #374151;
+            color: #f9fafb;
         }
 
         /* Gantt chart dark mode adjustments */
@@ -204,8 +187,8 @@
         }
 
         .dark .gantt text {
-            fill: #ffffff !important;
-            font-weight: bold;
+            fill: #f9fafb !important;
+            font-weight: 500;
         }
 
         .dark .gantt .tick {
@@ -223,8 +206,18 @@
         .dark .gantt .bar-progress {
             fill: #10b981;
         }
+
+        /* Loading animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
     </style>
-    <!-- Day.js harus di atas sebelum script main -->
+   <!-- Day.js -->
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.12.0/dayjs.min.js"></script>
 
     <!-- Frappe Gantt -->
@@ -244,6 +237,7 @@
                 const opt = document.createElement('option');
                 opt.value = y;
                 opt.textContent = y;
+                if (y === currentYear) opt.selected = true;
                 yearSelect.appendChild(opt);
             }
 
@@ -271,28 +265,29 @@
                     const res = await fetch(`{{ url('/api/SummaryProject') }}?year=${year}`);
                     if (!res.ok) throw new Error("Gagal ambil data summary");
                     const data = await res.json();
+                    
                     document.getElementById('all-projects').textContent = data.total ?? '-';
                     document.getElementById('void-projects').textContent = data.void ?? '-';
-                    document.getElementById('waiting-projects').textContent = data.active ?? '-';
+                    document.getElementById('waiting-projects').textContent = data.waiting ?? '-';
+                    document.getElementById('closedOnTime-projects').textContent = data.closedOnTime ?? '-';
+                    document.getElementById('closedLate-projects').textContent = data.closedLate ?? '-';
+                    document.getElementById('pending-projects').textContent = data.pending ?? '-';
                     document.getElementById('active-projects').textContent = data.active ?? '-';
                     document.getElementById('closed-projects').textContent = data.closed ?? '-';
                     document.getElementById('sla-value').textContent = data.sla ? `${data.sla}%` : '-';
                 } catch (err) {
-                    console.error(err);
-                    document.getElementById('all-projects').textContent = '-';
-                    document.getElementById('void-projects').textContent = '-';
-                    document.getElementById('waiting-projects').textContent = '-';
-                    document.getElementById('active-projects').textContent = '-';
-                    document.getElementById('closed-projects').textContent = '-';
-                    document.getElementById('sla-value').textContent = '-';
+                    console.error('Error loading summary:', err);
+                    // Set semua ke '-' jika error
+                    ['all-projects', 'void-projects', 'waiting-projects', 'closedOnTime-projects', 
+                     'closedLate-projects', 'pending-projects', 'active-projects', 'closed-projects', 'sla-value']
+                    .forEach(id => document.getElementById(id).textContent = '-');
                 }
             }
 
             // === Load Project Queue ===
             async function loadProjectQueue(year) {
                 const tbody = document.getElementById('projectQueueTableBody');
-                tbody.innerHTML =
-                    `<tr><td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-4 italic">Loading data...</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-500 dark:text-gray-400 py-8 italic">Loading data...</td></tr>`;
 
                 try {
                     const res = await fetch(`/api/ProjectQueue?year=${year}`);
@@ -300,37 +295,36 @@
                     const data = json.data?.ProjectQueue || [];
 
                     if (data.length === 0) {
-                        tbody.innerHTML =
-                            `<tr><td colspan="7" class="text-center text-gray-400 dark:text-gray-500 py-4 italic">Tidak ada project queue.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-gray-400 dark:text-gray-500 py-8 italic">Tidak ada project queue.</td></tr>`;
                         return;
                     }
 
                     tbody.innerHTML = '';
                     data.forEach((item, index) => {
-                        tbody.insertAdjacentHTML('beforeend', `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${index + 1}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_code ?? '-'}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.project_name ?? '-'}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.priority?.priority_name ?? '-'}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.requestor?.name ?? '-'}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${item.description ?? '-'}</td>
-                        <td class="px-4 py-2 text-gray-900 dark:text-gray-100">${new Date(item.created_at).toLocaleString('id-ID')}</td>
-                    </tr>
-                `);
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
+                        row.innerHTML = `
+                            <td class="px-4 py-3 text-gray-900 dark:text-white">${index + 1}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.project_code ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.project_name ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.priority?.priority_name ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.requestor?.name ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.description ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.start_date ?? '-'}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${item.end_date ?? '-'}</td>
+                        `;
+                        tbody.appendChild(row);
                     });
                 } catch (error) {
-                    console.error(error);
-                    tbody.innerHTML =
-                        `<tr><td colspan="7" class="text-center text-red-500 dark:text-red-400 py-4">Gagal memuat data</td></tr>`;
+                    console.error('Error loading project queue:', error);
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-red-500 dark:text-red-400 py-8">Gagal memuat data</td></tr>`;
                 }
             }
 
             // === Load Gantt Chart ===
             async function loadGanttChart(year) {
                 const ganttContainer = document.getElementById('gantt');
-                ganttContainer.innerHTML =
-                    `<p class="text-gray-500 dark:text-gray-400 italic text-center mt-4">Loading Gantt chart...</p>`;
+                ganttContainer.innerHTML = `<p class="text-gray-500 dark:text-gray-400 italic text-center py-8">Loading Gantt chart...</p>`;
 
                 try {
                     const res = await fetch(`/api/ProjectMonitorGraph?year=${year}`);
@@ -338,20 +332,15 @@
                     const projects = await res.json();
 
                     if (!projects.length) {
-                        ganttContainer.innerHTML =
-                            `<p class="text-gray-400 dark:text-gray-500 italic text-center mt-4">Tidak ada data proyek untuk ditampilkan.</p>`;
+                        ganttContainer.innerHTML = `<p class="text-gray-400 dark:text-gray-500 italic text-center py-8">Tidak ada data proyek untuk ditampilkan.</p>`;
                         return;
                     }
 
                     ganttContainer.innerHTML = '';
 
                     const tasks = projects.map(p => {
-                        // Cutoff tanggal ke tahun yang dipilih
-                        const start = new Date(year, Number(p.month_start) - 1, Number(p
-                            .day_start));
+                        const start = new Date(year, Number(p.month_start) - 1, Number(p.day_start));
                         const end = new Date(year, Number(p.month_end) - 1, Number(p.day_end));
-
-                        // Format YYYY-MM-DD
                         const formatDate = d => d.toISOString().slice(0, 10);
 
                         return {
@@ -378,25 +367,23 @@
                                 });
                             };
                             return `
-                    <div class='popup-content text-sm p-2'>
-                        <strong>${task.name}</strong><br>
-                        ${formatDDMMMYYYY(task.start)} → ${formatDDMMMYYYY(task.end)}<br>
-                        Progress: <b>${task.progress}%</b><br>
-                        Status: ${task.status_name}
-                    </div>
-                `;
+                                <div class='popup-content'>
+                                    <strong>${task.name}</strong><br>
+                                    ${formatDDMMMYYYY(task.start)} → ${formatDDMMMYYYY(task.end)}<br>
+                                    Progress: <b>${task.progress}%</b><br>
+                                    Status: ${task.status_name}
+                                </div>
+                            `;
                         }
                     });
 
                 } catch (err) {
-                    console.error("❌ Error load Gantt:", err);
-                    ganttContainer.innerHTML =
-                        `<p class="text-red-500 dark:text-red-400 italic text-center mt-4">Gagal memuat data Gantt Chart.</p>`;
+                    console.error("Error loading Gantt:", err);
+                    ganttContainer.innerHTML = `<p class="text-red-500 dark:text-red-400 italic text-center py-8">Gagal memuat data Gantt Chart.</p>`;
                 }
             }
 
         });
     </script>
-
 
 </x-app-layout>
