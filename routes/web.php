@@ -121,4 +121,27 @@ Route::middleware(['auth'])->group(function () {
         return view('reports.ProjectMonitoring');
     })->name('reports.ProjectMonitoring');
 });
+
+Route::get('/ticket-files/{filename}', function($filename) {
+    // Sanitize filename untuk keamanan
+    $filename = basename($filename);
+    
+    // Path lengkap ke file
+    $path = storage_path('app/public/tickets/' . $filename);
+    
+    // Cek apakah file exist
+    if (!file_exists($path)) {
+        abort(404, 'File tidak ditemukan');
+    }
+    
+    // Tentukan MIME type
+    $mimeType = mime_content_type($path);
+    
+    // Return file dengan header yang benar
+    return response()->file($path, [
+        'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->name('ticket.file');
 require __DIR__ . '/auth.php';

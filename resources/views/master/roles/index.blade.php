@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-white leading-tight">
+                        <h2 class="font-semibold text-xl text-dark-eval-1 dark:text-light-eval-1 leading-tight">
                 {{ 'Kelola Roles' }}
             </h2>
             <a href="{{ route('roles.create') }}"

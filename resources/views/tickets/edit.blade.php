@@ -4,16 +4,15 @@
             {{ __('Edit Ticket') }}
         </h2>
     </x-slot>
-    <div
-        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+    
+    <div class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
                     {{-- Error Alert --}}
                     @if ($errors->any())
-                        <div
-                            class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+                        <div class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
                             <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -23,137 +22,108 @@
                     @endif
 
                     {{-- Form Edit Ticket --}}
-                    <form action="{{ route('DashboardTicketsAdmin.update', $ticket->id) }}" method="POST"
-                        enctype="multipart/form-data">
+                    <form action="{{ route('DashboardTicketsAdmin.update', $ticket->id) }}" method="POST" enctype="multipart/form-data" id="edit-form">
                         @csrf
                         @method('PUT')
 
-                        {{-- Ticket Code --}}
+                        {{-- Ticket Code (READ ONLY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Ticket Code
                             </label>
                             <input type="text" name="ticket_code" value="{{ $ticket->ticket_code }}" readonly
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">
                         </div>
 
-                        {{-- User --}}
-                        <div class="mb-4 relative">
+                        {{-- Requestor Name (READ ONLY) --}}
+                        <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Pilih Requestor <span class="text-red-500">*</span>
+                                Requestor Name (Tidak dapat diubah)
                             </label>
-
-                            {{-- Input teks untuk search --}}
-                            <input type="text" id="user-search" placeholder="Cari user..."
-                                value="{{ old('user_id') ? $users->firstWhere('id', old('user_id'))->name ?? '' : $ticket->user->name ?? '' }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-
-                            {{-- Hidden input untuk menyimpan user_id --}}
-                            <input type="hidden" name="user_id" id="user-id"
-                                value="{{ old('user_id', $ticket->user_id ?? '') }}" required>
-
-                            {{-- Dropdown hasil search --}}
-                            <ul id="search-results"
-                                class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
-                                @foreach ($users as $user)
-                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $user->id }}">{{ $user->name }}</li>
-                                @endforeach
-                            </ul>
+                            <input type="text" value="{{ $ticket->user->name ?? 'N/A' }}" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">
+                            <input type="hidden" name="user_id" value="{{ $ticket->user_id }}">
                         </div>
 
-
-                        {{-- IT Support --}}
+                        {{-- IT Support (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 IT Support <span class="text-red-500">*</span>
                             </label>
-                            <select name="support_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih IT Support --</option>
+                            <select name="support_id" required
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" hidden>-- Pilih IT Support --</option>
                                 @foreach ($developers as $dev)
-                                    <option value="{{ $dev->id }}"
-                                        {{ $ticket->support_id == $dev->id ? 'selected' : '' }}>
+                                    <option value="{{ $dev->id }}" {{ (old('support_id', $ticket->support_id) == $dev->id) ? 'selected' : '' }}>
                                         {{ $dev->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        {{-- Problem Category --}}
+                        {{-- Category (READ ONLY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Category <span class="text-red-500">*</span>
+                                Category (Tidak dapat diubah)
                             </label>
-                            <select name="problem_category_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih Category --</option>
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}"
-                                        {{ $ticket->problem_category_id == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->problem_category_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="text" value="{{ $ticket->problemCategory->problem_category_name ?? 'N/A' }}" readonly
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">
+                            <input type="hidden" name="problem_category_id" value="{{ $ticket->problem_category_id }}">
                         </div>
 
-                        {{-- Assets --}}
+                        {{-- Assets (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Assets <span class="text-red-500">*</span>
                             </label>
-                            <select name="assets_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih Assets --</option>
+                            <select name="assets_id" required
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" hidden>-- Pilih Assets --</option>
                                 @foreach ($assets as $ass)
-                                    <option value="{{ $ass->id }}"
-                                        {{ $ticket->assets_id == $ass->id ? 'selected' : '' }}>
-                                        {{ $ass->assets_name }}
+                                    <option value="{{ $ass->id }}" {{ (old('assets_id', $ticket->assets_id) == $ass->id) ? 'selected' : '' }}>
+                                        {{ $ass->assets_name }} - {{ $ass->assets_code }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        {{-- Problem --}}
+                        {{-- Problem (READ ONLY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Problem <span class="text-red-500">*</span>
+                                Problem (Tidak dapat diubah)
                             </label>
-                            <input type="text" name="problem" value="{{ $ticket->problem }}"
-                                placeholder="Masukkan Kendala..."
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <textarea readonly rows="3"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">{{ $ticket->problem }}</textarea>
+                            <input type="hidden" name="problem" value="{{ $ticket->problem }}">
                         </div>
 
-                        {{-- Priority --}}
+                        {{-- Priority (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Priority <span class="text-red-500">*</span>
                             </label>
-                            <select name="priority_id"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                                <option hidden>-- Pilih Priority --</option>
+                            <select name="priority_id" required
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" hidden>-- Pilih Priority --</option>
                                 @foreach ($priorities as $prt)
-                                    <option value="{{ $prt->id }}"
-                                        {{ $ticket->priority_id == $prt->id ? 'selected' : '' }}>
+                                    <option value="{{ $prt->id }}" {{ (old('priority_id', $ticket->priority_id) == $prt->id) ? 'selected' : '' }}>
                                         {{ $prt->priority_name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        {{-- Status --}}
+                        {{-- Status (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Status <span class="text-red-500">*</span>
                             </label>
-                            <select name="status_id" id="status-select"
+                            <select name="status_id" id="status-select" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option hidden value="">-- Pilih Status --</option>
+                                <option value="" hidden>-- Pilih Status --</option>
                                 @foreach ($statuses as $stat)
-                                    @if (!in_array($stat->id, [4, 5,6]))
-                                        <option value="{{ $stat->id }}"
-                                            data-name="{{ strtolower($stat->status_name) }}"
-                                            {{ $ticket->status_id == $stat->id ? 'selected' : '' }}>
+                                    @if (!in_array($stat->id, [4, 5, 6]))
+                                        <option value="{{ $stat->id }}" data-name="{{ strtolower($stat->status_name) }}" {{ (old('status_id', $ticket->status_id) == $stat->id) ? 'selected' : '' }}>
                                             {{ $stat->status_name }}
                                         </option>
                                     @endif
@@ -161,337 +131,222 @@
                             </select>
                         </div>
 
-                        {{-- Start Date --}}
-                        <div id="start-date-container"
-                            class="mb-4 {{ $ticket->status_id == 2 || $ticket->status_id == 3 ? '' : 'hidden' }}">
+                        {{-- Start Date (Conditional - MANDATORY untuk In Progress/Done) --}}
+                        <div id="start-date-container" class="mb-4 {{ in_array(old('status_id', $ticket->status_id), [2, 3]) ? '' : 'hidden' }}">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Start Date & Time
+                                Start Date & Time <span class="text-red-500">*</span>
                             </label>
                             <input type="datetime-local" id="start_datetime" name="start_date"
-                                value="{{ $ticket->start_date ? $ticket->start_date->format('Y-m-d\TH:i') : '' }}"
+                                value="{{ old('start_date', $ticket->start_date ? $ticket->start_date->format('Y-m-d\TH:i') : '') }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        {{-- End Date --}}
-                        <div id="end-date-container" class="mb-4 {{ $ticket->status_id == 3 ? '' : 'hidden' }}">
+                        {{-- End Date (Conditional - MANDATORY untuk Done) --}}
+                        <div id="end-date-container" class="mb-4 {{ old('status_id', $ticket->status_id) == 3 ? '' : 'hidden' }}">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                End Date & Time
+                                End Date & Time <span class="text-red-500">*</span>
                             </label>
                             <input type="datetime-local" id="end_datetime" name="end_date"
-                                value="{{ $ticket->end_date ? $ticket->end_date->format('Y-m-d\TH:i') : '' }}"
+                                value="{{ old('end_date', $ticket->end_date ? $ticket->end_date->format('Y-m-d\TH:i') : '') }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        {{-- Time Spent --}}
-                        <div id="time-spent-container" class="mb-4 {{ $ticket->status_id == 3 ? '' : 'hidden' }}">
-                            <div class="flex items-center justify-between">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Time Spent (Menit)
+                        {{-- Time Spent (Conditional - MANDATORY untuk Done) --}}
+                        <div id="time-spent-container" class="mb-4 {{ old('status_id', $ticket->status_id) == 3 ? '' : 'hidden' }}">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Time Spent (Menit) <span class="text-red-500">*</span>
                                 </label>
-                                <label class="flex items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
-                                    <input type="checkbox" id="manual_time" class="mr-2"
-                                        {{ old('time_spent') ? 'checked' : '' }}> Manual Input
+                                <label class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                    <input type="checkbox" id="manual_time" class="mr-2 rounded focus:ring-blue-500"> Manual Input
                                 </label>
                             </div>
-                            <input type="number" id="time_spent" name="time_spent" value="{{ $ticket->time_spent }}"
-                                readonly
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            <input type="number" id="time_spent" name="time_spent" value="{{ old('time_spent', $ticket->time_spent) }}" readonly min="1" placeholder="Masukkan Waktu Pengerjaan (Menit)"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
-                        {{-- Notes (hanya muncul saat Manual Input dicentang) --}}
+
+                        {{-- Notes (Muncul jika manual time) --}}
                         <div id="notes-container" class="mb-4 hidden">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Notes
+                                Notes <span class="text-red-500">*</span>
                             </label>
-                            <textarea name="notes" id="notes" rows="3"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                placeholder="Masukkan catatan...">{{ old('notes', $ticket->notes ?? '') }}</textarea>
+                            <textarea name="notes" id="notes" rows="3" placeholder="Masukkan catatan..."
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ old('notes', $ticket->notes ?? '') }}</textarea>
                         </div>
-                        <div id="solution-container" class="mb-4 {{ $ticket->status_id == 3 ? '' : 'hidden' }}">
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        Solution
-    </label>
-    <textarea name="solution" id="solution" rows="3"
-        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-        placeholder="Masukkan solusi penyelesaian...">{{ old('solution', $ticket->solution ?? '') }}</textarea>
-</div>
 
+                        {{-- Solution (Conditional - MANDATORY untuk In Progress/Done) --}}
+                        <div id="solution-container" class="mb-4 {{ in_array(old('status_id', $ticket->status_id), [2, 3]) ? '' : 'hidden' }}">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Solution <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="solution" id="solution" rows="3" placeholder="Masukkan solusi penyelesaian..." minlength="10"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">{{ old('solution', $ticket->solution ?? '') }}</textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Minimal 10 karakter</p>
+                        </div>
 
-                        {{-- Upload Media --}}
+                        {{-- File Preview (READ ONLY - Tidak bisa diubah) --}}
                         <div class="mb-6">
-                            <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Upload Gambar / Video (Max 10 MB)
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                File Saat Ini (Tidak dapat diubah)
                             </label>
-                            <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4"
-                                class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 
-                                file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
-                                file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 
-                                hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 
-                                dark:hover:file:bg-gray-600">
-
-                            <div id="preview-container"
-                                class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                @if ($ticket->image)
-                                    @if (Str::endsWith($ticket->image, ['.mp4']))
-                                        <video controls
-                                            class="w-full h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
-                                            <source src="{{ asset('storage/' . $ticket->image) }}">
+                            
+                            @if ($ticket->image)
+                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-900">
+                                    @php
+                                        $extension = pathinfo($ticket->image, PATHINFO_EXTENSION);
+                                        $filename = basename($ticket->image);
+                                    @endphp
+                                    
+                                    @if (in_array($extension, ['jpg', 'jpeg', 'png']))
+                                        <img src="{{ route('ticket.file', $filename) }}" alt="Ticket Image"
+                                            class="max-w-md h-40 object-cover rounded border border-gray-300 dark:border-gray-600">
+                                    @elseif ($extension == 'mp4')
+                                        <video controls class="max-w-md h-40 rounded border border-gray-300 dark:border-gray-600">
+                                            <source src="{{ route('ticket.file', $filename) }}" type="video/mp4">
                                         </video>
-                                    @else
-                                        <img src="{{ asset('storage/' . $ticket->image) }}"
-                                            class="w-full h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
                                     @endif
-                                @endif
-                            </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">📎 {{ $filename }}</p>
+                                </div>
+                            @else
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada file yang diupload</p>
+                            @endif
+                            
+                            <input type="hidden" name="image" value="{{ $ticket->image }}">
                         </div>
 
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Update
-                            Ticket</button>
+                        {{-- Buttons --}}
+                        <div class="flex gap-2">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                                Update Ticket
+                            </button>
+                            <button type="button" onclick="history.back()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                                Kembali
+                            </button>
+                        </div>
                     </form>
-
-                    {{-- jQuery --}}
-                    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-                      {{-- Scripts --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-
-<script>
-    // 🔧 Status Field Trigger
-    document.addEventListener("DOMContentLoaded", function() {
-        const statusSelect = document.getElementById("status-select");
-        const startContainer = document.getElementById("start-date-container");
-        const endContainer = document.getElementById("end-date-container");
-        const timeContainer = document.getElementById("time-spent-container");
-        const startInput = document.getElementById("start_datetime");
-        const endInput = document.getElementById("end_datetime");
-        const timeInput = document.getElementById("time_spent");
-        const manualCheckbox = document.getElementById("manual_time");
-        const solutionContainer = document.getElementById("solution-container");
-        const notesContainer = document.getElementById("notes-container");
-
-        // 🔄 Ubah tampilan field berdasarkan status
-        statusSelect.addEventListener("change", function() {
-            const status = this.options[this.selectedIndex].getAttribute("data-name");
-
-            // Sembunyikan semua dulu
-            startContainer.classList.add("hidden");
-            endContainer.classList.add("hidden");
-            timeContainer.classList.add("hidden");
-            solutionContainer.classList.add("hidden");
-
-            if (status === "in progress") {
-                startContainer.classList.remove("hidden");
-            } else if (status === "done") {
-                startContainer.classList.remove("hidden");
-                endContainer.classList.remove("hidden");
-                timeContainer.classList.remove("hidden");
-                solutionContainer.classList.remove("hidden");
-            }
-        });
-
-        // ⏱️ Batasi end date minimal sesuai start
-        function updateEndDateMin() {
-            if (startInput.value) {
-                endInput.min = startInput.value;
-                if (endInput.value && endInput.value < startInput.value) {
-                    endInput.value = '';
-                    timeInput.value = '';
-                }
-            } else {
-                endInput.removeAttribute('min');
-            }
-        }
-
-        startInput.addEventListener('change', updateEndDateMin);
-        startInput.addEventListener('input', updateEndDateMin);
-        updateEndDateMin();
-
-        // ⌚ Hitung time spent otomatis (kalau tidak manual)
-        function hitungTimeSpent() {
-            if (manualCheckbox.checked) return;
-            const start = new Date(startInput.value);
-            const end = new Date(endInput.value);
-            if (!isNaN(start) && !isNaN(end) && end > start) {
-                timeInput.value = Math.floor((end - start) / 60000);
-            } else {
-                timeInput.value = "";
-            }
-        }
-
-        endInput.addEventListener("change", hitungTimeSpent);
-        startInput.addEventListener("change", hitungTimeSpent);
-
-        // 📝 Manual time toggle
-        manualCheckbox.addEventListener("change", function() {
-            if (this.checked) {
-                timeInput.removeAttribute("readonly");
-                timeInput.classList.remove("bg-gray-100");
-                notesContainer.classList.remove("hidden");
-            } else {
-                timeInput.setAttribute("readonly", true);
-                timeInput.classList.add("bg-gray-100");
-                hitungTimeSpent();
-                notesContainer.classList.add("hidden");
-            }
-        });
-    });
-</script>
-
-
-
-                    {{-- Script: User Search --}}
-                    <script>
-                        $(function() {
-                            const $input = $('#user-search');
-                            const $results = $('#search-results');
-                            const $hidden = $('#user-id');
-
-                            $input.on('focus', () => $results.show());
-                            $input.on('input', function() {
-                                const val = $(this).val().toLowerCase();
-                                let visible = false;
-
-                                $results.children('li').each(function() {
-                                    const match = $(this).text().toLowerCase().includes(val);
-                                    $(this).toggle(match);
-                                    if (match) visible = true;
-                                });
-                                $results.toggle(visible);
-                            });
-
-                            $results.on('click', 'li', function() {
-                                $input.val($(this).text());
-                                $hidden.val($(this).data('id'));
-                                $results.hide();
-                            });
-
-                            $(document).on('click', (e) => {
-                                if (!$(e.target).closest('#user-search, #search-results').length) $results.hide();
-                            });
-                        });
-                    </script>
-
-                    {{-- Script: Image Preview & Validation --}}
-                    <script>
-                        document.getElementById('image').addEventListener('change', function(e) {
-                            const file = e.target.files[0];
-                            const preview = document.getElementById('preview-image');
-                            const maxSize = 2 * 1024 * 1024;
-                            const allowed = ['image/jpeg', 'image/png', 'image/jpg'];
-
-                            if (!file) return preview.classList.add('hidden');
-                            if (file.size > maxSize) return alert('Ukuran file maksimal 2 MB!'), e.target.value = '', preview
-                                .classList.add('hidden');
-                            if (!allowed.includes(file.type)) return alert('Format file harus JPG atau PNG!'), e.target.value = '',
-                                preview.classList.add('hidden');
-
-                            preview.src = URL.createObjectURL(file);
-                            preview.classList.remove('hidden');
-                        });
-                    </script>
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const input = document.getElementById("media");
-                            const previewContainer = document.getElementById("preview-container");
-                            let selectedFile = null; // cuma 1 file
-
-                            input.addEventListener("change", function(e) {
-                                const file = e.target.files[0];
-                                const maxSize = 5 * 1024 * 1024; // 5 mb
-                                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4'];
-
-                                if (!file) return;
-                                if (!allowedTypes.includes(file.type)) {
-                                    alert("Format file harus JPG, PNG, atau MP4!");
-                                    input.value = "";
-                                    return;
-                                }
-                                if (file.size > maxSize) {
-                                    alert("Ukuran file maksimal 10 MB!");
-                                    input.value = "";
-                                    return;
-                                }
-
-                                selectedFile = file;
-                                renderPreview();
-                            });
-
-                            function renderPreview() {
-                                previewContainer.innerHTML = ""; // kosongin dulu
-
-                                const previewItem = document.createElement("div");
-                                previewItem.className = "relative group";
-
-                                // tombol hapus
-                                const removeBtn = document.createElement("button");
-                                removeBtn.innerHTML = "❌";
-                                removeBtn.className =
-                                    "absolute top-1 right-1 bg-red-600 text-white rounded-full px-1 text-xs opacity-80 hover:opacity-100";
-                                removeBtn.addEventListener("click", removeFile);
-
-                                // preview gambar / video
-                                if (selectedFile.type.startsWith("image/")) {
-                                    const img = document.createElement("img");
-                                    img.src = URL.createObjectURL(selectedFile);
-                                    img.className =
-                                        "w-full h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-600";
-                                    previewItem.appendChild(img);
-                                } else if (selectedFile.type === "video/mp4") {
-                                    const video = document.createElement("video");
-                                    video.src = URL.createObjectURL(selectedFile);
-                                    video.controls = true;
-                                    video.className =
-                                        "w-full h-40 object-cover rounded-lg border border-gray-300 dark:border-gray-600";
-                                    previewItem.appendChild(video);
-                                }
-
-                                previewItem.appendChild(removeBtn);
-                                previewContainer.appendChild(previewItem);
-                            }
-
-                            function removeFile() {
-                                selectedFile = null;
-                                input.value = "";
-                                previewContainer.innerHTML = "";
-                            }
-
-                            // sebelum submit, masukkan file ke input
-                            const form = document.querySelector("form");
-                            form.addEventListener("submit", function(e) {
-                                if (selectedFile) {
-                                    const dataTransfer = new DataTransfer();
-                                    dataTransfer.items.add(selectedFile);
-                                    input.files = dataTransfer.files;
-                                }
-                            });
-                        });
-                    </script>
-
-                    {{-- Custom Scrollbar --}}
-                    <style>
-                        #search-results::-webkit-scrollbar {
-                            width: 8px;
-                        }
-
-                        #search-results::-webkit-scrollbar-track {
-                            background: #374151;
-                        }
-
-                        #search-results::-webkit-scrollbar-thumb {
-                            background: #6b7280;
-                            border-radius: 4px;
-                        }
-
-                        #search-results::-webkit-scrollbar-thumb:hover {
-                            background: #9ca3af;
-                        }
-                    </style>
 
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Scripts --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const statusSelect = document.getElementById("status-select");
+    const startContainer = document.getElementById("start-date-container");
+    const endContainer = document.getElementById("end-date-container");
+    const timeContainer = document.getElementById("time-spent-container");
+    const solutionContainer = document.getElementById("solution-container");
+    const notesContainer = document.getElementById("notes-container");
+    const startInput = document.getElementById("start_datetime");
+    const endInput = document.getElementById("end_datetime");
+    const timeInput = document.getElementById("time_spent");
+    const solutionField = document.getElementById("solution");
+    const notesField = document.getElementById("notes");
+    const manualCheckbox = document.getElementById("manual_time");
+
+    // Restore old status jika ada error
+    @if(old('status_id'))
+        statusSelect.value = "{{ old('status_id') }}";
+        const event = new Event('change');
+        statusSelect.dispatchEvent(event);
+    @endif
+
+    // === STATUS CHANGE HANDLER ===
+    statusSelect.addEventListener("change", function() {
+        const statusId = parseInt(this.value);
+
+        // Sembunyikan semua field dulu
+        startContainer.classList.add("hidden");
+        endContainer.classList.add("hidden");
+        timeContainer.classList.add("hidden");
+        solutionContainer.classList.add("hidden");
+
+        // Hapus required semua dulu
+        startInput.removeAttribute("required");
+        endInput.removeAttribute("required");
+        timeInput.removeAttribute("required");
+        solutionField.removeAttribute("required");
+
+        // Status: WAITING (id 1) → gak muncul field tambahan
+        if (statusId === 1) {
+            // nothing
+        }
+
+        // Status: IN PROGRESS (id 2) → hanya Start Date
+        else if (statusId === 2) {
+            startContainer.classList.remove("hidden");
+            startInput.setAttribute("required", "required");
+        }
+
+        // Status: DONE (id 3) → semua field + Solution
+        else if (statusId === 3) {
+            startContainer.classList.remove("hidden");
+            endContainer.classList.remove("hidden");
+            timeContainer.classList.remove("hidden");
+            solutionContainer.classList.remove("hidden");
+
+            startInput.setAttribute("required", "required");
+            endInput.setAttribute("required", "required");
+            timeInput.setAttribute("required", "required");
+            solutionField.setAttribute("required", "required");
+        }
+    });
+
+    // Update minimum end date sesuai start
+    function updateEndDateMin() {
+        if (startInput.value) {
+            endInput.min = startInput.value;
+            if (endInput.value && endInput.value < startInput.value) {
+                endInput.value = '';
+                timeInput.value = '';
+            }
+        } else {
+            endInput.removeAttribute('min');
+        }
+    }
+
+    startInput.addEventListener('change', updateEndDateMin);
+    startInput.addEventListener('input', updateEndDateMin);
+    updateEndDateMin();
+
+    // Auto calculate time spent
+    function hitungTimeSpent() {
+        if (manualCheckbox.checked) return;
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        if (!isNaN(start) && !isNaN(end) && end > start) {
+            timeInput.value = Math.floor((end - start) / 60000);
+        } else {
+            timeInput.value = "";
+        }
+    }
+
+    endInput.addEventListener("change", hitungTimeSpent);
+    startInput.addEventListener("change", hitungTimeSpent);
+
+    // Manual input toggle
+    manualCheckbox.addEventListener("change", function() {
+        if (this.checked) {
+            timeInput.removeAttribute("readonly");
+            timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+            timeInput.classList.add("bg-white");
+            notesContainer.classList.remove("hidden");
+            notesField.setAttribute("required", "required");
+        } else {
+            timeInput.setAttribute("readonly", true);
+            timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+            timeInput.classList.remove("bg-white");
+            hitungTimeSpent();
+            notesContainer.classList.add("hidden");
+            notesField.removeAttribute("required");
+        }
+    });
+});
+</script>
+
+
 </x-app-layout>

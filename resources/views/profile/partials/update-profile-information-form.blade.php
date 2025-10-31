@@ -37,6 +37,7 @@
                 autofocus
                 autocomplete="name"
                 aria-readonly="@break"
+                readonly
             />
 
             <x-form.error :messages="$errors->get('name')" />
@@ -57,6 +58,7 @@
                 required
                 autocomplete="email"
                 aria-readonly="@break"
+                readonly
             />
 
             <x-form.error :messages="$errors->get('email')" />

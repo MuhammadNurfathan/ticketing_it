@@ -84,6 +84,11 @@
     @endif
 
     @if (auth()->user()->role_id == 1)
+    <x-sidebar.link title="All Tickets" href="{{ route('DashboardTicketsAdmin.index') }}" :isActive="request()->routeIs('DashboardTicketsAdmin.index')">
+        <x-slot name="icon">
+            <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
+        </x-slot>
+    </x-sidebar.link>
       <x-sidebar.link title="Feedbacks" href="{{ route('feedback') }}" :isActive="request()->routeIs('feedback')">
         <x-slot name="icon">
             <x-icons.dashboard class="flex-shrink-0 w-6 h-6" aria-hidden="true" />
