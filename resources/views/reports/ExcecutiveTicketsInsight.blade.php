@@ -13,7 +13,7 @@
                 class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        📈 Ticket Selesai Per Tahun
+                        Tickets Completed this year
                     </h3>
 
                     {{-- Year Filter --}}
@@ -21,7 +21,7 @@
                         <div class="flex items-center gap-2 w-full sm:w-auto">
                             <label for="line_year"
                                 class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                                Pilih Tahun
+                                Select Year
                             </label>
                             <input type="number" id="line_year" placeholder="2025" min="2020" max="2100"
                                 class="block w-full sm:w-32 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
@@ -65,21 +65,21 @@
                 class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        📊 Distribusi Ticket Berdasarkan Kategori
+                        Ticket Distribution Based on Category
                     </h3>
 
                     {{-- Pie Chart Filter --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Tanggal Mulai
+                                Start Date
                             </label>
                             <input type="date" id="pie_start_date"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Tanggal Akhir
+                                End Date
                             </label>
                             <input type="date" id="pie_end_date"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">

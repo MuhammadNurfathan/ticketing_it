@@ -7,7 +7,7 @@ class PriorityController extends Controller
 {
     public function index()
     {
-        $priorities = Priority::latest()->paginate(10);
+        $priorities = Priority::latest()->get();
         return view('master/priority.index', compact('priorities'));
     }
 

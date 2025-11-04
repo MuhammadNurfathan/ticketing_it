@@ -38,7 +38,7 @@
                         <tr>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Ticket Code</th>
+                                No</th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Nama</th>
@@ -53,7 +53,7 @@
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $locations->firstItem() + $index }}</td>
+                                    {{ $index + 1 }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $location->location_name }}</td>

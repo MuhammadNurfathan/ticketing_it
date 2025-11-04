@@ -49,7 +49,7 @@
                         @foreach ($assets as $index => $asset)
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->firstItem() + $index }}
+                                    {{ $index + 1 }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $asset->assets_code }}

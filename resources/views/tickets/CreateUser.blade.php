@@ -53,7 +53,7 @@
                             </label>
                             <select name="problem_category_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih Category --</option>
+                                <option value="" hidden>-- Choose Category --</option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}" {{ old('problem_category_id') == $cat->id ? 'selected' : '' }}>
                                         {{ $cat->problem_category_name }}
@@ -84,10 +84,10 @@
                         {{-- Buttons --}}
                         <div class="flex gap-2">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
-                                Simpan Ticket
+                                Save
                             </button>
                             <button type="button" onclick="history.back()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
-                                Kembali
+                                Back
                             </button>
                         </div>
                     </form>

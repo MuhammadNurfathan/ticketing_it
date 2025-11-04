@@ -25,11 +25,11 @@ class ProjectDetail extends Model
     ];
 
     public function header(){
-        return $this->belongsTo(ProjectHeader::class, 'project_header_id');
+        return $this->belongsTo(ProjectHeader::class, 'project_header_id')->withTrashed();
     }
 
     public function status(){
-        return $this->belongsTo(Status::class,'status_id');
+        return $this->belongsTo(Status::class,'status_id')->withTrashed();
     }
 
 

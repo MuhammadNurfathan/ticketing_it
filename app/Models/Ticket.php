@@ -41,31 +41,31 @@ class Ticket extends Model
     // ==================== RELATIONSHIPS ====================
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
     public function support()
     {
-        return $this->belongsTo(User::class, 'support_id');
+        return $this->belongsTo(User::class, 'support_id')->withTrashed();
     }
     public function problemCategory()
     {
-        return $this->belongsTo(ProblemCategory::class);
+        return $this->belongsTo(ProblemCategory::class)->withTrashed();
     }
     public function assets()
     {
-        return $this->belongsTo(Assets::class);
+        return $this->belongsTo(Assets::class)->withTrashed();
     }
     public function status()
     {
-        return $this->belongsTo(Status::class);
+        return $this->belongsTo(Status::class)->withTrashed();
     }
     public function priority()
     {
-        return $this->belongsTo(Priority::class);
+        return $this->belongsTo(Priority::class)->withTrashed();
     }
     public function feedback()
     {
-        return $this->hasOne(Feedback::class, 'ticket_id');
+        return $this->hasOne(Feedback::class, 'ticket_id')->withTrashed();
     }
 
     // ==================== SCOPES ====================

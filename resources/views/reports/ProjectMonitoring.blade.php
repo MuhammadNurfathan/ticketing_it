@@ -117,7 +117,7 @@
                 <div
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Daftar Project Queue</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">List of Project Queues</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">List of all project queues</p>
                     </div>
 
@@ -301,9 +301,9 @@
 
                     if (data.length === 0) {
                         tbody.innerHTML =
-                            `<tr><td colspan="8" class="text-center py-8 text-gray-400 italic">Tidak ada data</td></tr>`;
+                            `<tr><td colspan="8" class="text-center py-8 text-gray-400 italic">No Data</td></tr>`;
                         cardBody.innerHTML =
-                            `<div class="text-center py-4 text-gray-400 italic">Tidak ada data</div>`;
+                            `<div class="text-center py-4 text-gray-400 italic">No Data</div>`;
                         return;
                     }
 
@@ -360,7 +360,7 @@
                     const projects = await res.json();
                     if (!projects.length) {
                         ganttContainer.innerHTML =
-                            `<p class="text-center text-gray-500 py-8 italic">Tidak ada data Gantt Chart.</p>`;
+                            `<p class="text-center text-gray-500 py-8 italic">No Data Gantt Chart.</p>`;
                         return;
                     }
 

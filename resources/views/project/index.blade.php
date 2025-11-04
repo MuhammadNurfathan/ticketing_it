@@ -530,8 +530,7 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->end_date ?? '-' }} </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                               
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     <button onclick="showProjectModal({{ $project->id }})"
@@ -780,7 +779,7 @@ table.dataTable tbody td.dataTables_empty {
     text-align: center;   /* teks di tengah */
     vertical-align: middle; /* vertikal di tengah */
     font-weight: 500;
-    color: #6b7280; /* teks abu */
+    color: #111827; /* teks abu */
     padding: 2rem 0; /* beri jarak agar tidak terlalu mepet */
 }
 .dark table.dataTable tbody td.dataTables_empty {
@@ -800,7 +799,7 @@ table.dataTable tbody td.dataTables_empty {
                 language: {
                     search: "_INPUT_",
                     searchPlaceholder: "Cari data...",
-                        emptyTable: "Tidak ada data tersedia di tabel ini",
+                        emptyTable: "No data available in this table",
                         paginate: {
                             next: "›",
                             previous: "‹"

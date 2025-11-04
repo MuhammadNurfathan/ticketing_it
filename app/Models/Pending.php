@@ -32,7 +32,7 @@ class Pending extends Model
 
      public function projectHeader()
     {
-        return $this->belongsTo(ProjectHeader::class, 'id_project_header');
+        return $this->belongsTo(ProjectHeader::class, 'id_project_header')->withTrashed();
     }
 
 

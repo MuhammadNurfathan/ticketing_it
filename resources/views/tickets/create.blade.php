@@ -1,18 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Tambah Ticket') }}
+            {{ __('Create Ticket') }}
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+    <div
+        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
 
                     {{-- Error Alert --}}
                     @if ($errors->any())
-                        <div class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+                        <div
+                            class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
                             <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -22,7 +24,8 @@
                     @endif
 
                     {{-- Form Ticket --}}
-                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data" id="ticket-form">
+                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data"
+                        id="ticket-form">
                         @csrf
                         <input type="hidden" name="from" value="admin">
 
@@ -38,13 +41,14 @@
                         {{-- User --}}
                         <div class="mb-4 relative">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Pilih Requestor <span class="text-red-500">*</span>
+                                Choose Requestor <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="user-search" placeholder="Cari user..." required
                                 value="{{ old('user_search') }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <input type="hidden" name="user_id" id="user-id" value="{{ old('user_id') }}" required>
-                            <ul id="search-results" class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
+                            <ul id="search-results"
+                                class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
                                 @foreach ($users as $user)
                                     <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
                                         data-id="{{ $user->id }}">{{ $user->name }}</li>
@@ -59,9 +63,10 @@
                             </label>
                             <select name="support_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih IT Support --</option>
+                                <option value="" hidden>-- Choose IT Support --</option>
                                 @foreach ($developers as $dev)
-                                    <option value="{{ $dev->id }}" {{ old('support_id') == $dev->id ? 'selected' : '' }}>
+                                    <option value="{{ $dev->id }}"
+                                        {{ old('support_id') == $dev->id ? 'selected' : '' }}>
                                         {{ $dev->name }}
                                     </option>
                                 @endforeach
@@ -75,31 +80,35 @@
                             </label>
                             <select name="problem_category_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih Category --</option>
+                                <option value="" hidden>-- Choose Category --</option>
                                 @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('problem_category_id') == $cat->id ? 'selected' : '' }}>
+                                    <option value="{{ $cat->id }}"
+                                        {{ old('problem_category_id') == $cat->id ? 'selected' : '' }}>
                                         {{ $cat->problem_category_name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-
                         {{-- Assets --}}
                         <div class="mb-4 relative">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Pilih Assets <span class="text-red-500">*</span>
+                                Choose Assets <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="assets-search" placeholder="Cari assets..." required
                                 value="{{ old('assets_search') }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" required>
-                            <ul id="assets-results" class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
+                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}"
+                                required>
+                            <ul id="assets-results"
+                                class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
                                 @foreach ($assets as $ass)
-                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $ass->id }}">{{ $ass->assets_name }} - {{ $ass->assets_code }}</li>
+                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                                        data-id="{{ $ass->id }}">{{ $ass->assets_name }} -
+                                        {{ $ass->assets_code }} </li>
                                 @endforeach
                             </ul>
                         </div>
+
 
                         {{-- Problem --}}
                         <div class="mb-4">
@@ -117,9 +126,10 @@
                             </label>
                             <select name="priority_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih Priority --</option>
+                                <option value="" hidden>-- Choose Priority --</option>
                                 @foreach ($priorities as $prt)
-                                    <option value="{{ $prt->id }}" {{ old('priority_id') == $prt->id ? 'selected' : '' }}>
+                                    <option value="{{ $prt->id }}"
+                                        {{ old('priority_id') == $prt->id ? 'selected' : '' }}>
                                         {{ $prt->priority_name }}
                                     </option>
                                 @endforeach
@@ -133,10 +143,11 @@
                             </label>
                             <select name="status_id" id="status-select" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih Status --</option>
+                                <option value="" hidden>-- Choose Status --</option>
                                 @foreach ($statuses as $stat)
                                     @if (!in_array($stat->id, [4, 5, 6]))
-                                        <option value="{{ $stat->id }}" data-name="{{ strtolower($stat->status_name) }}">
+                                        <option value="{{ $stat->id }}"
+                                            data-name="{{ strtolower($stat->status_name) }}">
                                             {{ $stat->status_name }}
                                         </option>
                                     @endif
@@ -145,31 +156,42 @@
                         </div>
 
                         {{-- Date Range --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end mb-4">
                             {{-- Start Date --}}
-                            <div id="start-date-container" class="mb-4 hidden">
+                            <div id="start-date-container" class="hidden">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <svg class="w-4 h-4 inline-block mr-1 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg class="w-4 h-4 inline-block mr-1 text-gray-600 dark:text-gray-300"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Start Date & Time <span class="text-red-500">*</span>
                                 </label>
-                                <input type="datetime-local" id="start_datetime" name="start_date" value="{{ old('start_date') }}"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <input type="datetime-local" id="start_datetime" name="start_date"
+                                    value="{{ old('start_date') }}"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                   bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             </div>
 
                             {{-- End Date --}}
-                            <div id="end-date-container" class="mb-4 hidden">
+                            <div id="end-date-container" class="hidden">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    <svg class="w-4 h-4 inline-block mr-1 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <svg class="w-4 h-4 inline-block mr-1 text-gray-600 dark:text-gray-300"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     End Date & Time <span class="text-red-500">*</span>
                                 </label>
-                                <input type="datetime-local" id="end_datetime" name="end_date" value="{{ old('end_date') }}"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <input type="datetime-local" id="end_datetime" name="end_date"
+                                    value="{{ old('end_date') }}"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                   bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             </div>
                         </div>
+
 
                         {{-- Time Spent --}}
                         <div id="time-spent-container" class="mb-4 hidden">
@@ -178,7 +200,8 @@
                                     Time Spent (Menit) <span class="text-red-500">*</span>
                                 </label>
                                 <label class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                    <input type="checkbox" id="manual_time" class="mr-2 rounded focus:ring-blue-500"> Manual Input
+                                    <input type="checkbox" id="manual_time" class="mr-2 rounded focus:ring-blue-500">
+                                    Manual Input
                                 </label>
                             </div>
                             <input type="number" id="time_spent" name="time_spent" readonly min="1"
@@ -205,7 +228,8 @@
 
                         {{-- Upload Media --}}
                         <div class="mb-6">
-                            <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label for="media"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Upload Gambar / Video (Max 5 mb)
                             </label>
                             <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4"
@@ -214,8 +238,9 @@
                         </div>
 
                         {{-- Submit Button --}}
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
-                            Simpan Ticket
+                        <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200">
+                            Simpan
                         </button>
                     </form>
 
@@ -228,162 +253,162 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
     <script>
-    {{-- Status Field Logic dengan Validasi --}}
-    document.addEventListener("DOMContentLoaded", function() {
-        const statusSelect = document.getElementById("status-select");
-        const startContainer = document.getElementById("start-date-container");
-        const endContainer = document.getElementById("end-date-container");
-        const timeContainer = document.getElementById("time-spent-container");
-        const solutionContainer = document.getElementById("solution-container");
-        const notesContainer = document.getElementById("notes-container");
-        const startInput = document.getElementById("start_datetime");
-        const endInput = document.getElementById("end_datetime");
-        const timeInput = document.getElementById("time_spent");
-        const solutionField = document.getElementById("solution-field");
-        const notesField = document.getElementById("notes");
-        const manualCheckbox = document.getElementById("manual_time");
+        {{-- Status Field Logic dengan Validasi --}}
+        document.addEventListener("DOMContentLoaded", function() {
+            const statusSelect = document.getElementById("status-select");
+            const startContainer = document.getElementById("start-date-container");
+            const endContainer = document.getElementById("end-date-container");
+            const timeContainer = document.getElementById("time-spent-container");
+            const solutionContainer = document.getElementById("solution-container");
+            const notesContainer = document.getElementById("notes-container");
+            const startInput = document.getElementById("start_datetime");
+            const endInput = document.getElementById("end_datetime");
+            const timeInput = document.getElementById("time_spent");
+            const solutionField = document.getElementById("solution-field");
+            const notesField = document.getElementById("notes");
+            const manualCheckbox = document.getElementById("manual_time");
 
-        // Restore old status jika ada error
-        @if(old('status_id'))
-            statusSelect.value = "{{ old('status_id') }}";
-            // Trigger change untuk munculkan field yang sesuai
-            const event = new Event('change');
-            statusSelect.dispatchEvent(event);
-        @endif
+            // Restore old status jika ada error
+            @if (old('status_id'))
+                statusSelect.value = "{{ old('status_id') }}";
+                // Trigger change untuk munculkan field yang sesuai
+                const event = new Event('change');
+                statusSelect.dispatchEvent(event);
+            @endif
 
-        statusSelect.addEventListener("change", function() {
-            const status = this.options[this.selectedIndex].getAttribute("data-name");
-            
-            // Reset semua field
-            startContainer.classList.add("hidden");
-            endContainer.classList.add("hidden");
-            timeContainer.classList.add("hidden");
-            solutionContainer.classList.add("hidden");
-            notesContainer.classList.add("hidden");
-            
-            // Reset required attributes
-            startInput.removeAttribute("required");
-            endInput.removeAttribute("required");
-            timeInput.removeAttribute("required");
-            solutionField.removeAttribute("required");
-            notesField.removeAttribute("required");
-            
-            // Clear values
-            startInput.value = "";
-            endInput.value = "";
-            timeInput.value = "";
+            statusSelect.addEventListener("change", function() {
+                const status = this.options[this.selectedIndex].getAttribute("data-name");
 
-            if (status === "waiting") {
-                // Waiting: Tidak perlu field tambahan
-            } else if (status === "in progress") {
-                // In Progress: Start Date + Solution wajib
-                startContainer.classList.remove("hidden");
-                startInput.setAttribute("required", "required");
-            } else if (status === "done") {
-                // Done: Start Date, End Date, Time Spent, Solution wajib
-                startContainer.classList.remove("hidden");
-                endContainer.classList.remove("hidden");
-                timeContainer.classList.remove("hidden");
-                solutionContainer.classList.remove("hidden");
-                startInput.setAttribute("required", "required");
-                endInput.setAttribute("required", "required");
-                timeInput.setAttribute("required", "required");
-                solutionField.setAttribute("required", "required");
-            }
-        });
-
-        // Batasi end date
-        function updateEndDateMin() {
-            if (startInput.value) {
-                endInput.min = startInput.value;
-                if (endInput.value && endInput.value < startInput.value) {
-                    endInput.value = '';
-                    timeInput.value = '';
-                }
-            } else {
-                endInput.removeAttribute('min');
-            }
-        }
-
-        startInput.addEventListener('change', updateEndDateMin);
-        startInput.addEventListener('input', updateEndDateMin);
-
-        // Hitung time spent otomatis
-        function hitungTimeSpent() {
-            if (manualCheckbox.checked) return;
-            const start = new Date(startInput.value);
-            const end = new Date(endInput.value);
-            if (!isNaN(start) && !isNaN(end) && end > start) {
-                timeInput.value = Math.floor((end - start) / 60000);
-            } else {
-                timeInput.value = "";
-            }
-        }
-
-        endInput.addEventListener("change", hitungTimeSpent);
-        startInput.addEventListener("change", hitungTimeSpent);
-
-        // Manual time checkbox
-        manualCheckbox.addEventListener("change", function() {
-            if (this.checked) {
-                timeInput.removeAttribute("readonly");
-                timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-                timeInput.classList.add("bg-white");
-                notesContainer.classList.remove("hidden");
-                notesField.setAttribute("required", "required");
-            } else {
-                timeInput.setAttribute("readonly", true);
-                timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
-                timeInput.classList.remove("bg-white");
-                hitungTimeSpent();
+                // Reset semua field
+                startContainer.classList.add("hidden");
+                endContainer.classList.add("hidden");
+                timeContainer.classList.add("hidden");
+                solutionContainer.classList.add("hidden");
                 notesContainer.classList.add("hidden");
+
+                // Reset required attributes
+                startInput.removeAttribute("required");
+                endInput.removeAttribute("required");
+                timeInput.removeAttribute("required");
+                solutionField.removeAttribute("required");
                 notesField.removeAttribute("required");
-            }
-        });
 
-        // Form validation sebelum submit
-        document.getElementById('ticket-form').addEventListener('submit', function(e) {
-            const userIdField = document.getElementById('user-id');
-            const assetsIdField = document.getElementById('assets-id');
-            
-            if (!userIdField.value) {
-                e.preventDefault();
-                alert('⚠️ Pilih Requestor terlebih dahulu!');
-                document.getElementById('user-search').focus();
-                return false;
-            }
-            
-            if (!assetsIdField.value) {
-                e.preventDefault();
-                alert('⚠️ Pilih Assets terlebih dahulu!');
-                document.getElementById('assets-search').focus();
-                return false;
-            }
-        });
+                // Clear values
+                startInput.value = "";
+                endInput.value = "";
+                timeInput.value = "";
 
-        // Restore old values untuk search fields
-        @if(old('user_id'))
-            const userId = "{{ old('user_id') }}";
-            const userSearch = document.getElementById('user-search');
-            const userResults = document.querySelectorAll('#search-results li');
-            userResults.forEach(li => {
-                if (li.getAttribute('data-id') == userId) {
-                    userSearch.value = li.textContent;
+                if (status === "waiting") {
+                    // Waiting: Tidak perlu field tambahan
+                } else if (status === "in progress") {
+                    // In Progress: Start Date + Solution wajib
+                    startContainer.classList.remove("hidden");
+                    startInput.setAttribute("required", "required");
+                } else if (status === "done") {
+                    // Done: Start Date, End Date, Time Spent, Solution wajib
+                    startContainer.classList.remove("hidden");
+                    endContainer.classList.remove("hidden");
+                    timeContainer.classList.remove("hidden");
+                    solutionContainer.classList.remove("hidden");
+                    startInput.setAttribute("required", "required");
+                    endInput.setAttribute("required", "required");
+                    timeInput.setAttribute("required", "required");
+                    solutionField.setAttribute("required", "required");
                 }
             });
-        @endif
 
-        @if(old('assets_id'))
-            const assetsId = "{{ old('assets_id') }}";
-            const assetsSearch = document.getElementById('assets-search');
-            const assetsResults = document.querySelectorAll('#assets-results li');
-            assetsResults.forEach(li => {
-                if (li.getAttribute('data-id') == assetsId) {
-                    assetsSearch.value = li.textContent;
+            // Batasi end date
+            function updateEndDateMin() {
+                if (startInput.value) {
+                    endInput.min = startInput.value;
+                    if (endInput.value && endInput.value < startInput.value) {
+                        endInput.value = '';
+                        timeInput.value = '';
+                    }
+                } else {
+                    endInput.removeAttribute('min');
+                }
+            }
+
+            startInput.addEventListener('change', updateEndDateMin);
+            startInput.addEventListener('input', updateEndDateMin);
+
+            // Hitung time spent otomatis
+            function hitungTimeSpent() {
+                if (manualCheckbox.checked) return;
+                const start = new Date(startInput.value);
+                const end = new Date(endInput.value);
+                if (!isNaN(start) && !isNaN(end) && end > start) {
+                    timeInput.value = Math.floor((end - start) / 60000);
+                } else {
+                    timeInput.value = "";
+                }
+            }
+
+            endInput.addEventListener("change", hitungTimeSpent);
+            startInput.addEventListener("change", hitungTimeSpent);
+
+            // Manual time checkbox
+            manualCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    timeInput.removeAttribute("readonly");
+                    timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+                    timeInput.classList.add("bg-white");
+                    notesContainer.classList.remove("hidden");
+                    notesField.setAttribute("required", "required");
+                } else {
+                    timeInput.setAttribute("readonly", true);
+                    timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+                    timeInput.classList.remove("bg-white");
+                    hitungTimeSpent();
+                    notesContainer.classList.add("hidden");
+                    notesField.removeAttribute("required");
                 }
             });
-        @endif
-    });
+
+            // Form validation sebelum submit
+            document.getElementById('ticket-form').addEventListener('submit', function(e) {
+                const userIdField = document.getElementById('user-id');
+                const assetsIdField = document.getElementById('assets-id');
+
+                if (!userIdField.value) {
+                    e.preventDefault();
+                    alert('⚠️ Pilih Requestor terlebih dahulu!');
+                    document.getElementById('user-search').focus();
+                    return false;
+                }
+
+                if (!assetsIdField.value) {
+                    e.preventDefault();
+                    alert('⚠️ Pilih Assets terlebih dahulu!');
+                    document.getElementById('assets-search').focus();
+                    return false;
+                }
+            });
+
+            // Restore old values untuk search fields
+            @if (old('user_id'))
+                const userId = "{{ old('user_id') }}";
+                const userSearch = document.getElementById('user-search');
+                const userResults = document.querySelectorAll('#search-results li');
+                userResults.forEach(li => {
+                    if (li.getAttribute('data-id') == userId) {
+                        userSearch.value = li.textContent;
+                    }
+                });
+            @endif
+
+            @if (old('assets_id'))
+                const assetsId = "{{ old('assets_id') }}";
+                const assetsSearch = document.getElementById('assets-search');
+                const assetsResults = document.querySelectorAll('#assets-results li');
+                assetsResults.forEach(li => {
+                    if (li.getAttribute('data-id') == assetsId) {
+                        assetsSearch.value = li.textContent;
+                    }
+                });
+            @endif
+        });
     </script>
 
     {{-- User Search --}}
@@ -462,7 +487,7 @@
 
         mediaInput.addEventListener("change", function(e) {
             previewContainer.innerHTML = "";
-            
+
             const file = e.target.files[0];
             if (!file) return;
 
@@ -484,7 +509,7 @@
             // Tampilkan preview
             const preview = document.createElement("div");
             preview.className = "relative inline-block";
-            
+
             if (file.type.startsWith('image/')) {
                 const img = document.createElement("img");
                 img.src = URL.createObjectURL(file);
@@ -508,7 +533,7 @@
                 mediaInput.value = "";
                 previewContainer.innerHTML = "";
             };
-            
+
             preview.appendChild(btnRemove);
             previewContainer.appendChild(preview);
         });

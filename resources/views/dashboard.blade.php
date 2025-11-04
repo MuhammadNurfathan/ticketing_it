@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="min-h-[calc(100vh-4rem)]">
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <div class="py-8 sm:py-12">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
             
             {{-- Welcome Section --}}
             <div class="mb-8 sm:mb-12">
@@ -19,24 +19,24 @@
             </div>
 
             {{-- Menu Cards Grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 mb-8 sm:mb-12 px-2">
                 
                 {{-- Create Ticket Card --}}
                 <a href="{{ route('DashboardTicketsUser.createUser') }}" 
-                   class="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 p-[2px] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/30">
-                    <div class="relative h-full bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10">
+                   class="block group relative rounded-xl sm:rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 p-[2px] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/30">
+                    <div class="relative bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 overflow-hidden">
                         {{-- Icon --}}
-                        <div class="mb-4 sm:mb-6">
-                            <div class="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
-                                <svg class="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="mb-4 sm:mb-6 relative z-10">
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
+                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
                             </div>
                         </div>
                         
                         {{-- Content --}}
-                        <div>
-                            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
+                        <div class="relative z-10">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
                                 Create Ticket
                             </h3>
                             <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
@@ -52,27 +52,27 @@
                             </div>
                         </div>
 
-                        {{-- Decorative Elements --}}
-                        <div class="absolute -top-10 -right-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500"></div>
+                        {{-- Decorative Elements (behind content) --}}
+                        <div class="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl -z-10"></div>
                     </div>
                 </a>
 
                 {{-- My Tickets Card --}}
                 <a href="{{ route('DashboardTicketsUser.indexUser') }}" 
-                   class="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-[2px] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/30">
-                    <div class="relative h-full bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10">
+                   class="block group relative rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 p-[2px] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-500/30">
+                    <div class="relative bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 overflow-hidden">
                         {{-- Icon --}}
-                        <div class="mb-4 sm:mb-6">
-                            <div class="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
-                                <svg class="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="mb-4 sm:mb-6 relative z-10">
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
+                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
                                 </svg>
                             </div>
                         </div>
                         
                         {{-- Content --}}
-                        <div>
-                            <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
+                        <div class="relative z-10">
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
                                 My Tickets
                             </h3>
                             <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">
@@ -88,15 +88,15 @@
                             </div>
                         </div>
 
-                        {{-- Decorative Elements --}}
-                        <div class="absolute -top-10 -right-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500"></div>
+                        {{-- Decorative Elements (behind content) --}}
+                        <div class="absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-emerald-400/10 to-teal-400/10 rounded-full blur-3xl -z-10"></div>
                     </div>
                 </a>
 
             </div>
 
-            {{-- Quick Stats (Optional - bisa dihapus jika tidak perlu) --}}
-            <div class="mt-8 sm:mt-12 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {{-- Quick Stats --}}
+            {{-- <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
                     <div class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 sm:mb-2">Total Tickets</div>
                     <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white" id="all-projects">-</div>
@@ -109,12 +109,12 @@
                     <div class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 sm:mb-2">Resolved</div>
                     <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="closed-projects">-</div>
                 </div>
-            </div>
+            </div> --}}
 
-        </main>
+        </div>
     </div>
 
-    <script>
+    {{-- <script>
         document.addEventListener("DOMContentLoaded", async () => {
             async function loadSummary(year) {
                 try {
@@ -140,5 +140,5 @@
             const currentYear = new Date().getFullYear();
             loadSummary(currentYear);
         });
-    </script>
+    </script> --}}
 </x-app-layout>

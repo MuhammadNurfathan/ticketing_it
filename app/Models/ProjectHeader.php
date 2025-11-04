@@ -40,26 +40,26 @@ class ProjectHeader extends Model
 
     public function details()
     {
-        return $this->hasMany(ProjectDetail::class, 'project_header_id', 'id');
+        return $this->hasMany(ProjectDetail::class, 'project_header_id', 'id')->withTrashed();
     }
 
     public function status()
     {
-        return $this->belongsTo(Status::class, 'status_id');
+        return $this->belongsTo(Status::class, 'status_id')->withTrashed();
     }
 
     public function requestor()
     {
-        return $this->belongsTo(User::class, 'requestor_id');
+        return $this->belongsTo(User::class, 'requestor_id')->withTrashed();
     }
 
     public function developer()
     {
-        return $this->belongsTo(User::class, 'dev_id');
+        return $this->belongsTo(User::class, 'dev_id')->withTrashed();
     }
     public function priority()
     {
-        return $this->belongsTo(Priority::class, 'priority_id');
+        return $this->belongsTo(Priority::class, 'priority_id')->withTrashed();
     }
 
     public function pendings()

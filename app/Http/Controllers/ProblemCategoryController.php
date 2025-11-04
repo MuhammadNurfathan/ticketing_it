@@ -7,7 +7,7 @@ class ProblemCategoryController extends Controller
 {
     public function index()
     {
-        $problemCategories = ProblemCategory::latest()->paginate(10);
+        $problemCategories = ProblemCategory::latest()->get();
         return view('master/problem_category.index', compact('problemCategories'));
     }
 

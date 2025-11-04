@@ -8,7 +8,7 @@ class LocationController extends Controller
 
     public function index()
     {
-        $locations = Location::latest()->paginate(10);
+        $locations = Location::latest()->get();
         return view('master/location.index', compact('locations'));
     }
 

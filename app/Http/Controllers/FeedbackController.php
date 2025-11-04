@@ -12,7 +12,7 @@ class FeedbackController extends Controller
     public function index()
     {
         $Rate =number_format(feedback::avg('rating'),1) ;
-        $feedback = feedback::latest()->paginate(10);
+        $feedback = feedback::latest()->get();
         return view('feedback.index', compact('feedback','Rate'));
     }
     public function form($ticket_id)

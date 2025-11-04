@@ -46,7 +46,7 @@
                         @forelse ($problemCategories as $index => $pc)
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $problemCategories->firstItem() + $index }}
+                                    {{ $index + 1 }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $pc->problem_category_name }}

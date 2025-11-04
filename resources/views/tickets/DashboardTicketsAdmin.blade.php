@@ -6,7 +6,7 @@
                     <h2 class="font-bold text-2xl text-light-text dark:text-dark-text">Ticket Dashboard</h2>
                     <a href="{{ route('DashboardTicketsAdmin.create') }}"
                         class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition duration-300">
-                        Tambah Ticket
+                        Create Ticket
                     </a>
                 </div>
             @endif
@@ -348,7 +348,7 @@
                                                 {{-- Tombol Pilih --}}
                                                 <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
                                                     class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs inline-block transition-all duration-200">
-                                                    Kerjakan
+                                                    Execution
                                                 </a>
 
                                                 {{-- Modal Overlay --}}
@@ -392,12 +392,12 @@
                                                             <div class="flex justify-end mt-4 space-x-2">
                                                                 <button type="button" @click="open = false"
                                                                     class="px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-lg text-sm transition-all duration-200">
-                                                                    Batal
+                                                                    Cancel
                                                                 </button>
 
                                                                 <button type="submit"
                                                                     class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-all duration-200">
-                                                                    Simpan
+                                                                    Save
                                                                 </button>
                                                             </div>
                                                         </form>

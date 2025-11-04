@@ -44,11 +44,11 @@
                         <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
                     </label>
 
-                    @if (Route::has('password.request'))
+                    {{-- @if (Route::has('password.request'))
                     <a class="text-sm text-blue-500 hover:underline" href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
-                    @endif
+                    @endif --}}
                 </div>
 
                 <div>
@@ -58,14 +58,14 @@
                     </x-button>
                 </div>
 
-                @if (Route::has('register'))
+                {{-- @if (Route::has('register'))
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ __('Don’t have an account?') }}
                     <a href="{{ route('register') }}" class="text-blue-500 hover:underline">
                         {{ __('Register') }}
                     </a>
                 </p>
-                @endif
+                @endif --}}
             </div>
         </form>
     </x-auth-card>

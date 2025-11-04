@@ -12,6 +12,6 @@ class Location extends Model
 
     public function departments()
     {
-        return $this->hasMany(Department::class);
+        return $this->hasMany(Department::class)->withTrashed();
     }
 }
