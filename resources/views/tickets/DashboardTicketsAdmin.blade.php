@@ -20,15 +20,14 @@
             class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
             <div>
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Dari (Request Date)
+                    Request Date
                 </label>
                 <input type="date" name="start_date" value="{{ $start }}"
                     class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <div>
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Sampai (Request
-                    Date)</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
                 <input type="date" name="end_date"
                     value="{{ $end }}"class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
@@ -210,7 +209,7 @@
                                                         </label>
                                                         <textarea
                                                             class="notesInput w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                                            rows="2" placeholder="Tambahkan catatan..."></textarea>
+                                                            rows="2" placeholder="Enter Notes..."></textarea>
                                                     </div>
 
                                                     <!-- Solution -->
@@ -221,7 +220,7 @@
                                                         </label>
                                                         <textarea name="solution"
                                                             class="solutionInput w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                                            rows="3" placeholder="Masukkan solusi..." required>{{ old('solution', $ticket->solution ?? '') }}</textarea>
+                                                            rows="3" placeholder="Enter Solution..." required>{{ old('solution', $ticket->solution ?? '') }}</textarea>
                                                     </div>
 
                                                     <!-- Buttons -->
@@ -386,7 +385,7 @@
 
                                                             <textarea name="notes" rows="3"
                                                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:text-gray-100"
-                                                                placeholder="Tulis alasan void di sini..." required></textarea>
+                                                                placeholder="Enter Notes..." required></textarea>
 
                                                             {{-- Footer --}}
                                                             <div class="flex justify-end mt-4 space-x-2">

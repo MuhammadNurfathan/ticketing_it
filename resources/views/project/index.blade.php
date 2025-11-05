@@ -7,7 +7,7 @@
                     <h2 class="font-bold text-2xl text-light-text dark:text-dark-text">Project</h2>
                     <button onclick="openModal('projectModal')"
                         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Tambah Project
+                        Create Project
                     </button>
                 </div>
             @endif
@@ -20,15 +20,14 @@
             class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
             <div>
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Dari (Request Date)
+                    Start Date
                 </label>
                 <input type="date" name="start_date" value="{{ $start }}"
                     class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <div>
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Sampai (Request
-                    Date)</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
                 <input type="date" name="end_date"
                     value="{{ $end }}"class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
@@ -798,7 +797,7 @@ table.dataTable tbody td.dataTables_empty {
                 info: true,
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Cari data...",
+                    searchPlaceholder: "Search Data...",
                         emptyTable: "No data available in this table",
                         paginate: {
                             next: "›",
@@ -979,7 +978,7 @@ table.dataTable tbody td.dataTables_empty {
     </x-modal-table>
 
     {{-- ============================================ MODAL FORM PENDING ============================================ --}}
-    <x-modal-form id="pendingModal" title="Tambah Pending" size="max-w-md">
+    <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
         <form id="pendingForm" method="POST">
             @csrf
             <input type="hidden" name="id_project_header" id="pending_project_id">
@@ -999,9 +998,8 @@ table.dataTable tbody td.dataTables_empty {
             {{-- Tombol --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('pendingModal')"
-                    class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan
-                    Pending</button>
+                    class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
     </x-modal-form>
@@ -1118,9 +1116,9 @@ table.dataTable tbody td.dataTables_empty {
             {{-- Tombol --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('editProgressModal')"
-                    class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Batal</button>
+                    class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Simpan Perubahan
+                    Save
                 </button>
             </div>
         </form>
@@ -1128,7 +1126,7 @@ table.dataTable tbody td.dataTables_empty {
     </x-modal-form>
 
     {{-- ============================================ MODAL FORM TAMBAH ============================================ --}}
-    <x-modal-form id="projectModal" title="Tambah Project" size="max-w-4xl">
+    <x-modal-form id="projectModal" title="Create Project" size="max-w-4xl">
         <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="from" value="user">
@@ -1220,9 +1218,8 @@ table.dataTable tbody td.dataTables_empty {
             {{-- Tombol Submit --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('projectModal')"
-                    class="px-4 py-2 bg-red-800 rounded mr-2">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan
-                    Project</button>
+                    class="px-4 py-2 bg-red-800 rounded mr-2">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
     </x-modal-form>
@@ -1248,11 +1245,11 @@ table.dataTable tbody td.dataTables_empty {
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeModal('voidModal')"
                     class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
-                    Batal
+                    Cancel
                 </button>
                 <button type="submit"
                     class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
-                    Void Project
+                    Save
                 </button>
             </div>
         </form>

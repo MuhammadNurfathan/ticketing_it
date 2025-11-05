@@ -69,7 +69,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="px-3 py-1 text-red-400 hover:text-red-300 border border-gray-300 dark:border-gray-600 rounded">
-                                                Hapus
+                                                Delete
                                             </button>
                                         </form>
                                     </div>

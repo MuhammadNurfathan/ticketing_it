@@ -67,14 +67,14 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Problem <span class="text-red-500">*</span>
                             </label>
-                            <textarea name="problem" placeholder="Masukkan Kendala..." 
+                            <textarea name="problem" placeholder="Enter Problem..." 
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
 
                         {{-- Upload Media (OPTIONAL - Max 5 MB) --}}
                         <div class="mb-6">
                             <label for="media" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Upload Gambar / Video (Opsional - Max 5 MB)
+                                Upload Image / Video (Max 5 MB)
                             </label>
                             <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4" capture="environment"
                                 class="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600">
