@@ -308,24 +308,26 @@ public function update(Request $request, $id)
 }
 
     public function updateStatusDone(Request $request, Ticket $ticket)
-    {
-        $statusId  = $request->input('status_id');
-        $timeSpent = $request->input('time_spent');
-        $solution  = $request->input('solution');
-        $notes     = $request->input('notes');
+{
+    $validated = $request->validate([
+        'status_id' => 'required|integer',
+        'time_spent' => 'nullable|integer',
+        'solution' => 'required|string',
+        'notes' => 'nullable|string',
+    ]);
 
-        $ticket->status_id  = $statusId;
-        $ticket->time_spent = $timeSpent;
-        $ticket->solution   = $solution;
-        $ticket->notes      = $notes;
+    // kalau time_spent tidak dikirim, tetap pakai yang lama (biar gak null)
+    $timeSpent = $validated['time_spent'] ?? $ticket->time_spent ?? 0;
 
-        // jika status Done (3) dan end_date null, set sekarang
-        if ($statusId == 3 && !$ticket->end_date) {
-            $ticket->end_date = now();
-        }
+    // hitung ulang apakah late atau tidak
+    $validated['is_late'] = $timeSpent > 480;
 
-        $ticket->save();
+    // update field time_spent biar ikut tersimpan
+    $validated['time_spent'] = $timeSpent;
 
-        return redirect()->back()->with('success', 'Ticket updated successfully.');
-    }
+    $ticket->update($validated);
+
+    return back()->with('success', 'Ticket updated successfully.');
+}
+
 }

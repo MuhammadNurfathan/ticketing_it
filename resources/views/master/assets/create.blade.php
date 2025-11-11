@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     @if ($errors->any())
@@ -24,77 +24,78 @@
                         @csrf
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kode Asset</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Kode Asset</label>
                             <input type="text" name="assets_code" value="{{ old('assets_code') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Contoh: AST-001" required>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Asset</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Asset</label>
                             <input type="text" name="assets_name" value="{{ old('assets_name') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Contoh: Laptop Lenovo ThinkPad" required>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Kategori</label>
                             <input type="text" name="category" value="{{ old('category') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: Laptop / PC" required>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                            <select name="status" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Status</label>
+                            <select name="status" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2" required>
                                 <option value="Available" {{ old('status') == 'Available' ? 'selected' : '' }}>Available</option>
                                 <option value="Checked Out" {{ old('status') == 'Checked Out' ? 'selected' : '' }}>Checked Out</option>
                             </select>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Lokasi</label>
                             <input type="text" name="location" value="{{ old('location') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: Ruang IT" required>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Model</label>
                             <input type="text" name="model" value="{{ old('model') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: X1 Carbon Gen 9">
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Check In</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check In</label>
                             <input type="text" name="check_in" value="{{ old('check_in') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: Admin IT">
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Check Out</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check Out</label>
                             <input type="text" name="check_out" value="{{ old('check_out') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: -">
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Check Out To</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check Out To</label>
                             <input type="text" name="check_out_to" value="{{ old('check_out_to') }}"
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2"
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
                                 placeholder="Contoh: Divisi Keuangan">
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                            <textarea name="notes" class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2" rows="3">{{ old('notes') }}</textarea>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Catatan</label>
+                            <textarea name="notes" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2" rows="3">{{ old('notes') }}</textarea>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Gambar</label>
-                            <input type="file" name="image" accept="image/*" class="w-full">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Gambar</label>
+                             <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4" capture="environment"
+                                class="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600">
                         </div>
 
                         <div class="flex items-center gap-3">

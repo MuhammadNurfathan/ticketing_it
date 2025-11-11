@@ -21,4 +21,7 @@ class Assets extends Model
                             'location',
                             'notes',
                           ];
+
+
+
 }

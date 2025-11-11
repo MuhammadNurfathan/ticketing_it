@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-dark-eval-1 dark:text-light-eval-1 leading-tight">
-                {{ __('Kelola Assets') }}
+                {{ __('Kelola assets') }}
             </h2>
             <a href="{{ route('assets.create') }}"
                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow">
-                Tambah Asset
+                Tambah assets
             </a>
         </div>
     </x-slot>
@@ -29,7 +29,7 @@
 
         <div class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
             <h3 class="font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Daftar Assets
+                Daftar assets
             </h3>
 
             <div class="overflow-x-auto">
@@ -37,8 +37,8 @@
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">No</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Kode Asset</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Nama Asset</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Kode assets</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Nama assets</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Kategori</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Status</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Lokasi</th>
@@ -46,33 +46,33 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($assets as $index => $asset)
+                        @foreach ($assets as $index => $assets)
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $index + 1 }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $asset->assets_code }}
+                                    {{ $assets->assets_code }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $asset->assets_name }}
+                                    {{ $assets->assets_name }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $asset->category }}
+                                    {{ $assets->category }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $asset->status }}
+                                    {{ $assets->status }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $asset->location }}
+                                    {{ $assets->location }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('assets.edit', $asset) }}"
+                                        <a href="{{ route('assets.edit', $assets) }}"
                                            class="border border-gray-300 dark:border-gray-600 px-3 py-1 text-light-text dark:text-dark-text rounded">
                                             Edit
                                         </a>
-                                        <form action="{{ route('assets.destroy', $asset) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus asset ini?');">
+                                        <form action="{{ route('assets.destroy', $assets) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus assets ini?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

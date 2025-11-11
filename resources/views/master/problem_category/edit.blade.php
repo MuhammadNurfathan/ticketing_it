@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     @if ($errors->any())
@@ -25,10 +25,11 @@
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Role</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Problem Category</label>
                             <input type="text" name="problem_category_name" value="{{ old('problem_category_name', $problemCategory->problem_category_name) }}" 
-                                class="w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="Contoh: Admin, User, Manager" 
+                               class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                                text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 
+                                focus:outline-none focus:ring-blue-500 focus:border-blue-500"  placeholder="Contoh: Netsuite Error"
                                 required>
                         </div>
 

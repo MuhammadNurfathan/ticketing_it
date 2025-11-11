@@ -207,15 +207,17 @@
         }
 
         .dark .gantt .grid-row {
-            fill: #111827;
-        }
+  fill: #111827 !important;
+  stroke: none !important;
+}
+
 
         .dark .gantt .bar {
             fill: #6b7280;
         }
 
         .dark .gantt .bar-progress {
-            fill: #10b981;
+            fill: #a057f3d5;
         }
 
         /* === Loading Animation === */

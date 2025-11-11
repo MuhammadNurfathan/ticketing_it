@@ -580,13 +580,13 @@
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Tanggal Req</th>
-                                @auth
-                                    @if (Auth::user()->role_id != 3)
+                                {{-- @auth
+                                    @if (Auth::user()->role_id != 3
                                         <th
                                             class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
                                             Action</th>
                                     @endif
-                                @endauth
+                                @endauth --}}
 
                             </tr>
                         </thead>
@@ -615,7 +615,7 @@
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
-
+{{-- 
                                     @auth
                                         @if (Auth::user()->role_id != 3)
                                             <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
@@ -632,7 +632,7 @@
                                                 </form>
                                             </td>
                                         @endif
-                                    @endauth
+                                    @endauth --}}
 
                                 </tr>
                             @endforeach
@@ -666,7 +666,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 0.5rem;
-}
+}Tickets Completed this year
 
 /* Input & select styling */
 .dataTables_wrapper .dataTables_filter input,
