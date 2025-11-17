@@ -38,7 +38,7 @@
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">No</th>
-                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Nama</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Username</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Email</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Role</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Aksi</th>
@@ -51,7 +51,7 @@
                                     {{ $index + 1 }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $user->name }}
+                                    {{ $user->username }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $user->email }}

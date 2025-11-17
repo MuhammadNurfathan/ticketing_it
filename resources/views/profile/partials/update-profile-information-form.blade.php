@@ -42,6 +42,27 @@
 
             <x-form.error :messages="$errors->get('name')" />
         </div>
+        <div class="space-y-2">
+            <x-form.label
+                for="username"
+                :value="__('Username')"
+            />
+
+            <x-form.input
+                id="username"
+                name="username"
+                type="text"
+                class="block w-full"
+                :value="old('username', $user->username)"
+                required
+                autofocus
+                autocomplete="username"
+                aria-readonly="@break"
+                readonly
+            />
+
+            <x-form.error :messages="$errors->get('name')" />
+        </div>
 
         <div class="space-y-2">
             <x-form.label

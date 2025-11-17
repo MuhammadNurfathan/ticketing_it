@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('username', 255)->unique();
             $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('restrict')->onUpdate('cascade');
             $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('restrict')->onUpdate('cascade');;
-            $table->string('email', 255)->unique();
+            $table->string('email', 255)->unique()->nullable();
             $table->string('password', 255);
             $table->string('phone', 20)->nullable();
             $table->string('job_position', 100)->nullable();

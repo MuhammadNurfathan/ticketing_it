@@ -38,15 +38,14 @@
                 </div>
 
                 @if (!$hasDoneTicket)
-                        <a href="{{ route('DashboardTicketsUser.createUser') }}"
-                            class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-500 dark:bg-blue-500 text-white dark:text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-800 transition-colors font-medium text-sm shadow-sm">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Create Ticket
-                        </a>
-                    @endif
+                    <a href="{{ route('DashboardTicketsUser.createUser') }}"
+                        class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-500 dark:bg-blue-500 text-white dark:text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-800 transition-colors font-medium text-sm shadow-sm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create Ticket
+                    </a>
+                @endif
             </div>
 
             {{-- Stats Cards --}}
@@ -98,15 +97,22 @@
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Problem</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Status</th>
+
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Date</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Solution</th>
+                                    Feedback</th>
+                                <th
+                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
+                                    Feedback</th>
+                                <th
+                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
+                                    IT Support</th>
+                                <th
+                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
+                                    Status</th>
                                 <th
                                     class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Action</th>
@@ -131,6 +137,19 @@
                                     <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
                                         {{ $ticket->problem }}
                                     </td>
+
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                        {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->solution ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->feedback->description ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->support->name ?? '-' }}
+                                    </td>
                                     <td class="px-4 py-4">
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
@@ -140,12 +159,6 @@
                                             {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
-                                        {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
-                                    </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                                        {{ $ticket->solution ?? '-' }}
                                     </td>
                                     <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
@@ -180,66 +193,110 @@
                         </div>
 
                         {{-- Cards Container --}}
+                        {{-- Cards Container --}}
                         <div id="mobileCards" class="space-y-3">
+
                             @php
                                 $sortedMobile = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
                             @endphp
+
                             @foreach ($sortedMobile as $ticket)
                                 <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-lg p-4 border border-gray-200 dark:border-gray-700 
-                                    {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
+            {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
                                     data-code="{{ strtolower($ticket->ticket_code) }}"
                                     data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
                                     data-problem="{{ strtolower($ticket->problem) }}"
                                     data-status="{{ strtolower($ticket->status->status_name) }}"
+                                    data-support="{{ strtolower($ticket->support->name ?? '') }}"
+                                    data-feedback="{{ strtolower($ticket->feedback->description ?? '') }}"
                                     data-priority="{{ $ticket->status_id == 3 ? '1' : '0' }}">
 
+                                    {{-- Header --}}
                                     <div class="flex justify-between items-start mb-3">
                                         <div>
                                             <div class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                {{ $ticket->ticket_code }}</div>
+                                                {{ $ticket->ticket_code }}
+                                            </div>
                                             <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                {{ $ticket->user->name ?? '-' }}</div>
+                                                {{ $ticket->user->name ?? '-' }}
+                                            </div>
                                         </div>
+
+                                        {{-- Status Badge --}}
                                         <span
                                             class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
-                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                    {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
+                    {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
+                    {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
+                    {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
                                     </div>
 
+                                    {{-- Content --}}
                                     <div class="space-y-2 text-sm">
+
                                         <div class="flex">
                                             <span
                                                 class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Category:</span>
-                                            <span
-                                                class="text-gray-900 dark:text-white text-xs font-medium">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</span>
+                                            <span class="text-gray-900 dark:text-white text-xs font-medium">
+                                                {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
+                                            </span>
                                         </div>
+
                                         <div class="flex">
                                             <span
                                                 class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Problem:</span>
-                                            <span
-                                                class="text-gray-900 dark:text-white text-xs">{{ Str::limit($ticket->problem, 60) }}</span>
+                                            <span class="text-gray-900 dark:text-white text-xs">
+                                                {{ Str::limit($ticket->problem, 60) }}
+                                            </span>
                                         </div>
+
                                         <div class="flex">
                                             <span
                                                 class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Date:</span>
-                                            <span
-                                                class="text-gray-900 dark:text-white text-xs">{{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}</span>
+                                            <span class="text-gray-900 dark:text-white text-xs">
+                                                {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
+                                            </span>
                                         </div>
+
+                                        {{-- SOLUTION --}}
                                         @if ($ticket->solution)
                                             <div class="flex">
                                                 <span
                                                     class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Solution:</span>
-                                                <span
-                                                    class="text-gray-900 dark:text-white text-xs">{{ Str::limit($ticket->solution, 60) }}</span>
+                                                <span class="text-gray-900 dark:text-white text-xs">
+                                                    {{ Str::limit($ticket->solution, 60) }}
+                                                </span>
                                             </div>
                                         @endif
+
+                                        {{-- FEEDBACK --}}
+                                        @if ($ticket->feedback)
+                                            <div class="flex">
+                                                <span
+                                                    class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Feedback:</span>
+                                                <span class="text-gray-900 dark:text-white text-xs">
+                                                    {{ Str::limit($ticket->feedback->description, 60) }}
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        {{-- SUPPORT / IT SUPPORT --}}
+                                        @if ($ticket->support)
+                                            <div class="flex">
+                                                <span
+                                                    class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Support:</span>
+                                                <span class="text-gray-900 dark:text-white text-xs font-medium">
+                                                    {{ $ticket->support->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+
                                     </div>
 
-                                    @if ($ticket->status_id == 3)
+                                    {{-- Give Feedback Button (ONLY if closed & no feedback) --}}
+                                    @if ($ticket->status_id == 3 && !$ticket->feedback)
                                         <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
                                                 class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
@@ -247,9 +304,13 @@
                                             </a>
                                         </div>
                                     @endif
+
                                 </div>
                             @endforeach
+
                         </div>
+
+
 
                         {{-- Pagination --}}
                         <div id="mobilePagination"
@@ -450,6 +511,7 @@
 
     <script>
         $(document).ready(function() {
+
             // Desktop DataTable
             if (window.innerWidth >= 1024) {
                 $('.datatable').DataTable({
@@ -487,12 +549,17 @@
 
                 filteredCards = allCards.filter(function() {
                     const card = $(this);
+
+                    // ADD: searching ke support & feedback
                     const searchText = [
                         card.data('code'),
                         card.data('category'),
                         card.data('problem'),
-                        card.data('status')
+                        card.data('status'),
+                        card.data('support'), // <-- baru ditambah
+                        card.data('feedback') // <-- baru ditambah
                     ].join(' ');
+
                     return searchText.includes(searchTerm);
                 }).toArray();
 
@@ -545,49 +612,42 @@
                     'bg-gray-100 text-gray-900 border-none' :
                     'bg-gray-900 text-white border-none';
 
-                // Previous button
+                // Prev
                 const prevBtn = $(`
-                    <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" 
-                        ${currentPage === 1 ? 'disabled' : ''}>
-                        ‹
-                    </button>
-                `);
+                <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" 
+                    ${currentPage === 1 ? 'disabled' : ''}>‹</button>
+            `);
                 if (currentPage > 1) {
-                    prevBtn.on('click', function() {
-                        changePage(currentPage - 1);
-                    });
+                    prevBtn.on('click', () => changePage(currentPage - 1));
                 }
                 buttons.append(prevBtn);
 
-                // Page numbers
+                // Pages
                 let startPage = Math.max(1, currentPage - 2);
                 let endPage = Math.min(totalPages, startPage + 4);
+
                 if (endPage - startPage < 4) {
                     startPage = Math.max(1, endPage - 4);
                 }
 
                 for (let i = startPage; i <= endPage; i++) {
                     const pageBtn = $(`
-                        <button class="${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}">${i}</button>
-                    `);
+                    <button class="${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}">${i}</button>
+                `);
                     if (i !== currentPage) {
-                        pageBtn.on('click', function() {
-                            changePage(i);
-                        });
+                        pageBtn.on('click', () => changePage(i));
                     }
                     buttons.append(pageBtn);
                 }
 
-                // Next button
+                // Next
                 const nextBtn = $(`
-                    <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                        ›
-                    </button>
-                `);
+                <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
+                    ›
+                </button>
+            `);
                 if (currentPage < totalPages) {
-                    nextBtn.on('click', function() {
-                        changePage(currentPage + 1);
-                    });
+                    nextBtn.on('click', () => changePage(currentPage + 1));
                 }
                 buttons.append(nextBtn);
             }
@@ -604,11 +664,8 @@
                 }, 300);
             }
 
-            // Event listeners
-            $('#mobileSearch').on('keyup', function() {
-                filterCards();
-            });
-
+            // Events
+            $('#mobileSearch').on('keyup', filterCards);
             $('#mobilePerPage').on('change', function() {
                 const val = $(this).val();
                 perPage = val === 'all' ? 999999 : parseInt(val);
@@ -620,4 +677,5 @@
             filterCards();
         });
     </script>
+
 </x-app-layout>

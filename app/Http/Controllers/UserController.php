@@ -33,13 +33,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role_id' => 'required|string',
         ]);
 
-        User::create($request->only('name', 'department_id','role_id', 'email', 'password'));
+        User::create($request->only('name','username', 'department_id','role_id', 'email', 'password'));
         return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
     }
 
@@ -47,13 +48,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
             'role_id' => 'nullable|string',
         ]);
 
-        $data = $request->only('name', 'department_id','role_id', 'email');
+        $data = $request->only('name','username', 'department_id','role_id', 'email');
         if ($request->password) {
             $data['password'] = $request->password;
         }

@@ -9,16 +9,16 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="grid gap-6">
-                <!-- Email Address -->
+                <!-- username Address -->
                 <div class="space-y-2">
-                    <x-label for="email" :value="__('Email')" />
+                    <x-label for="username" :value="__('Username')" />
 
                     <x-input-with-icon-wrapper>
                         <x-slot name="icon">
                             <x-heroicon-o-mail aria-hidden="true" class="w-5 h-5" />
                         </x-slot>
-                        <x-input withicon id="email" class="block w-full" type="email" name="email"
-                            :value="old('email')" placeholder="{{ __('Email') }}" required autofocus />
+                        <x-input withicon id="username" class="block w-full" type="username" name="username"
+                            :value="old('username')" placeholder="{{ __('Username') }}" required autofocus />
                     </x-input-with-icon-wrapper>
                 </div>
 
