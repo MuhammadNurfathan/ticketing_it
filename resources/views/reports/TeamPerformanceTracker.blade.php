@@ -612,4 +612,4 @@
             transition: transform 0.2s ease-out;
         }
     </style>
-</x-app-layout>
+</x-app-layout> 

@@ -1,147 +1,90 @@
 <?php
 
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\LocationController; // ← TAMBAHKAN INI
-use App\Http\Controllers\PriorityController;
-use App\Http\Controllers\ProblemCategoryController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\StatusController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AssetsController;
-use App\Http\Controllers\FeedbackController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\TicketsController;
-use GuzzleHttp\Middleware;
+use App\Http\Controllers\{
+    DepartmentController,
+    LocationController,
+    PriorityController,
+    ProblemCategoryController,
+    RoleController,
+    StatusController,
+    UserController,
+    AssetsController,
+    FeedbackController,
+    ProfileController,
+    ProjectController,
+    TicketsController
+};
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
-Route::get('/', function () {
-    return view('auth/login');
-});
+// Route login & profile
+Route::get('/', function () { return view('auth/login'); });
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Tambahkan name di sini
+    Route::get('/dashboard', function () { return view('dashboard'); })->name('dashboard');
 });
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/buttons/text', function () {
-    return view('buttons-showcase.text');
-})->middleware(['auth'])->name('buttons.text');
-
-Route::get('/buttons/icon', function () {
-    return view('buttons-showcase.icon');
-})->middleware(['auth'])->name('buttons.icon');
-
-Route::get('/buttons/text-icon', function () {
-    return view('buttons-showcase.text-icon');
-})->middleware(['auth'])->name('buttons.text-icon');
-
-Route::get('/department',function(){
-    return view('department/index');
-})->middleware(['auth','verified'])->name('department');
-
-Route::middleware(['auth', 'verified'])->group(function () {
+// Admin + Superadmin (role_id 1,2)
+Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::resource('locations', LocationController::class);
-});
-
-Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('departments', DepartmentController::class);
-});
-Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', UserController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('problem_categories', ProblemCategoryController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('status', StatusController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('project', ProjectController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('priority', PriorityController::class);
-});
-
-Route::middleware('auth')->group(function () {
     Route::resource('assets', AssetsController::class);
+
+    Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
+    Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
+
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');
 });
 
-Route::post('/DashboardTicketsAdmin/{ticket}/updatestatus', [TicketsController::class, 'updateStatus'])->name('DashboardTicketsAdmin.updateStatus');
-Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])->name('DashboardTicketsAdmin.updateStatusDone');
-Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
-Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.indexUser');
-Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
-Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
-Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
-Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback');
-Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
-Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
-Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
-Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
-Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/reports/ExcecutiveTicketsInsight', function () {
-        return view('reports.ExcecutiveTicketsInsight');
-    })->name('reports.ExcecutiveTicketsInsight');
+// Admin + Superadmin + User (role_id 1,2,3)
+Route::middleware(['auth', 'role:1,2,3'])->group(function () {
+    Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
+    Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.indexUser');
+    Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
+    Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
+    Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/reports/TeamPerformanceTracker', function () {
-        return view('reports.TeamPerformanceTracker');
-    })->name('reports.TeamPerformanceTracker');
-});
-Route::middleware(['auth'])->group(function () {
-    Route::get('/reports/ProjectMonitoring', function () {
-        return view('reports.ProjectMonitoring');
-    })->name('reports.ProjectMonitoring');
+// Khusus Superadmin (role_id 2)
+Route::middleware(['auth', 'role:2'])->group(function () {
+    Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
+    Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
+    Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
+    Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
+    Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
+
+    Route::get('/reports/ExcecutiveTicketsInsight', function () { return view('reports.ExcecutiveTicketsInsight'); })->name('reports.ExcecutiveTicketsInsight');
+    Route::get('/reports/TeamPerformanceTracker', function () { return view('reports.TeamPerformanceTracker'); })->name('reports.TeamPerformanceTracker');
+    Route::get('/reports/ProjectMonitoring', function () { return view('reports.ProjectMonitoring'); })->name('reports.ProjectMonitoring');
 });
 
-Route::get('/ticket-files/{filename}', function($filename) {
-    // Sanitize filename untuk keamanan
+// File ticket
+Route::get('/ticket-files/{filename}', function ($filename) {
     $filename = basename($filename);
-    
-    // Path lengkap ke file
     $path = storage_path('app/public/tickets/' . $filename);
-    
-    // Cek apakah file exist
-    if (!file_exists($path)) {
-        abort(404, 'File tidak ditemukan');
-    }
-    
-    // Tentukan MIME type
-    $mimeType = mime_content_type($path);
-    
-    // Return file dengan header yang benar
+    if (!file_exists($path)) abort(404, 'File tidak ditemukan');
     return response()->file($path, [
-        'Content-Type' => $mimeType,
+        'Content-Type' => mime_content_type($path),
         'Content-Disposition' => 'inline; filename="' . $filename . '"',
         'Cache-Control' => 'public, max-age=31536000',
     ]);
 })->name('ticket.file');
+
 require __DIR__ . '/auth.php';

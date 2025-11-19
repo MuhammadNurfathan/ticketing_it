@@ -39,6 +39,7 @@
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">No</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Kode assets</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Nama assets</th>
+                            <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Nama User</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Kategori</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Status</th>
                             <th class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">Lokasi</th>
@@ -56,6 +57,9 @@
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $assets->assets_name }}
+                                </td>
+                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $assets->check_out_to }}
                                 </td>
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $assets->category }}

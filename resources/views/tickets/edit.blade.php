@@ -77,22 +77,25 @@
                                 value="{{ $ticket->problem_category_id }}">
                         </div>
 
-                        {{-- Assets (MANDATORY) --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Assets <span class="text-red-500">*</span>
-                            </label>
-                            <select name="assets_id" required
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Pilih Assets --</option>
-                                @foreach ($assets as $ass)
-                                    <option value="{{ $ass->id }}"
-                                        {{ old('assets_id', $ticket->assets_id) == $ass->id ? 'selected' : '' }}>
-                                        {{ $ass->assets_name }} - {{ $ass->assets_code }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                                               {{-- Assets --}}
+<div class="mb-4 relative">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Choose Assets <span class="text-red-500">*</span>
+    </label>
+    <input type="text" id="assets-search" placeholder="Cari assets..." required
+        value="{{ old('assets_search') }}"
+        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+    <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" required>
+    <ul id="assets-results"
+        class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
+        @foreach ($assets as $ass)
+            <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                data-id="{{ $ass->id }}">{{ $ass->assets_name }} - {{ $ass->assets_code }} - {{ $ass->check_out_to }}</li>
+        @endforeach
+    </ul>
+</div>
+
+
 
                         {{-- Problem (READ ONLY) --}}
                         <div class="mb-4">
@@ -259,124 +262,166 @@
             </div>
         </div>
     </div>
+{{-- Assets Search --}}
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script>
+$(function() {
+    const $input = $('#assets-search');
+    const $results = $('#assets-results');
+    const $hidden = $('#assets-id');
 
-    {{-- Scripts --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    // Tampilkan list saat focus
+    $input.on('focus', () => $results.removeClass('hidden'));
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const statusSelect = document.getElementById("status-select");
-            const startContainer = document.getElementById("start-date-container");
-            const endContainer = document.getElementById("end-date-container");
-            const timeContainer = document.getElementById("time-spent-container");
-            const solutionContainer = document.getElementById("solution-container");
-            const notesContainer = document.getElementById("notes-container");
-            const startInput = document.getElementById("start_datetime");
-            const endInput = document.getElementById("end_datetime");
-            const timeInput = document.getElementById("time_spent");
-            const solutionField = document.getElementById("solution");
-            const notesField = document.getElementById("notes");
-            const manualCheckbox = document.getElementById("manual_time");
+    // Filter list saat ketik
+    $input.on('input', function() {
+        const val = $(this).val().toLowerCase();
+        let hasVisible = false;
 
-            // Restore old status jika ada error
-            @if (old('status_id'))
-                statusSelect.value = "{{ old('status_id') }}";
-                const event = new Event('change');
-                statusSelect.dispatchEvent(event);
-            @endif
-
-            // === STATUS CHANGE HANDLER ===
-            statusSelect.addEventListener("change", function() {
-                const statusId = parseInt(this.value);
-
-                // Sembunyikan semua field dulu
-                startContainer.classList.add("hidden");
-                endContainer.classList.add("hidden");
-                timeContainer.classList.add("hidden");
-                solutionContainer.classList.add("hidden");
-
-                // Hapus required semua dulu
-                startInput.removeAttribute("required");
-                endInput.removeAttribute("required");
-                timeInput.removeAttribute("required");
-                solutionField.removeAttribute("required");
-
-                // Status: WAITING (id 1) → gak muncul field tambahan
-                if (statusId === 1) {
-                    // nothing
-                }
-
-                // Status: IN PROGRESS (id 2) → hanya Start Date
-                else if (statusId === 2) {
-                    startContainer.classList.remove("hidden");
-                    startInput.setAttribute("required", "required");
-                }
-
-                // Status: DONE (id 3) → semua field + Solution
-                else if (statusId === 3) {
-                    startContainer.classList.remove("hidden");
-                    endContainer.classList.remove("hidden");
-                    timeContainer.classList.remove("hidden");
-                    solutionContainer.classList.remove("hidden");
-
-                    startInput.setAttribute("required", "required");
-                    endInput.setAttribute("required", "required");
-                    timeInput.setAttribute("required", "required");
-                    solutionField.setAttribute("required", "required");
-                }
-            });
-
-            // Update minimum end date sesuai start
-            function updateEndDateMin() {
-                if (startInput.value) {
-                    endInput.min = startInput.value;
-                    if (endInput.value && endInput.value < startInput.value) {
-                        endInput.value = '';
-                        timeInput.value = '';
-                    }
-                } else {
-                    endInput.removeAttribute('min');
-                }
-            }
-
-            startInput.addEventListener('change', updateEndDateMin);
-            startInput.addEventListener('input', updateEndDateMin);
-            updateEndDateMin();
-
-            // Auto calculate time spent
-            function hitungTimeSpent() {
-                if (manualCheckbox.checked) return;
-                const start = new Date(startInput.value);
-                const end = new Date(endInput.value);
-                if (!isNaN(start) && !isNaN(end) && end > start) {
-                    timeInput.value = Math.floor((end - start) / 60000);
-                } else {
-                    timeInput.value = "";
-                }
-            }
-
-            endInput.addEventListener("change", hitungTimeSpent);
-            startInput.addEventListener("change", hitungTimeSpent);
-
-            // Manual input toggle
-            manualCheckbox.addEventListener("change", function() {
-                if (this.checked) {
-                    timeInput.removeAttribute("readonly");
-                    timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-                    timeInput.classList.add("bg-white");
-                    notesContainer.classList.remove("hidden");
-                    notesField.setAttribute("required", "required");
-                } else {
-                    timeInput.setAttribute("readonly", true);
-                    timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
-                    timeInput.classList.remove("bg-white");
-                    hitungTimeSpent();
-                    notesContainer.classList.add("hidden");
-                    notesField.removeAttribute("required");
-                }
-            });
+        $results.children('li').each(function() {
+            const text = $(this).text().toLowerCase();
+            const match = text.includes(val);
+            $(this).toggleClass('hidden', !match);
+            if (match) hasVisible = true;
         });
-    </script>
 
+        $results.toggleClass('hidden', !hasVisible);
+    });
 
+    // Pilih item
+    $results.on('click', 'li', function() {
+        $input.val($(this).text());
+        $hidden.val($(this).data('id'));
+        $results.addClass('hidden');
+    });
+
+    // Klik di luar → sembunyikan list
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#assets-search, #assets-results').length) {
+            $results.addClass('hidden');
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const statusSelect = document.getElementById("status-select");
+    const startContainer = document.getElementById("start-date-container");
+    const endContainer = document.getElementById("end-date-container");
+    const timeContainer = document.getElementById("time-spent-container");
+    const solutionContainer = document.getElementById("solution-container");
+    const notesContainer = document.getElementById("notes-container");
+
+    const startInput = document.getElementById("start_datetime");
+    const endInput = document.getElementById("end_datetime");
+    const timeInput = document.getElementById("time_spent");
+    const solutionField = document.getElementById("solution");
+    const notesField = document.getElementById("notes");
+    const manualCheckbox = document.getElementById("manual_time");
+
+    // Restore old status jika ada error
+    @if (old('status_id'))
+        statusSelect.value = "{{ old('status_id') }}";
+        const event = new Event('change');
+        statusSelect.dispatchEvent(event);
+    @endif
+
+    // === STATUS CHANGE HANDLER ===
+    statusSelect.addEventListener("change", function() {
+        const statusId = parseInt(this.value);
+
+        // Sembunyikan semua field dulu
+        startContainer.classList.add("hidden");
+        endContainer.classList.add("hidden");
+        timeContainer.classList.add("hidden");
+        solutionContainer.classList.add("hidden");
+
+        // Hapus required semua dulu
+        startInput.removeAttribute("required");
+        endInput.removeAttribute("required");
+        timeInput.removeAttribute("required");
+        solutionField.removeAttribute("required");
+
+        // Field sesuai status
+        if (statusId === 2) { // IN PROGRESS
+            startContainer.classList.remove("hidden");
+            startInput.setAttribute("required", "required");
+        } else if (statusId === 3) { // DONE
+            startContainer.classList.remove("hidden");
+            endContainer.classList.remove("hidden");
+            timeContainer.classList.remove("hidden");
+            solutionContainer.classList.remove("hidden");
+
+            startInput.setAttribute("required", "required");
+            endInput.setAttribute("required", "required");
+            timeInput.setAttribute("required", "required");
+            solutionField.setAttribute("required", "required");
+        }
+    });
+
+    // === Update minimum end date ===
+    function updateEndDateMin() {
+        if (startInput.value) {
+            endInput.min = startInput.value;
+            if (endInput.value && endInput.value < startInput.value) {
+                endInput.value = '';
+                timeInput.value = '';
+            }
+        } else {
+            endInput.removeAttribute('min');
+        }
+    }
+
+    startInput.addEventListener('change', updateEndDateMin);
+    startInput.addEventListener('input', updateEndDateMin);
+    updateEndDateMin();
+
+    // === Auto calculate time spent ===
+    function hitungTimeSpent() {
+        if (manualCheckbox.checked) return; // skip kalau manual
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+        if (!isNaN(start) && !isNaN(end) && end > start) {
+            timeInput.value = Math.floor((end - start) / 60000); // menit
+        } else {
+            timeInput.value = "";
+        }
+    }
+
+    startInput.addEventListener('change', hitungTimeSpent);
+    startInput.addEventListener('input', hitungTimeSpent);
+    endInput.addEventListener('change', hitungTimeSpent);
+    endInput.addEventListener('input', hitungTimeSpent);
+
+    // Hitung saat page load jika ada nilai
+    hitungTimeSpent();
+
+    // === Manual input toggle ===
+    // Manual time checkbox
+manualCheckbox.addEventListener("change", function() {
+    if (this.checked) {
+        timeInput.removeAttribute("readonly");
+
+        // Ganti kelas bg sesuai tema tapi tetap editable
+        timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+        timeInput.classList.add("bg-gray-50", "dark:bg-gray-800"); 
+
+        notesContainer.classList.remove("hidden");
+        notesField.setAttribute("required", "required");
+    } else {
+        timeInput.setAttribute("readonly", true);
+
+        // Kembalikan bg default readonly
+        timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
+        timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+
+        hitungTimeSpent();
+        notesContainer.classList.add("hidden");
+        notesField.removeAttribute("required");
+    }
+});
+
+});
+</script>   
 </x-app-layout>

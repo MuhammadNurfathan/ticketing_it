@@ -89,24 +89,23 @@
                                 @endforeach
                             </select>
                         </div>
-                        {{-- Assets --}}
-                        <div class="mb-4 relative">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Choose Assets <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="assets-search" placeholder="Cari assets..." required
-                                value="{{ old('assets_search') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}"
-                                required>
-                            <ul id="assets-results"
-                                class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
-                                @foreach ($assets as $ass)
-                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $ass->id }}">{{ $ass->assets_name }} - {{ $ass->assets_code }} </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                       {{-- Assets --}}
+<div class="mb-4 relative">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        Choose Assets <span class="text-red-500">*</span>
+    </label>
+    <input type="text" id="assets-search" placeholder="Cari assets..." required
+        value="{{ old('assets_search') }}"
+        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+    <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" required>
+    <ul id="assets-results"
+        class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
+        @foreach ($assets as $ass)
+            <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                data-id="{{ $ass->id }}">{{ $ass->assets_name }} - {{ $ass->assets_code }} - {{ $ass->check_out_to }}</li>
+        @endforeach
+    </ul>
+</div>
 
 
                         {{-- Problem --}}
@@ -348,22 +347,30 @@
             startInput.addEventListener("change", hitungTimeSpent);
 
             // Manual time checkbox
-            manualCheckbox.addEventListener("change", function() {
-                if (this.checked) {
-                    timeInput.removeAttribute("readonly");
-                    timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-                    timeInput.classList.add("bg-white");
-                    notesContainer.classList.remove("hidden");
-                    notesField.setAttribute("required", "required");
-                } else {
-                    timeInput.setAttribute("readonly", true);
-                    timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
-                    timeInput.classList.remove("bg-white");
-                    hitungTimeSpent();
-                    notesContainer.classList.add("hidden");
-                    notesField.removeAttribute("required");
-                }
-            });
+            // Manual time checkbox
+manualCheckbox.addEventListener("change", function() {
+    if (this.checked) {
+        timeInput.removeAttribute("readonly");
+
+        // Ganti kelas bg sesuai tema tapi tetap editable
+        timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+        timeInput.classList.add("bg-gray-50", "dark:bg-gray-800"); 
+
+        notesContainer.classList.remove("hidden");
+        notesField.setAttribute("required", "required");
+    } else {
+        timeInput.setAttribute("readonly", true);
+
+        // Kembalikan bg default readonly
+        timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
+        timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+
+        hitungTimeSpent();
+        notesContainer.classList.add("hidden");
+        notesField.removeAttribute("required");
+    }
+});
+
 
             // Form validation sebelum submit
             document.getElementById('ticket-form').addEventListener('submit', function(e) {
@@ -444,39 +451,49 @@
         });
     </script>
 
-    {{-- Assets Search --}}
-    <script>
-        $(function() {
-            const $input = $('#assets-search');
-            const $results = $('#assets-results');
-            const $hidden = $('#assets-id');
+  {{-- Assets Search --}}
+<script>
+$(function() {
+    const $input = $('#assets-search');
+    const $results = $('#assets-results');
+    const $hidden = $('#assets-id');
 
-            $input.on('focus', () => $results.show());
-            $input.on('input', function() {
-                const val = $(this).val().toLowerCase();
-                let visible = false;
+    // Tampilkan list saat focus
+    $input.on('focus', () => {
+        $results.removeClass('hidden');
+    });
 
-                $results.children('li').each(function() {
-                    const match = $(this).text().toLowerCase().includes(val);
-                    $(this).toggle(match);
-                    if (match) visible = true;
-                });
-                $results.toggle(visible);
-            });
+    // Filter list saat ketik
+    $input.on('input', function() {
+        const val = $(this).val().toLowerCase();
+        let hasVisible = false;
 
-            $results.on('click', 'li', function() {
-                $input.val($(this).text());
-                $hidden.val($(this).data('id'));
-                $results.hide();
-            });
-
-            $(document).on('click', (e) => {
-                if (!$(e.target).closest('#assets-search, #assets-results').length) {
-                    $results.hide();
-                }
-            });
+        $results.children('li').each(function() {
+            const text = $(this).text().toLowerCase();
+            const match = text.includes(val);
+            $(this).toggleClass('hidden', !match);
+            if (match) hasVisible = true;
         });
-    </script>
+
+        // Tampilkan atau sembunyikan dropdown
+        $results.toggleClass('hidden', !hasVisible);
+    });
+
+    // Pilih item
+    $results.on('click', 'li', function() {
+        $input.val($(this).text());
+        $hidden.val($(this).data('id'));
+        $results.addClass('hidden');
+    });
+
+    // Klik di luar → sembunyikan list
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#assets-search, #assets-results').length) {
+            $results.addClass('hidden');
+        }
+    });
+});
+</script>
 
     {{-- Media Preview & Validation (FIXED) --}}
     <script>

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Notifications\Notifiable;
 use App\Models\Role;
 use App\Models\Department;
 use App\Models\User;
@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    use Notifiable;
     public function index()
     {
     $users = User::latest()->get();
