@@ -23,12 +23,12 @@ class TicketReportController extends Controller
             $query = Ticket::select('problem_category_id', DB::raw('count(*) as total'))
                 ->with('problemCategory:id,problem_category_name');
 
-            if ($request->has('start_date') && $request->start_date) {
+            if ($request->start_date) {
                 $startDate = Carbon::parse($request->start_date)->startOfDay();
                 $query->where('created_at', '>=', $startDate);
             }
 
-            if ($request->has('end_date') && $request->end_date) {
+            if ($request->end_date) {
                 $endDate = Carbon::parse($request->end_date)->endOfDay();
                 $query->where('created_at', '<=', $endDate);
             }
@@ -58,14 +58,12 @@ class TicketReportController extends Controller
         }
     }
 
-
     public function ticketsDonePerMonth(Request $request)
     {
         try {
             $request->validate([
                 'year' => 'nullable|integer|min:2020|max:2100',
             ]);
-
 
             $year = $request->year ?? Carbon::now()->year;
 
@@ -75,14 +73,12 @@ class TicketReportController extends Controller
             )
                 ->whereYear('end_date', $year)
                 ->whereNotNull('end_date')
-                ->whereIn('status_id', [3,5])
+                ->whereIn('status_id', [3, 5])
                 ->groupBy(DB::raw('MONTH(end_date)'))
                 ->orderBy('month')
                 ->get();
 
-            $monthlyData = collect(range(1, 12))->mapWithKeys(function ($month) {
-                return [$month => 0];
-            });
+            $monthlyData = collect(range(1, 12))->mapWithKeys(fn($month) => [$month => 0]);
 
             foreach ($tickets as $ticket) {
                 $monthlyData[$ticket->month] = $ticket->total;
@@ -126,6 +122,7 @@ class TicketReportController extends Controller
                 $startDate = Carbon::parse($request->start_date)->startOfDay();
                 $query->where('end_date', '>=', $startDate);
             }
+
             if ($request->end_date) {
                 $endDate = Carbon::parse($request->end_date)->endOfDay();
                 $query->where('end_date', '<=', $endDate);
@@ -217,7 +214,7 @@ class TicketReportController extends Controller
                 $minutes = $tickets->where('support_id', $support->id)
                     ->where('month', $m)
                     ->sum('total_minutes');
-                $data[] = round($minutes / 60, 2); // convert to hours
+                $data[] = round($minutes / 60, 2);
             }
             $datasets[] = [
                 'label' => $support->name,
@@ -237,29 +234,29 @@ class TicketReportController extends Controller
 
     public function ticketsBySupport(Request $request)
     {
-        $date = $request->query('date'); // contoh: 2025-10-28
+        $date = $request->query('date', now()->toDateString());
 
-        $ticketsAzi = Ticket::where('support_id', 2)
-            ->whereIn('status_id', [3,5])
-            ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        $ticketsAzi = Ticket::where('support_id', 21)
+            ->whereIn('status_id', [3, 5])
+            ->whereDate('end_date', $date)
             ->select('ticket_code', 'problem', 'solution')
             ->get();
 
-        $ticketsApri = Ticket::where('support_id', 3)
-            ->whereIn('status_id', [3,5])
-            ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        $ticketsApri = Ticket::where('support_id', 18)
+            ->whereIn('status_id', [3, 5])
+            ->whereDate('end_date', $date)
             ->select('ticket_code', 'problem', 'solution')
             ->get();
 
-        $ticketsBayu = Ticket::where('support_id', 4)
-            ->whereIn('status_id', [3,5])
-            ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        $ticketsBayu = Ticket::where('support_id', 24)
+            ->whereIn('status_id', [3, 5])
+            ->whereDate('end_date', $date)
             ->select('ticket_code', 'problem', 'solution')
             ->get();
 
-        $ticketsFatih = Ticket::where('support_id', 5)
-           ->whereIn('status_id', [3,5])
-            ->when($date, fn($q) => $q->whereDate('end_date', $date))
+        $ticketsFatih = Ticket::where('support_id', 15)
+            ->whereIn('status_id', [3, 5])
+            ->whereDate('end_date', $date)
             ->select('ticket_code', 'problem', 'solution')
             ->get();
 
@@ -276,98 +273,94 @@ class TicketReportController extends Controller
         ]);
     }
 
- public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
-{
-    $startDate = $request->query('start_date');
-    $endDate   = $request->query('end_date');
+    public function export(Request $request): StreamedResponse
+    {
+        $startDate = $request->query('start_date');
+        $endDate   = $request->query('end_date');
 
-    // Ambil semua tiket berdasarkan tanggal dibuat
-    $tickets = Ticket::with([
-            'user.department', // ✅ ambil user + department
-            'support',
-            'status',
-            'assets',
-            'problemCategory'
-        ])
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->orderBy('created_at', 'asc')
-        ->get([
-            'ticket_code',
-            'user_id',
-            'support_id',
-            'problem_category_id',
-            'assets_id',
-            'status_id',
-            'problem',
-            'solution',
-            'notes',
-            'start_date',
-            'end_date',
-            'time_spent',
-            'is_late',
-            'created_at',
-        ]);
-
-    $filename = "Data Ticket {$startDate} - {$endDate}.csv";
-
-    $headers = [
-        "Content-Type"        => "text/csv",
-        "Content-Disposition" => "attachment; filename={$filename}",
-        "Pragma"              => "no-cache",
-        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-        "Expires"             => "0",
-    ];
-
-    // Kolom CSV
-    $columns = [
-        'Ticket Code',
-        'Requestor Name',
-        'Requestor Division',
-        'Support Name',
-        'Category Problem',
-        'Assets',
-        'Problem',
-        'Solution',
-        'Notes',
-        'Status',
-        'Start Date',
-        'End Date',
-        'Time Spent (Minutes)',
-        'Is Late',
-        'Created At',
-    ];
-
-    // Stream CSV ke browser
-    $callback = function () use ($tickets, $columns) {
-        $file = fopen('php://output', 'w');
-        fputcsv($file, $columns);
-
-        foreach ($tickets as $ticket) {
-            fputcsv($file, [
-                $ticket->ticket_code,
-                $ticket->user->name ?? '-',
-                $ticket->user->department->department_name ?? '-',
-                $ticket->support->name ?? '-',
-                $ticket->problemCategory->problem_category_name ?? '-',
-                $ticket->assets->assets_name ?? '-',
-                $ticket->problem,
-                $ticket->solution,
-                $ticket->notes,
-                $ticket->status->status_name ?? '-',
-                $ticket->start_date,
-                $ticket->end_date,
-                $ticket->time_spent,
-                $ticket->is_late ? 'Yes' : 'No',
-                $ticket->created_at,
+        $tickets = Ticket::with([
+                'user.department',
+                'support',
+                'status',
+                'assets',
+                'problemCategory'
+            ])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc')
+            ->get([
+                'ticket_code',
+                'user_id',
+                'support_id',
+                'problem_category_id',
+                'assets_id',
+                'status_id',
+                'problem',
+                'solution',
+                'notes',
+                'start_date',
+                'end_date',
+                'time_spent',
+                'is_late',
+                'created_at',
             ]);
-        }
 
-        fclose($file);
-    };
+        $filename = "Data Ticket {$startDate} - {$endDate}.csv";
 
-    return response()->stream($callback, 200, $headers);
-}
+        $headers = [
+            "Content-Type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename={$filename}",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        ];
 
+        $columns = [
+            'Ticket Code',
+            'Requestor Name',
+            'Requestor Division',
+            'Support Name',
+            'Category Problem',
+            'Assets',
+            'Problem',
+            'Solution',
+            'Notes',
+            'Status',
+            'Start Date',
+            'End Date',
+            'Time Spent (Minutes)',
+            'Is Late',
+            'Created At',
+        ];
+
+        $callback = function () use ($tickets, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($tickets as $ticket) {
+                fputcsv($file, [
+                    $ticket->ticket_code,
+                    $ticket->user->name ?? '-',
+                    $ticket->user->department->department_name ?? '-',
+                    $ticket->support->name ?? '-',
+                    $ticket->problemCategory->problem_category_name ?? '-',
+                    $ticket->assets->assets_name ?? '-',
+                    $ticket->problem,
+                    $ticket->solution,
+                    $ticket->notes,
+                    $ticket->status->status_name ?? '-',
+                    $ticket->start_date,
+                    $ticket->end_date,
+                    $ticket->time_spent,
+                    $ticket->is_late ? 'Yes' : 'No',
+                    $ticket->created_at,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
     public function preview(Request $request)
     {
@@ -381,7 +374,7 @@ class TicketReportController extends Controller
         $tickets = Ticket::with(['user', 'support', 'status'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'asc')
-            ->limit(50) // biar ringan
+            ->limit(50)
             ->get([
                 'ticket_code',
                 'user_id',

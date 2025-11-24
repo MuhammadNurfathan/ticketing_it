@@ -135,7 +135,6 @@ public function store(Request $request)
         'status_id.required'           => 'Status wajib dipilih',
         'problem.required'             => 'Problem wajib diisi',
         'support_id.required'          => 'IT Support wajib dipilih',
-        'assets_id.required'           => 'Assets wajib dipilih',
         'priority_id.required'         => 'Priority wajib dipilih',
         'image.mimes'                  => 'Format file harus JPG, PNG, atau MP4',
         'image.max'                    => $isFromUser ? 'Ukuran file maksimal 5MB' : 'Ukuran file maksimal 10MB',
@@ -151,7 +150,6 @@ public function store(Request $request)
     if (!$isFromUser) {
         // Validasi tambahan untuk ADMIN
         $rules['support_id'] = 'required|exists:users,id';
-        $rules['assets_id'] = 'required|exists:assets,id';
         $rules['priority_id'] = 'required|exists:priority,id';
         $rules['image'] = 'nullable|file|mimes:jpg,jpeg,png,mp4|max:10240'; // 10MB opsional
 
@@ -227,14 +225,12 @@ public function store(Request $request)
 
         $rules = [
             'support_id'  => 'required|exists:users,id',
-            'assets_id'   => 'required|exists:assets,id',
             'status_id'   => 'required|exists:status,id',
             'priority_id' => 'required|exists:priority,id',
         ];
 
         $messages = [
             'support_id.required'  => 'IT Support wajib dipilih',
-            'assets_id.required'   => 'Assets wajib dipilih',
             'status_id.required'   => 'Status wajib dipilih',
             'priority_id.required' => 'Priority wajib dipilih',
             'start_date.required'  => 'Start Date wajib diisi',

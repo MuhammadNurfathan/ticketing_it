@@ -11,18 +11,18 @@
             {{-- DOWNLOAD DATA SECTION --}}
             <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Download Tickets Data</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Download Data Tickets</h2>
 
                     <form id="exportForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Start Date
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Mulai
                             </label>
                             <input type="date" id="start_date" name="start_date"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
                         </div>
 
                         <div>
-                            <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> End Date
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Akhir
                             </label>
                             <input type="date" id="end_date" name="end_date"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
@@ -31,7 +31,7 @@
                         <div class="flex items-end">
                             <button type="button" id="previewBtn"
                                 class="w-full px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
-                                Preview
+                                👁️ Preview
                             </button>
                         </div>
                     </form>
@@ -81,12 +81,12 @@
             <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        Number of Tickets Completed based on it support
+                        👨‍💻 Jumlah Ticket Selesai per Developer
                     </h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Select Year
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Pilih Tahun
                             </label>
                             <select id="bar_year"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
@@ -126,12 +126,12 @@
             <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        Total Time Spent based on it support
+                        ⏱️ Total Time Spent per Developer
                     </h3>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Select Year
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Pilih Tahun
                             </label>
                             <select id="time_year"
                                 class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
@@ -171,7 +171,7 @@
             <div class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div class="p-4 sm:p-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        Tickets by Support (Per Day)
+                        Tickets by Support (Per Hari)
                     </h2>
 
                     <div class="flex flex-col sm:flex-row gap-3 mb-6">
@@ -612,4 +612,4 @@
             transition: transform 0.2s ease-out;
         }
     </style>
-</x-app-layout> 
+</x-app-layout>

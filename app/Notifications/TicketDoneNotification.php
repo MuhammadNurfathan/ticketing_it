@@ -33,8 +33,9 @@ class TicketDoneNotification extends Notification implements ShouldQueue
             ->line("**📋 Detail Ticket:**")
             ->line("**Kode Ticket:** `{$this->ticket->ticket_code}`")
             ->line("**Masalah:** {$this->ticket->problem}")
+            ->line("**PIC:** " . (optional($this->ticket->support)->name ?? 'Belum ada PIC'))
             ->when($this->ticket->solution, fn($mail) =>
-                $mail->line("**✨ Solusi:** {$this->ticket->solution}")
+                $mail->line("**Solusi:** {$this->ticket->solution}")
             )
             ->line("---")
             ->line("Kami sangat menghargai feedback Anda untuk membantu kami meningkatkan layanan.")

@@ -80,12 +80,12 @@
                                                {{-- Assets --}}
 <div class="mb-4 relative">
     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        Choose Assets <span class="text-red-500">*</span>
+        Choose Assets
     </label>
-    <input type="text" id="assets-search" placeholder="Cari assets..." required
+    <input type="text" id="assets-search" placeholder="Cari assets..." 
         value="{{ old('assets_search') }}"
         class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-    <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" required>
+    <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" >
     <ul id="assets-results"
         class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
         @foreach ($assets as $ass)

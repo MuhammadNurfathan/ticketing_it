@@ -105,9 +105,6 @@
                                 class="block w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 transition-colors resize-none @error('description') border-red-500 dark:border-red-500 focus:border-red-500 focus:ring-red-500/20 @enderror"
                                 placeholder="Ceritakan pengalaman Anda dengan layanan kami..."
                                 required>{{ old('description', $feedback->description ?? '') }}</textarea>
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                Minimal 10 karakter. Berikan feedback yang konstruktif dan detail.
-                            </p>
                             @error('description')
                                 <div class="mt-2 flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
