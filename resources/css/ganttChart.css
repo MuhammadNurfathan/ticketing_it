@@ -1,4 +1,3 @@
-/* === Gantt Container Responsif === */
         #gantt {
             width: 100%;
             height: auto !important;
@@ -57,27 +56,26 @@
             fill: #111827 !important;
             stroke: none !important;
         }
-
-
+        
         .dark .gantt .bar {
-            fill: #6b7280;
+        fill: #6b7280;
         }
 
         .dark .gantt .bar-progress {
-            fill: #a057f3d5;
+        fill: #a057f3d5;
         }
 
         /* === Loading Animation === */
         @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
+        from {
+        transform: rotate(0deg);
+        }
 
-            to {
-                transform: rotate(360deg);
-            }
+        to {
+        transform: rotate(360deg);
+        }
         }
 
         .spin {
-            animation: spin 1s linear infinite;
+        animation: spin 1s linear infinite;
         }

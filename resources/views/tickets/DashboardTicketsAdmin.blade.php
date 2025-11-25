@@ -642,18 +642,23 @@
 
         {{-- ================= DATATABLE ================= --}}
             <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: true,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength", // ✔️ fitur resmi v2
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
-            });
-        });
+      document.addEventListener("DOMContentLoaded", () => {
+    new DataTable(".datatable", {
+        responsive: true,
+        pageLength: 5, 
+        lengthMenu: [
+            [5, 10, 25, 50, -1],
+            [5, 10, 25, 50, "All"] 
+        ],
+        layout: {
+            topStart: "pageLength",
+            topEnd: "search",
+            bottomStart: "info",
+            bottomEnd: "paging"
+        }
+    });
+});
+
     </script>
         {{-- ================= DONE BUTTON ================= --}}
 

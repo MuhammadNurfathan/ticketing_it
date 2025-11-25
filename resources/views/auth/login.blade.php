@@ -15,10 +15,10 @@
 
                     <x-input-with-icon-wrapper>
                         <x-slot name="icon">
-                            <x-heroicon-o-mail aria-hidden="true" class="w-5 h-5" />
+                            <x-heroicon-o-user aria-hidden="true" class="w-5 h-5" />
                         </x-slot>
-                        <x-input withicon id="username" class="block w-full" type="username" name="username"
-                            :value="old('username')" placeholder="{{ __('Username') }}" required autofocus />
+                        <x-input withicon id="username" class="block w-full border-gray-300 rounded" type="text" name="username"
+                            :value="old('username')" placeholder="{{ __('Username') }}" required />
                     </x-input-with-icon-wrapper>
                 </div>
 
@@ -34,6 +34,7 @@
                             autocomplete="current-password" placeholder="{{ __('Password') }}" />
                     </x-input-with-icon-wrapper>
                 </div>
+                
 
                 <!-- Remember Me -->
                 <div class="flex items-center justify-between">

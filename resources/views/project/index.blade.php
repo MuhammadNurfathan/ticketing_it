@@ -209,7 +209,7 @@
 
                                         <!-- Void -->
                                         <button onclick="openVoidModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-all duration-200">
+                                            class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
                                             Void
                                         </button>
                                     </div>
@@ -302,7 +302,7 @@
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                     <div class="flex gap-2 justify-center">
                                         <button onclick="openVoidModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors duration-200">
+                                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200">
                                             Void
                                         </button>
 
@@ -701,8 +701,10 @@
         }
     </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
+     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
     new DataTable(".datatable", {
         responsive: true,
         pageLength: 10,
@@ -714,8 +716,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
-</script>
+    </script>
 
 
     <script>
@@ -887,7 +888,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {{-- Tombol --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('pendingModal')"
-                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mr-2">Cancel</button>
+                    class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
@@ -1005,7 +1006,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {{-- Tombol --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('editProgressModal')"
-                    class="px-4 py-2 bg-red-600 rounded hover:bg-red-700 mr-2 text-white">Cancel</button>
+                    class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     Save
                 </button>
@@ -1107,7 +1108,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {{-- Tombol Submit --}}
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('projectModal')"
-                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 mr-2">Cancel</button>
+                    class="px-4 py-2 bg-red-800 rounded mr-2">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
@@ -1133,11 +1134,11 @@ document.addEventListener("DOMContentLoaded", () => {
             {{-- Tombol --}}
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeModal('voidModal')"
-                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
                     Cancel
                 </button>
                 <button type="submit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
                     Save
                 </button>
             </div>

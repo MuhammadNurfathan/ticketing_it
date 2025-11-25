@@ -150,19 +150,11 @@
         </div>
     </div>
 
+    <!-- CSS Frappe Gantt -->
+    <link rel="stylesheet" href="{{ asset('css/frappe-gantt.css') }}">
 
-
-    <!-- Day.js -->
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.12.0/dayjs.min.js"></script>
-
-    <!-- Frappe Gantt -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
-
-    {{-- SCRIPT --}}
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.12.0/dayjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+    <!-- JS Frappe Gantt -->
+    <script src="{{ asset('js/frappe-gantt.min.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {

@@ -1,4 +1,6 @@
-import Gantt from 'frappe-gantt';
+import Gantt from "frappe-gantt";
+import "frappe-gantt/dist/frappe-gantt.css"; // import CSS agar style muncul
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     console.log("✅ GanttChart component loaded");
