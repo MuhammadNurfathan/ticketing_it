@@ -29,7 +29,7 @@
             <div class="overflow-x-auto">
                 <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                     <div class="flex gap-4 text-sm mb-4 text-gray-600 dark:text-gray-400">
-                        <div>Total: {{ $feedback->count() }} | Average Rate: {{ $Rate}} ⭐</div>
+                        <div>Total: {{ $feedback->count() }} | Average Rate: {{ $Rate }} ⭐</div>
                     </div>
                     <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
                         <tr>
@@ -93,86 +93,92 @@
     {{-- DataTables JS --}}
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 
-      <style>
-/* Wrapper styling agar flexible */
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter {
-    display: inline-block;
-    margin: 0;
-}
+    
+    <style>
+        /* Wrapper styling agar flexible */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: inline-block;
+            margin: 0;
+        }
 
-.dataTables_wrapper .top-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
+        .dataTables_wrapper .top-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
 
-.dataTables_wrapper .bottom-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
-}
+        .dataTables_wrapper .bottom-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
 
-/* Input & select styling */
-.dataTables_wrapper .dataTables_filter input,
-.dataTables_wrapper .dataTables_length select {
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem;
-    border: 1px solid #d1d5db;
-    font-size: 0.875rem;
-}
+        /* Input & select styling */
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.875rem;
+        }
 
-.dark .dataTables_wrapper .dataTables_filter input,
-.dark .dataTables_wrapper .dataTables_length select {
-    border-color: #4b5563;
-    background-color: #374151;
-    color: #f9fafb;
-}
+        .dark .dataTables_wrapper .dataTables_filter input,
+        .dark .dataTables_wrapper .dataTables_length select {
+            border-color: #4b5563;
+            background-color: #374151;
+            color: #f9fafb;
+        }
 
-/* Pagination */
-.dataTables_wrapper .dataTables_paginate {
-    margin: 0;
-}
+        /* Pagination */
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 0;
+        }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    margin: 0 2px;
-    border-radius: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    border: none !important;
-    background-color: #f3f4f6;
-    color: #111827 !important;
-}
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            margin: 0 2px;
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border: none !important;
+            background-color: #f3f4f6;
+            color: #111827 !important;
+        }
 
-.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-    background-color: #374151;
-    color: #f9fafb !important;
-}
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background-color: #374151;
+            color: #f9fafb !important;
+        }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
-}
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
 
-.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: #2563eb !important;
-    color: #f9fafb !important;
-}
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #2563eb !important;
+            color: #f9fafb !important;
+        }
 
-/* Center empty table message */
-table.dataTable tbody td.dataTables_empty {
-    text-align: center;   /* teks di tengah */
-    vertical-align: middle; /* vertikal di tengah */
-    font-weight: 500;
-    color: #6b7280; /* teks abu */
-    padding: 2rem 0; /* beri jarak agar tidak terlalu mepet */
-}
-.dark table.dataTable tbody td.dataTables_empty {
-    color: #d1d5db; /* teks abu terang untuk dark mode */
-}
+        /* Center empty table message */
+        table.dataTable tbody td.dataTables_empty {
+            text-align: center;
+            /* teks di tengah */
+            vertical-align: middle;
+            /* vertikal di tengah */
+            font-weight: 500;
+            color: #111827;
+            /* teks abu */
+            padding: 2rem 0;
+            /* beri jarak agar tidak terlalu mepet */
+        }
 
-</style>
+        .dark table.dataTable tbody td.dataTables_empty {
+            color: #d1d5db;
+            /* teks abu terang untuk dark mode */
+        }
+    </style>
 
 
     <script>

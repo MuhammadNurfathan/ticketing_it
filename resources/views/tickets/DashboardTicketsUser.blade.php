@@ -103,7 +103,7 @@
                                     Date</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Feedback</th>
+                                    Solution</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Feedback</th>
@@ -506,6 +506,13 @@
         .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
             background-color: #2563eb !important;
             color: #f9fafb !important;
+        }
+
+        /* Memperlebar dropdown "Show entries" */
+        .dataTables_length select {
+            width: 60px;
+            /* ubah sesuai kebutuhan */
+            display: inline-block;
         }
     </style>
 

@@ -11,7 +11,7 @@
             {{-- Welcome Section --}}
             <div class="mb-8 sm:mb-12">
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                    Welcome back! 👋
+                    Welcome back!
                 </h1>
                 <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                     Manage your IT support tickets efficiently

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-                      <h2 class="font-semibold text-xl text-dark-eval-1 dark:text-light-eval-1 leading-tight">
+            <h2 class="font-semibold text-xl text-dark-eval-1 dark:text-light-eval-1 leading-tight">
 
                 {{ 'Kelola Location' }}
             </h2>
@@ -137,7 +137,91 @@
             });
         });
     </script>
+    <style>
+        /* Wrapper styling agar flexible */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            display: inline-block;
+            margin: 0;
+        }
 
+        .dataTables_wrapper .top-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .dataTables_wrapper .bottom-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        /* Input & select styling */
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.875rem;
+        }
+
+        .dark .dataTables_wrapper .dataTables_filter input,
+        .dark .dataTables_wrapper .dataTables_length select {
+            border-color: #4b5563;
+            background-color: #374151;
+            color: #f9fafb;
+        }
+
+        /* Pagination */
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            margin: 0 2px;
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border: none !important;
+            background-color: #f3f4f6;
+            color: #111827 !important;
+        }
+
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background-color: #374151;
+            color: #f9fafb !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+        }
+
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #2563eb !important;
+            color: #f9fafb !important;
+        }
+
+        /* Center empty table message */
+        table.dataTable tbody td.dataTables_empty {
+            text-align: center;
+            /* teks di tengah */
+            vertical-align: middle;
+            /* vertikal di tengah */
+            font-weight: 500;
+            color: #111827;
+            /* teks abu */
+            padding: 2rem 0;
+            /* beri jarak agar tidak terlalu mepet */
+        }
+
+        .dark table.dataTable tbody td.dataTables_empty {
+            color: #d1d5db;
+            /* teks abu terang untuk dark mode */
+        }
+    </style>
 
 
 </x-app-layout>
