@@ -35,7 +35,7 @@ class TicketsController extends Controller
     public function indexUser()
     {
         $userId = Auth::id();
-        $myTicket = Ticket::where('user_id', $userId)->orderBy('created_at', 'desc')->get();
+        $myTicket = Ticket::where('user_id', $userId)->get();
         $data = Ticket::data();
         $users = $data['users'];
         $assets = $data['assets'];
@@ -64,7 +64,7 @@ class TicketsController extends Controller
     {
         $data = Ticket::data();
         return view(
-            'tickets.Create',
+            'tickets.CreateAdmin',
             [
                 'users'      => $data['users'],
                 'assets'     => $data['assets'],
@@ -102,7 +102,7 @@ class TicketsController extends Controller
         $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
         $data = Ticket::data();
 
-        return view('tickets.Edit', [
+        return view('tickets.EditAdmin', [
             'ticket'      => $ticket,
             'users'       => $data['users'],
             'assets'      => $data['assets'],
@@ -200,7 +200,7 @@ public function store(Request $request)
     // Kirim notifikasi jika status Done dan admin
     if (!$isFromUser && $request->status_id == 3 && $ticket->user && $ticket->user->email) {
         $ticket->user->notify(
-            (new TicketDoneNotification($ticket))->delay(now()->addMinutes(1))
+            (new TicketDoneNotification($ticket))->delay(now()->addSeconds(15))
         );
     }
 

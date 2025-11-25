@@ -81,11 +81,10 @@
 
             {{-- Tickets Table/List --}}
             <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
 
-                {{-- Desktop Table --}}
-                <div class="hidden lg:block overflow-x-auto">
-                    <table class="datatable w-full text-gray-900 dark:text-gray-100">
+                <div class="overflow-x-auto py-4">
+                    <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
                         <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th
@@ -119,10 +118,8 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            @php
-                                $sortedTickets = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
-                            @endphp
-                            @foreach ($sortedTickets as $ticket)
+
+                            @foreach ($myTicket as $ticket)
                                 <tr
                                     class="transition-colors hover:bg-gray-100 dark:hover:bg-dark-eval-2 {{ $ticket->status_id == 3 ? 'bg-gray-50 dark:bg-dark-eval-2/50' : '' }}">
                                     <td class="px-4 py-4">
@@ -309,13 +306,11 @@
                             @endforeach
 
                         </div>
-
-
-
                         {{-- Pagination --}}
                         <div id="mobilePagination"
                             class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium"></div>
+                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                            </div>
                             <div id="mobilePaginationButtons" class="flex gap-1 flex-wrap justify-center"></div>
                         </div>
                     </div>
@@ -395,294 +390,137 @@
         </form>
     </x-modal-form>
 
-    {{-- DataTables CSS --}}
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-
-    <style>
-        /* DataTables Custom Styling */
-        table.dataTable {
-            border-collapse: separate;
-            border-spacing: 0;
-            border: 1px solid #d1d5db;
-            background-color: #f9fafb;
-            width: 100%;
-        }
-
-        .dark table.dataTable {
-            border-color: #4b5563;
-            background-color: #1f2937;
-        }
-
-        table.dataTable thead th {
-            background-color: #f3f4f6;
-            color: #111827;
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 2px solid #d1d5db;
-        }
-
-        .dark table.dataTable thead th {
-            background-color: #374151;
-            color: #f9fafb;
-            border-bottom-color: #4b5563;
-        }
-
-        table.dataTable tbody tr:hover {
-            background-color: #f3f4f6;
-        }
-
-        .dark table.dataTable tbody tr:hover {
-            background-color: #374151;
-        }
-
-        table.dataTable tbody td {
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .dark table.dataTable tbody td {
-            border-bottom-color: #4b5563;
-        }
-
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter,
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            padding: 1rem;
-            color: inherit;
-        }
-
-        .dataTables_wrapper .dataTables_filter input,
-        .dataTables_wrapper .dataTables_length select {
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            padding: 0.375rem 0.75rem;
-            background-color: #ffffff;
-            color: #111827;
-            font-size: 0.875rem;
-        }
-
-        .dark .dataTables_wrapper .dataTables_filter input,
-        .dark .dataTables_wrapper .dataTables_length select {
-            border-color: #4b5563;
-            background-color: #374151;
-            color: #f9fafb;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.5rem;
-            background-color: #f3f4f6;
-            color: #111827 !important;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: none !important;
-            margin: 0 2px;
-        }
-
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-            background-color: #374151;
-            color: #f9fafb !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button:not(.disabled):hover {
-            background-color: #e5e7eb !important;
-            color: #111827 !important;
-            border: none !important;
-        }
-
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:not(.disabled):hover {
-            background-color: #4b5563 !important;
-            color: #f9fafb !important;
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #3b82f6 !important;
-            color: #ffffff !important;
-        }
-
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #2563eb !important;
-            color: #f9fafb !important;
-        }
-
-        /* Memperlebar dropdown "Show entries" */
-        .dataTables_length select {
-            width: 60px;
-            /* ubah sesuai kebutuhan */
-            display: inline-block;
-        }
-    </style>
-
     <script>
-        $(document).ready(function() {
-
-            // Desktop DataTable
-            if (window.innerWidth >= 1024) {
-                $('.datatable').DataTable({
+        if (window.innerWidth >= 1024) {
+            document.addEventListener("DOMContentLoaded", () => {
+                new DataTable(".datatable", {
                     responsive: true,
                     pageLength: 10,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    },
+                    order: [
+                        [0, "desc"]
                     ],
-                    order: [],
-                    language: {
-                        search: "Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ tickets",
-                        infoEmpty: "No tickets available",
-                        zeroRecords: "No matching tickets found",
-                        paginate: {
-                            first: "First",
-                            last: "Last",
-                            next: "›",
-                            previous: "‹"
-                        }
-                    }
-                });
-            }
-
-            // Mobile Pagination
-            let currentPage = 1;
-            let perPage = 10;
-            let filteredCards = [];
-
-            function filterCards() {
-                const searchTerm = $('#mobileSearch').val().toLowerCase();
-                const allCards = $('.ticket-card');
-
-                filteredCards = allCards.filter(function() {
-                    const card = $(this);
-
-                    // ADD: searching ke support & feedback
-                    const searchText = [
-                        card.data('code'),
-                        card.data('category'),
-                        card.data('problem'),
-                        card.data('status'),
-                        card.data('support'), // <-- baru ditambah
-                        card.data('feedback') // <-- baru ditambah
-                    ].join(' ');
-
-                    return searchText.includes(searchTerm);
-                }).toArray();
-
-                // Sort by priority
-                filteredCards.sort((a, b) => {
-                    return parseInt($(b).data('priority')) - parseInt($(a).data('priority'));
                 });
 
-                filteredCards = $(filteredCards);
-                currentPage = 1;
-                displayCards();
-            }
+            });
+        }
 
-            function displayCards() {
-                const allCards = $('.ticket-card');
-                allCards.hide();
 
-                if ($('#mobilePerPage').val() === 'all') {
-                    filteredCards.show();
-                    $('#mobilePagination').hide();
-                    return;
-                }
+        let currentPage = 1;
+        let perPage = 10;
+        let filteredCards = [];
 
-                const start = (currentPage - 1) * perPage;
-                const end = start + perPage;
-                filteredCards.slice(start, end).show();
+        function filterCards() {
+            const searchTerm = document.getElementById("mobileSearch").value.toLowerCase();
+            const allCards = document.querySelectorAll(".ticket-card");
 
-                updatePagination();
-                updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
-                $('#mobilePagination').show();
-            }
+            filteredCards = Array.from(allCards).filter(card => {
+                const searchText = [
+                    card.dataset.code,
+                    card.dataset.category,
+                    card.dataset.problem,
+                    card.dataset.status,
+                    card.dataset.support,
+                    card.dataset.feedback
+                ].join(" ");
 
-            function updatePagination() {
-                const totalPages = Math.ceil(filteredCards.length / perPage);
-                const buttons = $('#mobilePaginationButtons');
-                buttons.empty();
-
-                if (totalPages <= 1) {
-                    buttons.hide();
-                    return;
-                }
-                buttons.show();
-
-                const isDark = document.documentElement.classList.contains('dark');
-                const btnBaseClass = 'px-3 py-1.5 text-xs rounded-lg font-medium transition-colors';
-                const btnNormalClass = isDark ?
-                    'border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3' :
-                    'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100';
-                const btnActiveClass = isDark ?
-                    'bg-gray-100 text-gray-900 border-none' :
-                    'bg-gray-900 text-white border-none';
-
-                // Prev
-                const prevBtn = $(`
-                <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}" 
-                    ${currentPage === 1 ? 'disabled' : ''}>‹</button>
-            `);
-                if (currentPage > 1) {
-                    prevBtn.on('click', () => changePage(currentPage - 1));
-                }
-                buttons.append(prevBtn);
-
-                // Pages
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(totalPages, startPage + 4);
-
-                if (endPage - startPage < 4) {
-                    startPage = Math.max(1, endPage - 4);
-                }
-
-                for (let i = startPage; i <= endPage; i++) {
-                    const pageBtn = $(`
-                    <button class="${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}">${i}</button>
-                `);
-                    if (i !== currentPage) {
-                        pageBtn.on('click', () => changePage(i));
-                    }
-                    buttons.append(pageBtn);
-                }
-
-                // Next
-                const nextBtn = $(`
-                <button class="${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">
-                    ›
-                </button>
-            `);
-                if (currentPage < totalPages) {
-                    nextBtn.on('click', () => changePage(currentPage + 1));
-                }
-                buttons.append(nextBtn);
-            }
-
-            function updateInfo(start, end, total) {
-                $('#mobileInfo').text(`Showing ${start}-${end} of ${total} tickets`);
-            }
-
-            function changePage(page) {
-                currentPage = page;
-                displayCards();
-                $('html, body').animate({
-                    scrollTop: 0
-                }, 300);
-            }
-
-            // Events
-            $('#mobileSearch').on('keyup', filterCards);
-            $('#mobilePerPage').on('change', function() {
-                const val = $(this).val();
-                perPage = val === 'all' ? 999999 : parseInt(val);
-                currentPage = 1;
-                displayCards();
+                return searchText.toLowerCase().includes(searchTerm);
             });
 
-            // Initial load
-            filterCards();
+            filteredCards.sort((a, b) =>
+                parseInt(b.dataset.priority) - parseInt(a.dataset.priority)
+            );
+
+            currentPage = 1;
+            displayCards();
+        }
+
+        function displayCards() {
+            document.querySelectorAll(".ticket-card").forEach(c => c.style.display = "none");
+
+            if (document.getElementById("mobilePerPage").value === "all") {
+                filteredCards.forEach(c => c.style.display = "");
+                document.getElementById("mobilePagination").style.display = "none";
+                return;
+            }
+
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+
+            filteredCards.slice(start, end).forEach(c => c.style.display = "");
+
+            updatePagination();
+            updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
+            document.getElementById("mobilePagination").style.display = "block";
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredCards.length / perPage);
+            const buttons = document.getElementById("mobilePaginationButtons");
+            buttons.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            const isDark = document.documentElement.classList.contains("dark");
+            const base = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
+            const normal = isDark ?
+                "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
+                "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100";
+            const active = isDark ?
+                "bg-gray-100 text-gray-900 border-none" :
+                "bg-gray-900 text-white border-none";
+
+            function addBtn(label, page, disabled = false, activePage = false) {
+                const btn = document.createElement("button");
+                btn.className = `${base} ${activePage ? active : normal}`;
+                btn.textContent = label;
+                if (!disabled) btn.onclick = () => changePage(page);
+                if (disabled) {
+                    btn.style.opacity = "0.5";
+                    btn.style.cursor = "not-allowed";
+                }
+                buttons.appendChild(btn);
+            }
+
+            addBtn("‹", currentPage - 1, currentPage === 1);
+
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+
+            for (let i = startPage; i <= endPage; i++) {
+                addBtn(i, i, false, i === currentPage);
+            }
+
+            addBtn("›", currentPage + 1, currentPage === totalPages);
+        }
+
+        function updateInfo(start, end, total) {
+            document.getElementById("mobileInfo").textContent =
+                `Showing ${start}-${end} of ${total} tickets`;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            displayCards();
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+
+        document.getElementById("mobileSearch").addEventListener("keyup", filterCards);
+        document.getElementById("mobilePerPage").addEventListener("change", (e) => {
+            perPage = e.target.value === "all" ? 999999 : parseInt(e.target.value);
+            currentPage = 1;
+            displayCards();
         });
+
+        filterCards(); // INITIAL
     </script>
 
 </x-app-layout>

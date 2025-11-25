@@ -28,7 +28,8 @@ class Ticket extends Model
         'end_date',
         'time_spent',
         'is_late',
-        'updated_at'
+        'updated_at',
+        'created_at'
     ];
 
     protected $casts =
