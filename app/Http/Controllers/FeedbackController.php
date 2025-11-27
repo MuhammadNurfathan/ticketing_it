@@ -15,18 +15,16 @@ class FeedbackController extends Controller
         $feedback = feedback::latest()->get();
         return view('feedback.index', compact('feedback','Rate'));
     }
+
     public function form($ticket_id)
     {
-        // Ambil tiket
         $ticket = Ticket::findOrFail($ticket_id);
 
-        // Ambil feedback (null kalau belum ada)
         $feedback = Feedback::where('ticket_id', $ticket->id)->first();
 
         return view('feedback.create', compact('ticket', 'feedback'));
     }
 
-    // Simpan feedback (create atau update)
     public function save(Request $request)
     {
         $data = $request->validate([

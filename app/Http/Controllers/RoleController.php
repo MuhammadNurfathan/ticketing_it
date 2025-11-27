@@ -1,23 +1,21 @@
 <?php
+
 namespace App\Http\Controllers;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-    public function index()
-    {
+    public function index(){
         $roles = Role::latest()->get();
         return view('master/roles.index', compact('roles'));
     }
 
-    public function create()
-    {
+    public function create(){
         return view('master/roles.create');
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
             'role_name' => 'required|string|max:255|unique:roles,role_name',
         ]);
@@ -33,18 +31,15 @@ class RoleController extends Controller
         }
     }
 
-    public function show(Role $role)
-    {
+    public function show(Role $role){
         return view('master/roles.show', compact('role'));
     }
 
-    public function edit(Role $role)
-    {
+    public function edit(Role $role){
         return view('master/roles.edit', compact('role'));
     }
 
-    public function update(Request $request, Role $role)
-    {
+    public function update(Request $request, Role $role){
         $request->validate([
             'role_name' => 'required|string|max:255|unique:roles,role_name,' . $role->id,
         ]);
@@ -60,10 +55,8 @@ class RoleController extends Controller
         }
     }
 
-    public function destroy(Role $role)
-    {
+    public function destroy(Role $role){
         try {
-            // Check if role has users
             if ($role->users()->count() > 0) {
                 return redirect()->back()->with('error', 'Role tidak dapat dihapus karena masih digunakan oleh user');
             }

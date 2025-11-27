@@ -150,10 +150,8 @@
         </div>
     </div>
 
-    <!-- CSS Frappe Gantt -->
-    <link rel="stylesheet" href="{{ asset('css/frappe-gantt.css') }}">
 
-    <!-- JS Frappe Gantt -->
+    <link rel="stylesheet" href="{{ asset('css/frappe-gantt.css') }}">
     <script src="{{ asset('js/frappe-gantt.min.js') }}"></script>
 
     <script>

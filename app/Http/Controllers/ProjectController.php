@@ -10,8 +10,7 @@ use App\Models\ProjectDetail;
 
 class ProjectController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $start = $request->start_date;
         $end = $request->end_date;
 
@@ -40,15 +39,15 @@ class ProjectController extends Controller
         $pendings = collect();
         $details = collect();
 
-      if ($request->has('id')) {
-    $project = ProjectHeader::with('projectDetails')->find($request->id);
+        if ($request->has('id')) {
+            $project = ProjectHeader::with('projectDetails')->find($request->id);
 
-    if ($project) {
-        $pendings = Pending::where('id_project_header', $project->id)->orderBy('created_at', 'ASC')->get();
+            if ($project) {
+                $pendings = Pending::where('id_project_header', $project->id)->orderBy('created_at', 'ASC')->get();
 
-        $details  = ProjectDetail::where('project_header_id', $project->id)->orderBy('created_at', 'ASC')->get();
-    }
-}
+                $details  = ProjectDetail::where('project_header_id', $project->id)->orderBy('created_at', 'ASC')->get();
+            }
+        }
 
 
         return view('project.index', compact(
@@ -72,16 +71,13 @@ class ProjectController extends Controller
         ));
     }
 
-    public function storePending(Request $request, $projectHeaderId)
-    {
-        // 🔹 Validasi input reason aja
+    public function storePending(Request $request, $projectHeaderId){
         $request->validate([
             'reason' => 'required|string|max:255',
         ]);
 
-        // 🔹 Simpan data pending baru
         Pending::create([
-            'id_project_header' => $projectHeaderId, // harus sama persis dengan fillable
+            'id_project_header' => $projectHeaderId,
             'reason'            => $request->reason,
             'pending_start'     => now(),
         ]);
@@ -96,24 +92,19 @@ class ProjectController extends Controller
 
     public function continueProgress(Request $request, $projectHeaderId)
     {
-        // 🔹 Ambil project
         $project = ProjectHeader::findOrFail($projectHeaderId);
 
-        // 🔹 Ambil pending terakhir yang belum selesai (pending_end null)
         $pending = $project->pendings()->whereNull('pending_end')->latest()->first();
 
         if ($pending) {
             $pending->pending_end = now();
 
-            // 🔹 Hitung durasi baru dan tambahkan ke duration_minutes lama
             $newDuration = now()->diffInMinutes($pending->pending_start);
             $pending->duration_minutes = ($pending->duration_minutes ?? 0) + abs($newDuration);
 
             $pending->save();
         }
 
-
-        // 🔹 Update status project (misal ke In Progress = 2)
         $project->update([
             'status_id' => $request->status_id ?? 2
         ]);
@@ -143,7 +134,6 @@ class ProjectController extends Controller
 
     public function update(Request $request, ProjectHeader $project)
     {
-        // 🔹 Validasi data header
         $validatedHeader = $request->validate([
             'progress_percent' => 'required|numeric|min:0|max:100',
             'status_id'        => 'required|integer',
@@ -151,20 +141,14 @@ class ProjectController extends Controller
             'developer_name'   => 'nullable|string',
         ]);
 
-        // 🔹 Ambil progress_percent & status_id dari input
         $progressPercent = $validatedHeader['progress_percent'];
         $statusId = $validatedHeader['status_id'];
 
-        // 🔹 Hitung total pending minutes dari tabel pending terkait project
-        // pastikan selalu integer dan default 0 kalau kosong
         $totalPendingMinutes = (int) $project->pendings()->whereNotNull('duration_minutes')->sum('duration_minutes');
 
-
-        // 🔹 Hitung dulu effective_end_date (selalu dihitung)
         $endDate = \Carbon\Carbon::parse($project->end_date);
         $effectiveEndDate = $endDate->copy()->addMinutes($totalPendingMinutes);
 
-        // 🔹 Siapkan data update
         $updateData = [
             'progress_percent'   => $progressPercent,
             'status_id'          => $statusId,
@@ -177,21 +161,16 @@ class ProjectController extends Controller
         if ($statusId == 3 && $progressPercent == 100) {
             $actualEndDate = now();
 
-            // 🔹 Tentukan apakah telat atau tidak
             $isLate = $actualEndDate->greaterThan($effectiveEndDate) ? 1 : 0;
 
-            // 🔹 Tambahkan field tambahan
             $updateData['actual_end_date'] = $actualEndDate;
             $updateData['is_late'] = $isLate;
 
-            // 🔹 Update total_pending_minutes juga hanya di sini
             $updateData['total_pending_minutes'] = $totalPendingMinutes;
         }
 
-        // 🔹 Update tabel project_header
         $project->update($updateData);
 
-        // 🔹 Simpan juga ke project_detail
         ProjectDetail::create([
             'project_header_id' => $project->id,
             'progress_date'     => now(),
@@ -207,12 +186,10 @@ class ProjectController extends Controller
 
     public function updateStatus(Request $request, ProjectHeader $project)
     {
-        // Data dasar yang selalu diupdate
         $data = [
             'status_id' => $request->status_id,
         ];
 
-        // Kalau status_id = 4 (void), tambahkan notes juga
         if ($request->status_id == 4) {
             $data['notes'] = $request->notes;
         }
@@ -236,9 +213,9 @@ class ProjectController extends Controller
         $pendings = Pending::where('id_project_header', $project->id)->orderBy('created_at', 'ASC')->get();
 
         $details = ProjectDetail::where('project_header_id', $project->id)
-        ->orderBy('progress_date', 'ASC') // urut dari paling lama ke terbaru
-        ->get();
-        
-        return view('project.history', compact('pendings', 'details','project'));
+            ->orderBy('progress_date', 'ASC') // urut dari paling lama ke terbaru
+            ->get();
+
+        return view('project.history', compact('pendings', 'details', 'project'));
     }
 }

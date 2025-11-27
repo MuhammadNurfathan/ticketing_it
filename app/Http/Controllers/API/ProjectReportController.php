@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 
 class ProjectReportController extends Controller
 {
-    public function ProjectQueue(Request $request)
-    {
+    public function ProjectQueue(Request $request){
         $year = $request->query('year', now()->year);
 
         $ProjectQueue = ProjectHeader::with(['priority', 'requestor', 'developer', 'status'])
@@ -24,11 +23,9 @@ class ProjectReportController extends Controller
         ]);
     }
 
-    public function gantChart(Request $request)
-    {
+    public function gantChart(Request $request){
         $year = $request->query('year', now()->year);
 
-        // Batas cutoff awal & akhir tahun
         $startOfYear = "{$year}-01-01";
         $endOfYear = "{$year}-12-31";
 
@@ -42,7 +39,6 @@ class ProjectReportController extends Controller
             'status_id'
         )
             ->where(function ($query) use ($year) {
-                // Ambil proyek yang masih aktif di tahun itu
                 $query->whereYear('start_date', '<=', $year)
                     ->where(function ($sub) use ($year) {
                         $sub->whereYear('effective_end_date', '>=', $year)
@@ -55,11 +51,9 @@ class ProjectReportController extends Controller
             ->get();
 
         $data = $projects->map(function ($p) use ($startOfYear, $endOfYear) {
-            // Tentukan tanggal mulai & selesai aktual
             $start = $p->start_date;
             $end = $p->effective_end_date ?? $p->end_date;
 
-            // Cutoff biar cuma di range tahun tertentu aja
             if ($start < $startOfYear) {
                 $start = $startOfYear;
             }
@@ -86,13 +80,9 @@ class ProjectReportController extends Controller
         return response()->json($data);
     }
 
-
-
-    public function summary(Request $request)
-    {
+    public function summary(Request $request){
         $year = $request->query('year', now()->year);
         $summary = ProjectHeader::summary($year);
         return response()->json($summary);
     }
-
 }

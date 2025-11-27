@@ -225,7 +225,6 @@
         </div>
     </div>
 
-
     {{-- Preview Modal Script --}}
     <script>
         document.getElementById('previewBtn').addEventListener('click', async () => {
@@ -321,12 +320,12 @@
                         ${
                             tickets.length
                                 ? tickets.map(t => `
-                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                        </div>
-                                    `).join('')
+                                            <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
+                                            </div>
+                                        `).join('')
                                 : '<p class="text-center text-gray-400 dark:text-gray-500 italic">Tidak ada tiket</p>'
                         }
                     </div>

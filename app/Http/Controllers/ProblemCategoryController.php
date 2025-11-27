@@ -5,19 +5,16 @@ use Illuminate\Http\Request;
 
 class ProblemCategoryController extends Controller
 {
-    public function index()
-    {
+    public function index(){
         $problemCategories = ProblemCategory::latest()->get();
         return view('master/problem_category.index', compact('problemCategories'));
     }
 
-    public function create()
-    {
+    public function create(){
         return view('master/problem_category.create');
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $request->validate([
             'problem_category_name' => 'required|string|max:50',
         ]);
@@ -35,18 +32,15 @@ class ProblemCategoryController extends Controller
         }
     }
 
-    public function show(ProblemCategory $problemCategory)
-    {
+    public function show(ProblemCategory $problemCategory){
         return view('master/problem_category.show', compact('problemCategory'));
     }
 
-    public function edit(ProblemCategory $problemCategory)
-    {
+    public function edit(ProblemCategory $problemCategory){
         return view('master/problem_category.edit', compact('problemCategory'));
     }
 
-    public function update(Request $request, ProblemCategory $problemCategory)
-    {
+    public function update(Request $request, ProblemCategory $problemCategory){
         $request->validate([
             'problem_category_name' => 'required|string|max:50',
         ]);
@@ -64,8 +58,7 @@ class ProblemCategoryController extends Controller
         }
     }
 
-    public function destroy(ProblemCategory $problemCategory)
-    {
+    public function destroy(ProblemCategory $problemCategory){
         try {
             $problemCategory->delete();
             return redirect()->route('problem_categories.index')
