@@ -80,11 +80,11 @@
             </div>
 
             {{-- Tickets Table/List --}}
+
             <div
                 class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-
-                <div class="overflow-x-auto py-4">
-                    <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
+                <div class="overflow-x-auto py-4" id="desktop-wrapper">
+                    <table class="datatable w-full text-gray-900 dark:text-gray-100">
                         <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
                             <tr>
                                 <th
@@ -118,8 +118,10 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-
-                            @foreach ($myTicket as $ticket)
+                            @php
+                                $sortedTickets = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
+                            @endphp
+                            @foreach ($sortedTickets as $ticket)
                                 <tr
                                     class="transition-colors hover:bg-gray-100 dark:hover:bg-dark-eval-2 {{ $ticket->status_id == 3 ? 'bg-gray-50 dark:bg-dark-eval-2/50' : '' }}">
                                     <td class="px-4 py-4">
@@ -174,7 +176,7 @@
                 </div>
 
                 {{-- Mobile Cards --}}
-                <div class="lg:hidden">
+                <div class="lg:hidden" id="mobile-wrapper">
                     <div class="p-4 space-y-3">
                         {{-- Search & Filter --}}
                         <div class="flex gap-2">
@@ -306,11 +308,13 @@
                             @endforeach
 
                         </div>
+
+
+
                         {{-- Pagination --}}
                         <div id="mobilePagination"
                             class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium">
-                            </div>
+                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium"></div>
                             <div id="mobilePaginationButtons" class="flex gap-1 flex-wrap justify-center"></div>
                         </div>
                     </div>
@@ -390,137 +394,185 @@
         </form>
     </x-modal-form>
 
+    <style>
+        /* default: desktop tampil */
+        #mobile-wrapper {
+            display: none;
+        }
+
+        /* kalau layar <=1023px (HP / Tablet) */
+        @media (max-width: 1023px) {
+            #desktop-wrapper {
+                display: none !important;
+            }
+
+            #mobile-wrapper {
+                display: block !important;
+            }
+        }
+
+        /* kalau layar >=1024px (Laptop / PC) */
+        @media (min-width: 1024px) {
+            #desktop-wrapper {
+                display: block !important;
+            }
+
+            #mobile-wrapper {
+                display: none !important;
+            }
+        }
+    </style>
+
     <script>
-        if (window.innerWidth >= 1024) {
-            document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", () => {
+            // ===== Desktop DataTable =====
+            if (window.innerWidth >= 1024) {
                 new DataTable(".datatable", {
                     responsive: true,
-                    pageLength: 10,
+                    pageLength: 5,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
                     layout: {
                         topStart: "pageLength",
                         topEnd: "search",
                         bottomStart: "info",
                         bottomEnd: "paging"
-                    },
-                    order: [
-                        [0, "desc"]
-                    ],
+                    }
+                });
+            }
+
+            // ===== Mobile Pagination =====
+            let currentPage = 1;
+            let perPage = 10;
+            let filteredCards = [];
+
+            const mobileSearch = document.getElementById("mobileSearch");
+            const mobilePerPage = document.getElementById("mobilePerPage");
+            const mobilePagination = document.getElementById("mobilePagination");
+            const mobilePaginationButtons = document.getElementById("mobilePaginationButtons");
+            const mobileInfo = document.getElementById("mobileInfo");
+
+            function filterCards() {
+                const searchTerm = mobileSearch.value.toLowerCase();
+                const allCards = Array.from(document.querySelectorAll(".ticket-card"));
+
+                filteredCards = allCards.filter(card => {
+                    const searchText = [
+                        card.dataset.code,
+                        card.dataset.category,
+                        card.dataset.problem,
+                        card.dataset.status,
+                        card.dataset.support,
+                        card.dataset.feedback
+                    ].join(" ").toLowerCase();
+
+                    return searchText.includes(searchTerm);
                 });
 
-            });
-        }
-
-
-        let currentPage = 1;
-        let perPage = 10;
-        let filteredCards = [];
-
-        function filterCards() {
-            const searchTerm = document.getElementById("mobileSearch").value.toLowerCase();
-            const allCards = document.querySelectorAll(".ticket-card");
-
-            filteredCards = Array.from(allCards).filter(card => {
-                const searchText = [
-                    card.dataset.code,
-                    card.dataset.category,
-                    card.dataset.problem,
-                    card.dataset.status,
-                    card.dataset.support,
-                    card.dataset.feedback
-                ].join(" ");
-
-                return searchText.toLowerCase().includes(searchTerm);
-            });
-
-            filteredCards.sort((a, b) =>
-                parseInt(b.dataset.priority) - parseInt(a.dataset.priority)
-            );
-
-            currentPage = 1;
-            displayCards();
-        }
-
-        function displayCards() {
-            document.querySelectorAll(".ticket-card").forEach(c => c.style.display = "none");
-
-            if (document.getElementById("mobilePerPage").value === "all") {
-                filteredCards.forEach(c => c.style.display = "");
-                document.getElementById("mobilePagination").style.display = "none";
-                return;
+                // Sort by priority
+                filteredCards.sort((a, b) => parseInt(b.dataset.priority) - parseInt(a.dataset.priority));
+                currentPage = 1;
+                displayCards();
             }
 
-            const start = (currentPage - 1) * perPage;
-            const end = start + perPage;
+            function displayCards() {
+                const allCards = document.querySelectorAll(".ticket-card");
+                allCards.forEach(card => card.style.display = "none");
 
-            filteredCards.slice(start, end).forEach(c => c.style.display = "");
-
-            updatePagination();
-            updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
-            document.getElementById("mobilePagination").style.display = "block";
-        }
-
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredCards.length / perPage);
-            const buttons = document.getElementById("mobilePaginationButtons");
-            buttons.innerHTML = "";
-
-            if (totalPages <= 1) return;
-
-            const isDark = document.documentElement.classList.contains("dark");
-            const base = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
-            const normal = isDark ?
-                "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
-                "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100";
-            const active = isDark ?
-                "bg-gray-100 text-gray-900 border-none" :
-                "bg-gray-900 text-white border-none";
-
-            function addBtn(label, page, disabled = false, activePage = false) {
-                const btn = document.createElement("button");
-                btn.className = `${base} ${activePage ? active : normal}`;
-                btn.textContent = label;
-                if (!disabled) btn.onclick = () => changePage(page);
-                if (disabled) {
-                    btn.style.opacity = "0.5";
-                    btn.style.cursor = "not-allowed";
+                if (mobilePerPage.value === "all") {
+                    filteredCards.forEach(card => card.style.display = "block");
+                    mobilePagination.style.display = "none";
+                    return;
                 }
-                buttons.appendChild(btn);
+
+                const start = (currentPage - 1) * perPage;
+                const end = start + perPage;
+                filteredCards.slice(start, end).forEach(card => card.style.display = "block");
+
+                updatePagination();
+                updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
+                mobilePagination.style.display = "flex";
             }
 
-            addBtn("‹", currentPage - 1, currentPage === 1);
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredCards.length / perPage);
+                mobilePaginationButtons.innerHTML = "";
 
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + 4);
+                if (totalPages <= 1) {
+                    mobilePaginationButtons.style.display = "none";
+                    return;
+                }
+                mobilePaginationButtons.style.display = "flex";
 
-            for (let i = startPage; i <= endPage; i++) {
-                addBtn(i, i, false, i === currentPage);
+                const isDark = document.documentElement.classList.contains('dark');
+
+                // Button class
+                const btnBaseClass = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
+                const btnNormalClass = isDark ?
+                    "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
+                    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100";
+                const btnActiveClass = isDark ?
+                    "bg-gray-100 text-gray-900 border-none" :
+                    "bg-gray-900 text-white border-none";
+
+                // Prev button
+                const prevBtn = document.createElement("button");
+                prevBtn.textContent = "‹";
+                prevBtn.className = `${btnBaseClass} ${btnNormalClass}`;
+                prevBtn.disabled = currentPage === 1;
+                if (!prevBtn.disabled) prevBtn.addEventListener("click", () => changePage(currentPage - 1));
+                mobilePaginationButtons.appendChild(prevBtn);
+
+                // Page buttons
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement("button");
+                    pageBtn.textContent = i;
+                    pageBtn.className = `${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}`;
+                    if (i !== currentPage) pageBtn.addEventListener("click", () => changePage(i));
+                    pageBtn.disabled = i === currentPage;
+                    mobilePaginationButtons.appendChild(pageBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement("button");
+                nextBtn.textContent = "›";
+                nextBtn.className = `${btnBaseClass} ${btnNormalClass}`;
+                nextBtn.disabled = currentPage === totalPages;
+                if (!nextBtn.disabled) nextBtn.addEventListener("click", () => changePage(currentPage + 1));
+                mobilePaginationButtons.appendChild(nextBtn);
             }
 
-            addBtn("›", currentPage + 1, currentPage === totalPages);
-        }
+            function updateInfo(start, end, total) {
+                mobileInfo.textContent = `Showing ${start}-${end} of ${total} tickets`;
+            }
 
-        function updateInfo(start, end, total) {
-            document.getElementById("mobileInfo").textContent =
-                `Showing ${start}-${end} of ${total} tickets`;
-        }
+            function changePage(page) {
+                currentPage = page;
+                displayCards();
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }
 
-        function changePage(page) {
-            currentPage = page;
-            displayCards();
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
+            // Events
+            mobileSearch.addEventListener("keyup", filterCards);
+            mobilePerPage.addEventListener("change", () => {
+                perPage = mobilePerPage.value === "all" ? 999999 : parseInt(mobilePerPage.value);
+                currentPage = 1;
+                displayCards();
             });
-        }
 
-        document.getElementById("mobileSearch").addEventListener("keyup", filterCards);
-        document.getElementById("mobilePerPage").addEventListener("change", (e) => {
-            perPage = e.target.value === "all" ? 999999 : parseInt(e.target.value);
-            currentPage = 1;
-            displayCards();
+            // Initial load
+            filterCards();
         });
-
-        filterCards(); // INITIAL
     </script>
+
 
 </x-app-layout>

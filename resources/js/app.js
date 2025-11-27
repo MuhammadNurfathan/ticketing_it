@@ -1,36 +1,21 @@
-// ====================================================================
-//  BOOTSTRAP
-// ====================================================================
-import "./bootstrap";
 
-// ====================================================================
-//  DATATABLES (MODERN, TANPA JQUERY)
-// ====================================================================
+import "./bootstrap";
 import DataTable from "datatables.net";
 import DataTableResponsive from "datatables.net-responsive";
 import Swal from "sweetalert2";
-
-
-// CSS DataTables modern
 import "datatables.net-dt/css/dataTables.dataTables.css";
 import "datatables.net-responsive-dt/css/responsive.dataTables.css";
 
-// Register plugin
+
 DataTable.use(DataTableResponsive);
 
-// Global untuk Blade
 window.DataTable = DataTable;
 window.Swal = Swal;
 
-// ====================================================================
-//  CHART.JS
-// ====================================================================
-import Chart from "chart.js/auto"; // ES Module lokal, auto-register
+
+import Chart from "chart.js/auto";
 window.Chart = Chart;
 
-// ====================================================================
-//  COMPONENT CHART
-// ====================================================================
 import {
   PieChart,
   renderPieChart,
@@ -47,9 +32,6 @@ window.LineChart = LineChart;
 window.renderLineChart = renderLineChart;
 window.initBarChart = initBarChart;
 
-// ====================================================================
-//  LIBRARY LAIN
-// ====================================================================
 import Alpine from "alpinejs";
 import collapse from "@alpinejs/collapse";
 
@@ -58,9 +40,6 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 
 window.PerfectScrollbar = PerfectScrollbar;
 
-// ====================================================================
-//  ALPINE SETUP
-// ====================================================================
 document.addEventListener("alpine:init", () => {
   Alpine.data("mainState", () => {
     let lastScrollTop = 0;
