@@ -32,7 +32,8 @@ class TicketsController extends Controller
 
     public function indexUser(){
         $userId = Auth::id();
-        $myTicket = Ticket::where('user_id', $userId)->get();
+        $myTicket = Ticket::where('user_id', $userId)->latest()->get();
+
         $data = Ticket::data();
         $users = $data['users'];
         $assets = $data['assets'];

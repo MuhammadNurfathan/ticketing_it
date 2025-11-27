@@ -185,9 +185,9 @@
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                fullEl.innerText = data.success ? data.data.fullResolutionTime + ' jam' : '-';
-                avgEl.innerText = data.success ? data.data.avgResolutionTime + ' jam' : '-';
-                slaEl.innerText = data.success ? data.data.slaPercentage + ' %' : '-';
+                fullEl.innerText = data.success ? data.data.fullResolutionTime:'-';
+                avgEl.innerText = data.success ? data.data.avgResolutionTime: '-';
+                slaEl.innerText = data.success ? data.data.slaPercentage + '%': '-';
             } catch (err) {
                 console.error(err);
                 fullEl.innerText = '-';

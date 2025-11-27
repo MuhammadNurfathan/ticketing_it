@@ -82,7 +82,7 @@
             {{-- Tickets Table/List --}}
 
             <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+                class="bg-light-eval-1 dark:bg-dark-eval-1 shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <div class="overflow-x-auto py-4" id="desktop-wrapper">
                     <table class="datatable w-full text-gray-900 dark:text-gray-100">
                         <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
@@ -118,10 +118,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                            @php
-                                $sortedTickets = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
-                            @endphp
-                            @foreach ($sortedTickets as $ticket)
+                            @foreach ($myTicket as $ticket)
                                 <tr
                                     class="transition-colors hover:bg-gray-100 dark:hover:bg-dark-eval-2 {{ $ticket->status_id == 3 ? 'bg-gray-50 dark:bg-dark-eval-2/50' : '' }}">
                                     <td class="px-4 py-4">
@@ -175,33 +172,49 @@
                     </table>
                 </div>
 
-                {{-- Mobile Cards --}}
                 <div class="lg:hidden" id="mobile-wrapper">
-                    <div class="p-4 space-y-3">
+                    <div class="p-4 space-y-4">
+
                         {{-- Search & Filter --}}
-                        <div class="flex gap-2">
-                            <input type="text" id="mobileSearch" placeholder="Search tickets..."
-                                class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:border-transparent">
-                            <select id="mobilePerPage"
-                                class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="25">25</option>
-                                <option value="all">All</option>
-                            </select>
+                        <div
+                            class="bg-white dark:bg-dark-eval-2 border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-sm mb-3">
+
+                            <div class="flex items-center gap-2 w-full">
+
+                                <!-- SEARCH FLEX -->
+                                <input type="text" id="mobileSearch" placeholder="Search..."
+                                    class="flex-1 min-w-0 px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md
+                           bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
+                           placeholder-gray-500 dark:placeholder-gray-400
+                           focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:border-transparent" />
+
+                                <!-- SELECT FLEX -->
+                                <div class="relative">
+                                    <select id="mobilePerPage"
+                                        class="px-2 pr-6 py-1.5 text-xs min-w-[55px] border border-gray-300 dark:border-gray-600 rounded-md
+                               bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
+                               focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 appearance-none">
+                                        <option value="5">5</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="25">25</option>
+                                        <option value="all">All</option>
+                                    </select>
+                                </div>
+
+                            </div>
                         </div>
 
                         {{-- Cards Container --}}
-                        {{-- Cards Container --}}
-                        <div id="mobileCards" class="space-y-3">
+                        <div id="mobileCards" class="space-y-4">
 
                             @php
                                 $sortedMobile = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
                             @endphp
 
                             @foreach ($sortedMobile as $ticket)
-                                <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-lg p-4 border border-gray-200 dark:border-gray-700 
-            {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
+                                <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4
+                            border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden
+                            {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
                                     data-code="{{ strtolower($ticket->ticket_code) }}"
                                     data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
                                     data-problem="{{ strtolower($ticket->problem) }}"
@@ -224,10 +237,10 @@
                                         {{-- Status Badge --}}
                                         <span
                                             class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
-                    {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
-                    {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
-                    {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
-                    {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
+                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
+                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
+                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
                                     </div>
@@ -235,70 +248,89 @@
                                     {{-- Content --}}
                                     <div class="space-y-2 text-sm">
 
-                                        <div class="flex">
+                                        {{-- Category --}}
+                                        <div class="flex items-start">
+                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                Category:
+                                            </span>
                                             <span
-                                                class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Category:</span>
-                                            <span class="text-gray-900 dark:text-white text-xs font-medium">
+                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
                                                 {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
                                             </span>
                                         </div>
 
-                                        <div class="flex">
+                                        {{-- Problem --}}
+                                        <div class="flex items-start">
+                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                Problem:
+                                            </span>
                                             <span
-                                                class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Problem:</span>
-                                            <span class="text-gray-900 dark:text-white text-xs">
-                                                {{ Str::limit($ticket->problem, 60) }}
+                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                {{ $ticket->problem }}
                                             </span>
                                         </div>
 
-                                        <div class="flex">
+                                        {{-- Date --}}
+                                        <div class="flex items-start">
+                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                Date:
+                                            </span>
                                             <span
-                                                class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Date:</span>
-                                            <span class="text-gray-900 dark:text-white text-xs">
+                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
                                                 {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
                                             </span>
                                         </div>
 
-                                        {{-- SOLUTION --}}
+                                        {{-- Solution --}}
                                         @if ($ticket->solution)
-                                            <div class="flex">
+                                            <div class="flex items-start">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Solution:</span>
-                                                <span class="text-gray-900 dark:text-white text-xs">
-                                                    {{ Str::limit($ticket->solution, 60) }}
+                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                    Solution:
+                                                </span>
+                                                <span
+                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                    {{ $ticket->solution }}
                                                 </span>
                                             </div>
                                         @endif
 
-                                        {{-- FEEDBACK --}}
+                                        {{-- Feedback --}}
                                         @if ($ticket->feedback)
-                                            <div class="flex">
+                                            <div class="flex items-start">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Feedback:</span>
-                                                <span class="text-gray-900 dark:text-white text-xs">
-                                                    {{ Str::limit($ticket->feedback->description, 60) }}
+                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                    Feedback:
+                                                </span>
+                                                <span
+                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                    {{ $ticket->feedback->description }}
                                                 </span>
                                             </div>
                                         @endif
 
-                                        {{-- SUPPORT / IT SUPPORT --}}
+                                        {{-- Support --}}
                                         @if ($ticket->support)
-                                            <div class="flex">
+                                            <div class="flex items-start">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 w-24 flex-shrink-0 text-xs">Support:</span>
-                                                <span class="text-gray-900 dark:text-white text-xs font-medium">
+                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
+                                                    Support:
+                                                </span>
+                                                <span
+                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal font-medium overflow-hidden">
                                                     {{ $ticket->support->name }}
                                                 </span>
                                             </div>
                                         @endif
-
                                     </div>
 
-                                    {{-- Give Feedback Button (ONLY if closed & no feedback) --}}
+                                    {{-- Give Feedback Button --}}
                                     @if ($ticket->status_id == 3 && !$ticket->feedback)
                                         <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
-                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
+                                       dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
+                                       text-sm font-medium transition-colors">
                                                 Give Feedback
                                             </a>
                                         </div>
@@ -309,16 +341,17 @@
 
                         </div>
 
-
-
                         {{-- Pagination --}}
                         <div id="mobilePagination"
                             class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                             <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium"></div>
                             <div id="mobilePaginationButtons" class="flex gap-1 flex-wrap justify-center"></div>
                         </div>
+
                     </div>
                 </div>
+
+
             </div>
 
         </div>
@@ -433,6 +466,10 @@
                     lengthMenu: [
                         [5, 10, 25, 50, -1],
                         [5, 10, 25, 50, "All"]
+                    ],
+                    order: [
+                        [8, "desc"],
+                        [0, "desc"],
                     ],
                     layout: {
                         topStart: "pageLength",

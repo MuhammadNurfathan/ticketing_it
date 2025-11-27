@@ -320,12 +320,12 @@
                         ${
                             tickets.length
                                 ? tickets.map(t => `
-                                            <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
-                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                                <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                            </div>
-                                        `).join('')
+                                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
+                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
+                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
+                                                        </div>
+                                                    `).join('')
                                 : '<p class="text-center text-gray-400 dark:text-gray-500 italic">Tidak ada tiket</p>'
                         }
                     </div>
@@ -349,202 +349,206 @@
         loadTickets();
     </script>
 
-    {{-- Bar & Time Charts Script --}}
-    <script type="module">
-        const NEUTRAL_COLOR = '#999999';
-        let barChart, timeChart;
+ {{-- Bar & Time Charts Script --}}
+<script type="module">
+const NEUTRAL_COLOR = '#999999';
+let barChart, timeChart;
 
-        function isDarkMode() {
-            return document.documentElement.classList.contains('dark');
-        }
+function isDarkMode() {
+    return document.documentElement.classList.contains('dark');
+}
 
-        function getTextColor() {
-            return NEUTRAL_COLOR;
-        }
+function getTextColor() {
+    return NEUTRAL_COLOR;
+}
 
-        function getGridColor() {
-            return NEUTRAL_COLOR;
-        }
+function getGridColor() {
+    return NEUTRAL_COLOR;
+}
 
-        function getBgColor() {
-            return isDarkMode() ? '#1f2937' : '#ffffff';
-        }
+function getBgColor() {
+    return isDarkMode() ? '#1f2937' : '#ffffff';
+}
 
-        function getBarColors() {
-            return ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
-        }
+// Warna default dataset (terang)
+function getBarColors() {
+    return ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+}
 
-        function getBarChartOptions() {
-            return {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: getTextColor(),
-                            font: {
-                                size: 12
-                            },
-                            padding: 15
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: isDarkMode() ? '#374151' : '#fff',
-                        titleColor: getTextColor(),
-                        bodyColor: getTextColor(),
-                        borderColor: getGridColor(),
-                        borderWidth: 1
-                    }
+// Opsi dasar untuk semua chart
+function getBaseChartOptions(extraOptions = {}) {
+    return {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    color: getTextColor(),
+                    font: { size: 12 },
+                    padding: 15
+                }
+            },
+            tooltip: {
+                backgroundColor: isDarkMode() ? '#374151' : '#fff',
+                titleColor: getTextColor(),
+                bodyColor: getTextColor(),
+                borderColor: getGridColor(),
+                borderWidth: 1
+            }
+        },
+        scales: {
+            x: {
+                grid: { color: getGridColor(), drawBorder: false },
+                ticks: { color: getTextColor(), font: { size: 11 } }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color: getGridColor(), drawBorder: false },
+                ticks: { color: getTextColor(), font: { size: 11 }, stepSize: 1 }
+            }
+        },
+        ...extraOptions
+    };
+}
+
+// Fungsi umum load chart, dengan opsi darkTotal untuk timeChart
+async function loadChart(url, canvas, container, loading, noData, chartInstance, extraOptions = {}, darkTotal = false) {
+    loading.classList.remove('hidden');
+    container.classList.add('hidden');
+    noData.classList.add('hidden');
+
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+
+    try {
+        const res = await fetch(url).then(r => r.json());
+        loading.classList.add('hidden');
+
+        if (res.success && res.data.datasets.length > 0) {
+            container.classList.remove('hidden');
+
+            chartInstance = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: res.data.labels,
+                    datasets: res.data.datasets.map((ds, i) => {
+                        let color = getBarColors()[i % getBarColors().length];
+
+                        // Total Time Spent hanya gelap kalau darkTotal = true
+                        if (darkTotal && ds.label === 'Total Time Spent') color = '#1f2937';
+
+                        return {
+                            ...ds,
+                            backgroundColor: color,
+                            borderColor: color,
+                            borderWidth: 2
+                        };
+                    })
                 },
-                scales: {
-                    x: {
-                        grid: {
-                            color: getGridColor(),
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: getTextColor(),
-                            font: {
-                                size: 11
-                            }
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: getGridColor(),
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: getTextColor(),
-                            font: {
-                                size: 11
-                            },
-                            stepSize: 1
+                options: getBaseChartOptions(extraOptions)
+            });
+        } else {
+            noData.classList.remove('hidden');
+        }
+    } catch (e) {
+        console.error(e);
+        loading.classList.add('hidden');
+        noData.classList.remove('hidden');
+    }
+
+    return chartInstance;
+}
+
+// Load Bar Chart → semua terang
+async function loadBarChart(year) {
+    barChart = await loadChart(
+        `/api/chart-tickets-by-dev?year=${year}`,
+        document.getElementById('myBarChart'),
+        document.getElementById('barChartContainer'),
+        document.getElementById('barLoadingIndicator'),
+        document.getElementById('barNoDataMessage'),
+        barChart
+    );
+}
+
+// Load Time Chart → Total Time Spent gelap
+async function loadTimeChart(year) {
+    timeChart = await loadChart(
+        `/api/chart-time-spent-by-dev?year=${year}`,
+        document.getElementById('timeSpentChart'),
+        document.getElementById('timeChartContainer'),
+        document.getElementById('timeLoadingIndicator'),
+        document.getElementById('timeNoDataMessage'),
+        timeChart,
+        {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const minutes = context.raw;
+                            const hours = Math.floor(minutes / 60);
+                            const mins = minutes % 60;
+                            return `${context.dataset.label}: ${hours} jam ${mins} menit`;
                         }
                     }
                 }
-            };
-        }
-
-        async function loadBarChart(year) {
-            const loading = document.getElementById('barLoadingIndicator');
-            const container = document.getElementById('barChartContainer');
-            const noData = document.getElementById('barNoDataMessage');
-            const canvas = document.getElementById('myBarChart');
-
-            loading.classList.remove('hidden');
-            container.classList.add('hidden');
-            noData.classList.add('hidden');
-            if (barChart) {
-                barChart.destroy();
-                barChart = null;
-            }
-
-            try {
-                const res = await fetch(`/api/chart-tickets-by-dev?year=${year}`).then(r => r.json());
-                loading.classList.add('hidden');
-                if (res.success && res.data.datasets.length > 0) {
-                    container.classList.remove('hidden');
-                    barChart = new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels: res.data.labels,
-                            datasets: res.data.datasets.map((ds, i) => ({
-                                ...ds,
-                                backgroundColor: getBarColors()[i % getBarColors().length],
-                                borderColor: getBgColor(),
-                                borderWidth: 1
-                            }))
-                        },
-                        options: getBarChartOptions()
-                    });
-                } else {
-                    noData.classList.remove('hidden');
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            const hours = Math.floor(value / 60);
+                            const mins = value % 60;
+                            return `${hours}j ${mins}m`;
+                        }
+                    }
                 }
-            } catch (e) {
-                console.error(e);
-                loading.classList.add('hidden');
-                noData.classList.remove('hidden');
             }
-        }
+        },
+        true // darkTotal = true
+    );
+}
 
-        async function loadTimeChart(year) {
-            const loading = document.getElementById('timeLoadingIndicator');
-            const container = document.getElementById('timeChartContainer');
-            const noData = document.getElementById('timeNoDataMessage');
-            const canvas = document.getElementById('timeSpentChart');
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+    const currentYear = new Date().getFullYear();
+    const barYear = document.getElementById('bar_year');
+    const timeYear = document.getElementById('time_year');
 
-            loading.classList.remove('hidden');
-            container.classList.add('hidden');
-            noData.classList.add('hidden');
-            if (timeChart) {
-                timeChart.destroy();
-                timeChart = null;
-            }
+    for (let y = currentYear; y >= currentYear - 5; y--) {
+        barYear.innerHTML += `<option value="${y}">${y}</option>`;
+        timeYear.innerHTML += `<option value="${y}">${y}</option>`;
+    }
 
-            try {
-                const res = await fetch(`/api/chart-time-spent-by-dev?year=${year}`).then(r => r.json());
-                loading.classList.add('hidden');
-                if (res.success && res.data.datasets.length > 0) {
-                    container.classList.remove('hidden');
-                    timeChart = new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels: res.data.labels,
-                            datasets: res.data.datasets.map((ds, i) => ({
-                                ...ds,
-                                backgroundColor: getBarColors()[i % getBarColors().length],
-                                borderColor: getBgColor(),
-                                borderWidth: 1
-                            }))
-                        },
-                        options: getBarChartOptions()
-                    });
-                } else {
-                    noData.classList.remove('hidden');
-                }
-            } catch (e) {
-                console.error(e);
-                loading.classList.add('hidden');
-                noData.classList.remove('hidden');
-            }
-        }
+    document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
+    document.getElementById('resetBarBtn').addEventListener('click', () => {
+        barYear.value = currentYear;
+        loadBarChart(currentYear);
+    });
+    document.getElementById('filterTimeBtn').addEventListener('click', () => loadTimeChart(timeYear.value));
+    document.getElementById('resetTimeBtn').addEventListener('click', () => {
+        timeYear.value = currentYear;
+        loadTimeChart(currentYear);
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentYear = new Date().getFullYear();
-            const barYear = document.getElementById('bar_year');
-            const timeYear = document.getElementById('time_year');
+    loadBarChart(currentYear);
+    loadTimeChart(currentYear);
 
-            for (let y = currentYear; y >= currentYear - 5; y--) {
-                barYear.innerHTML += `<option value="${y}">${y}</option>`;
-                timeYear.innerHTML += `<option value="${y}">${y}</option>`;
-            }
+    // Observer untuk dark mode
+    new MutationObserver(() => {
+        if (barChart) loadBarChart(barYear.value);
+        if (timeChart) loadTimeChart(timeYear.value);
+    }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+});
+</script>
 
-            document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
-            document.getElementById('resetBarBtn').addEventListener('click', () => {
-                barYear.value = currentYear;
-                loadBarChart(currentYear);
-            });
-            document.getElementById('filterTimeBtn').addEventListener('click', () => loadTimeChart(timeYear.value));
-            document.getElementById('resetTimeBtn').addEventListener('click', () => {
-                timeYear.value = currentYear;
-                loadTimeChart(currentYear);
-            });
-
-            loadBarChart(currentYear);
-            loadTimeChart(currentYear);
-
-            new MutationObserver(() => {
-                if (barChart) loadBarChart(barYear.value);
-                if (timeChart) loadTimeChart(timeYear.value);
-            }).observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-        });
-    </script>
 
 </x-app-layout>
