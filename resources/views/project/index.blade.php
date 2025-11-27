@@ -4,7 +4,7 @@
         @auth
             @if (Auth::user()->role_id != 3)
                 <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-2xl text-light-text dark:text-dark-text">Project</h2>
+                   <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Project</h2>
                     <button onclick="openModal('projectModal')"
                         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         Create Project
@@ -746,7 +746,7 @@
                 $('#developer_name').val(selected.join(' | '));
             });
 
-            // =================== Edit Modal ===================
+            // =================== Edit Modal ==================
             window.openEditModal = function(button) {
                 const projectId = $(button).data('id');
                 const projectCode = $(button).data('code');

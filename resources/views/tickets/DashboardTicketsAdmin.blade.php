@@ -3,7 +3,7 @@
         @auth
             @if (Auth::user()->role_id != 3)
                 <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-2xl text-light-text dark:text-dark-text">Ticket Dashboard</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Ticket Dashboard</h2>
                     <a href="{{ route('DashboardTicketsAdmin.create') }}"
                         class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition duration-300">
                         Create Ticket
@@ -290,9 +290,10 @@
 
                                 @auth
                                     @if (Auth::user()->role_id != 3)
-                                        <th
-                                            class="border border-gray-300 dark:border-gray-600 p-2 text-center text-light-text dark:text-dark-text text-center align-middle">
-                                            Action</th>
+                                       <th
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                        Action
+                                    </th>
                                 </tr>
                                 @endif
                             @endauth
