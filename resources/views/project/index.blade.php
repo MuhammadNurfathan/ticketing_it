@@ -4,7 +4,7 @@
         @auth
             @if (Auth::user()->role_id != 3)
                 <div class="flex justify-between items-center">
-                   <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Project</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Project</h2>
                     <button onclick="openModal('projectModal')"
                         class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         Create Project
@@ -28,8 +28,8 @@
 
             <div>
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
-                <input type="date" name="end_date"
-                    value="{{ $end }}" class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+                <input type="date" name="end_date" value="{{ $end }}"
+                    class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <button type="submit"
@@ -148,7 +148,7 @@
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code?? '-' }}</td>
+                                    {{ $project->project_code ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->project_name ?? '-' }}</td>
@@ -276,7 +276,7 @@
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code?? '-' }}</td>
+                                    {{ $project->project_code ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->project_name ?? '-' }}</td>
@@ -529,7 +529,7 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->end_date ?? '-' }} </td>
-                               
+
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     <button onclick="showProjectModal({{ $project->id }})"
@@ -701,21 +701,21 @@
         }
     </script>
 
-     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-    new DataTable(".datatable", {
-        responsive: false,
-        pageLength: 10,
-        layout: {
-            topStart: "pageLength",   // ✔️ fitur resmi v2
-            topEnd: "search",
-            bottomStart: "info",
-            bottomEnd: "paging"
-        }
-    });
-});
+            new DataTable(".datatable", {
+                responsive: false,
+                pageLength: 10,
+                layout: {
+                    topStart: "pageLength", // ✔️ fitur resmi v2
+                    topEnd: "search",
+                    bottomStart: "info",
+                    bottomEnd: "paging"
+                }
+            });
+        });
     </script>
 
 
@@ -861,24 +861,24 @@
             });
         });
     </script>
-<style>
-    /* Styling untuk date input di light mode */
-    .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(0);
-        cursor: pointer;
-    }
-    
-    /* Styling untuk date input di dark mode */
-    .dark .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
-    }
-    
-    /* Opsional: ubah opacity saat hover */
-    .date-input::-webkit-calendar-picker-indicator:hover {
-        opacity: 0.7;
-    }
-</style>
+    <style>
+        /* Styling untuk date input di light mode */
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
+
+        /* Styling untuk date input di dark mode */
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Opsional: ubah opacity saat hover */
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
+        }
+    </style>
 
     <x-modal-table name="project-history-1" title="Project History" max-width="7xl">
         @include('project.history')
@@ -906,7 +906,8 @@
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('pendingModal')"
                     class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
     </x-modal-form>
@@ -1126,7 +1127,8 @@
             <div class="flex justify-end">
                 <button type="button" onclick="closeModal('projectModal')"
                     class="px-4 py-2 bg-red-800 rounded mr-2">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                <button type="submit"
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
         </form>
     </x-modal-form>

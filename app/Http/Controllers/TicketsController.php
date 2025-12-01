@@ -9,12 +9,15 @@ use App\Notifications\TicketDoneNotification;
 
 class TicketsController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $start = $request->start_date;
         $end   = $request->end_date;
         $stats = Ticket::getStatsFiltered($start, $end);
         $doneTicketsQuery = Ticket::betweenRequestDates($start, $end);
-        $doneTickets = $doneTicketsQuery->whereHas('status', function ($q) {$q->whereIn('status_name', ['Done', 'Feedback']);})->with('feedback')->orderBy('updated_at', 'desc')->get();
+        $doneTickets = $doneTicketsQuery->whereHas('status', function ($q) {
+            $q->whereIn('status_name', ['Done', 'Feedback']);
+        })->with('feedback')->orderBy('updated_at', 'desc')->get();
         $waitingTickets = Ticket::waiting()->orderBy('ticket_code', 'asc')->get();
         $inProgressTickets = Ticket::inProgress()->orderBy('ticket_code', 'asc')->get();
         $voidTickets = Ticket::void()->orderBy('updated_at', 'desc')->get();
@@ -30,7 +33,8 @@ class TicketsController extends Controller
         ));
     }
 
-    public function indexUser(){
+    public function indexUser()
+    {
         $userId = Auth::id();
         $myTicket = Ticket::where('user_id', $userId)->latest()->get();
 
@@ -58,7 +62,8 @@ class TicketsController extends Controller
         return $view;
     }
 
-    public function create(){
+    public function create()
+    {
         $data = Ticket::data();
         return view(
             'tickets.CreateAdmin',
@@ -75,7 +80,8 @@ class TicketsController extends Controller
         );
     }
 
-    public function createUser(){
+    public function createUser()
+    {
         $user = Auth::user();
         $hasDoneWithoutFeedback = Ticket::where('user_id', $user->id)->where('status_id', 3)->exists();
 
@@ -87,13 +93,13 @@ class TicketsController extends Controller
 
         return view('tickets.createUser', [
             'users'          => $data['users'],
-            'assets'         => $data['assets'],
             'categories'     => $data['categories'],
             'generateticket' => $data['generateticket'],
         ]);
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
         $data = Ticket::data();
 
@@ -109,7 +115,8 @@ class TicketsController extends Controller
         ]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $isFromUser = $request->input('from') === 'user';
 
         $rules = [
@@ -118,6 +125,8 @@ class TicketsController extends Controller
             'problem_category_id' => 'required|exists:problem_categories,id',
             'status_id'           => 'required|exists:status,id',
             'problem'             => 'required|string',
+            'assets_id' => 'nullable|integer',
+
         ];
 
         $messages = [
@@ -193,7 +202,8 @@ class TicketsController extends Controller
             ->with('success', '✅ Ticket berhasil ditambahkan!');
     }
 
-    private function sendDoneNotification($ticket){
+    private function sendDoneNotification($ticket)
+    {
         if ($ticket->user && $ticket->user->email) {
             $ticket->user->notify(
                 (new TicketDoneNotification($ticket))->delay(now()->addMinutes(1))
@@ -201,13 +211,16 @@ class TicketsController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
         $ticket = Ticket::findOrFail($id);
 
         $rules = [
             'support_id'  => 'required|exists:users,id',
             'status_id'   => 'required|exists:status,id',
             'priority_id' => 'required|exists:priority,id',
+            'assets_id' => 'nullable|integer',
+
         ];
 
         $messages = [
@@ -244,7 +257,11 @@ class TicketsController extends Controller
 
         $validated = $request->validate($rules, $messages);
 
-        unset($validated['user_id'], $validated['problem'], $validated['image'], $validated['ticket_code'], $validated['problem_category_id']);
+        // Jangan ubah assets_id kalau tidak dikirim
+        if (!$request->filled('assets_id')) {
+            unset($validated['assets_id']);
+        }
+
 
         if ($statusId != 1 && $ticket->request_date) {
             $validated['waiting_hour'] = $ticket->request_date->diffInMinutes(now(), true);
@@ -272,7 +289,8 @@ class TicketsController extends Controller
         }
     }
 
-    public function updateStatus(Request $request, Ticket $ticket){
+    public function updateStatus(Request $request, Ticket $ticket)
+    {
         $data = [
             'status_id' => $request->status_id,
         ];
@@ -291,7 +309,8 @@ class TicketsController extends Controller
             ->with('success', 'Status tiket berhasil diperbarui.');
     }
 
-    public function updateStatusDone(Request $request, Ticket $ticket){
+    public function updateStatusDone(Request $request, Ticket $ticket)
+    {
         $validated = $request->validate([
             'status_id'  => 'required|integer',
             'time_spent' => 'nullable|integer',

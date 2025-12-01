@@ -28,8 +28,8 @@
 
             <div>
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
-                <input type="date" name="end_date"
-                    value="{{ $end }}" class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+                <input type="date" name="end_date" value="{{ $end }}"
+                    class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <button type="submit"
@@ -220,7 +220,7 @@
                                                         </label>
                                                         <textarea name="solution"
                                                             class="solutionInput w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                                            rows="3" placeholder="Enter Solution..." required>{{ old('solution', $ticket->solution ?? '') }}</textarea>
+                                                            rows="3" placeholder="Enter Solution..." required>{{ $ticket->solution ?? '' }}</textarea>
                                                     </div>
 
                                                     <!-- Buttons -->
@@ -290,10 +290,10 @@
 
                                 @auth
                                     @if (Auth::user()->role_id != 3)
-                                       <th
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                        Action
-                                    </th>
+                                        <th
+                                            class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                            Action
+                                        </th>
                                 </tr>
                                 @endif
                             @endauth
@@ -414,347 +414,322 @@
             </div>
         </div>
 
-            {{-- ================= TABLE DONE / CLOSED ================= --}}
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-                <h3
-                    class="inline bg-green-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                    Tickets Closed / Done</h3>
-                <div class="overflow-x-auto py-4">
-                    <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                        <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                            <tr>
-                                <th
+        {{-- ================= TABLE DONE / CLOSED ================= --}}
+        <div
+            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+            <h3
+                class="inline bg-green-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                Tickets Closed / Done</h3>
+            <div class="overflow-x-auto py-4">
+                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
+                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
+                        <tr>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Ticket Code</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Requestor</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Department</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Assignee</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Kategori</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Masalah</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Tanggal Req</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Time Spent</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Feedback</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Solusi</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Status</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                Image</th>
+
+                            @auth
+                                @if (Auth::user()->role_id != 3)
+                                    <th
+                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
+                                        Action</th>
+                                @endif
+                            @endauth
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-dark-eval-1">
+                        @foreach ($doneTickets as $ticket)
+                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Ticket Code</th>
-                                <th
+                                    {{ $ticket->ticket_code }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Requestor</th>
-                                <th
+                                    {{ $ticket->user->name ?? '-' }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Department</th>
-                                <th
+                                    {{ $ticket->user->department->department_name }} -
+                                    {{ $ticket->user->department->location->location_name }} </td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Assignee</th>
-                                <th
+                                    {{ $ticket->support->name ?? '-' }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Kategori</th>
-                                <th
+                                    {{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Masalah</th>
-                                <th
+                                    {{ $ticket->problem }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Tanggal Req</th>
-                                <th
+                                    {{ $ticket->request_date?->format('Y-m-d') }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Time Spent</th>
-                                <th
+                                    {{ $ticket->time_spent ?? '-' }} menit</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text break-words">
+                                    {{ $ticket->feedback->description ?? '-' }}</td>
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Feedback</th>
-                                <th
+                                    {{ $ticket->solution ?? '-' }}</td>
+
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Solusi</th>
-                                <th
+                                    {{ $ticket->is_late ? 'Late' : 'On Time' }}
+                                </td>
+
+
+
+                                <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Status</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                    Image</th>
+                                    @if ($ticket->image)
+                                        <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
+                                            class="text-blue-600 underline">
+                                            Lihat File
+                                        </a>
+                                    @else
+                                        <span class="text-gray-500 text-sm italic">No media</span>
+                                    @endif
+                                </td>
 
                                 @auth
                                     @if (Auth::user()->role_id != 3)
-                                        <th
-                                            class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                            Action</th>
+                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                                            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
+                                                method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="2">
+                                                <button
+                                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
+                                                    onclick="return confirm('Apakah Anda Yakin?')">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        </td>
                                     @endif
                                 @endauth
                             </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-dark-eval-1">
-                            @foreach ($doneTickets as $ticket)
-                                <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->ticket_code }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->user->name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->user->department->department_name }} -
-                                        {{ $ticket->user->department->location->location_name }} </td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->support->name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->problem }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->request_date?->format('Y-m-d') }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->time_spent ?? '-' }} menit</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text break-words">
-                                        {{ $ticket->feedback->description ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->solution ?? '-' }}</td>
-
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->is_late ? 'Late' : 'On Time' }}
-                                    </td>
-
-
-
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        @if ($ticket->image)
-                                            <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
-                                                class="text-blue-600 underline">
-                                                Lihat File
-                                            </a>
-                                        @else
-                                            <span class="text-gray-500 text-sm italic">No media</span>
-                                        @endif
-                                    </td>
-
-                                    @auth
-                                        @if (Auth::user()->role_id != 3)
-                                            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                                <form
-                                                    action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
-                                                    method="POST" class="inline">
-                                                    @csrf
-                                                    <input type="hidden" name="status_id" value="2">
-                                                    <button
-                                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-                                                        onclick="return confirm('Apakah Anda Yakin?')">
-                                                        Cancel
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    @endauth
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- ================= TABLE VOID ================= --}}
-            <div
-                class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-                <h3
-                    class="inline bg-red-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                    Tickets Void</h3>
-                <div class="overflow-x-auto py-4">
-                    <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                        <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                            <tr>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Ticket Code</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Requestor</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Department</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Assignee</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Kategori</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Masalah</th>
-                                <th
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Tanggal Req</th>
-                                {{-- @auth
-                                    @if (Auth::user()->role_id != 3
-                                        <th
-                                            class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                            Action</th>
-                                    @endif
-                                @endauth --}}
-
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-dark-eval-1">
-                            @foreach ($voidTickets as $ticket)
-                                <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->ticket_code ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->user->name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->user->department->department_name }} -
-                                        {{ $ticket->user->department->location->location_name }} </td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->support->name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->problem ?? '-' }}</td>
-                                    <td
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
-
-
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
-<style>
-    /* Styling untuk date input di light mode */
-    .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(0);
-        cursor: pointer;
-    }
-    
-    /* Styling untuk date input di dark mode */
-    .dark .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
-    }
-    
-    /* Opsional: ubah opacity saat hover */
-    .date-input::-webkit-calendar-picker-indicator:hover {
-        opacity: 0.7;
-    }
-</style>
-        {{-- ================= DATATABLE ================= --}}
-<script>
-new DataTable(".datatable", {
-    responsive: false,
-    pageLength: 5,
-    lengthMenu: [
-        [5, 10, 25, 50, -1],
-        [5, 10, 25, 50, "All"]
-    ],
-    layout: {
-        topStart: "pageLength",
-        topEnd: "search",
-        bottomStart: "info",
-        bottomEnd: "paging"
-    }
-});
 
+        {{-- ================= TABLE VOID ================= --}}
+        <div
+            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
+            <h3
+                class="inline bg-red-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
+                Tickets Void</h3>
+            <div class="overflow-x-auto py-4">
+                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
+                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
+                        <tr>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Ticket Code</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Requestor</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Department</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Assignee</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Kategori</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Masalah</th>
+                            <th
+                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                Tanggal Req</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-dark-eval-1">
+                        @foreach ($voidTickets as $ticket)
+                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->ticket_code ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->user->name ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->user->department->department_name }} -
+                                    {{ $ticket->user->department->location->location_name }} </td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->support->name ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->problem ?? '-' }}</td>
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    {{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
+
+
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <style>
+        /* Styling untuk date input di light mode */
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
+
+        /* Styling untuk date input di dark mode */
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Opsional: ubah opacity saat hover */
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
+        }
+    </style>
+    {{-- ================= DATATABLE ================= --}}
+
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    new DataTable(".datatable", {
+        responsive: false,
+        pageLength: 5,                 // default 5
+        lengthMenu: [                  // pilihan Page Length
+            [5, 10, 25, 50, -1],
+            [5, 10, 25, 50, "All"]
+        ],
+        order: [[0, "desc"]],          // default ordering kolom pertama
+        layout: {
+            topStart: "pageLength",
+            topEnd: "search",
+            bottomStart: "info",
+            bottomEnd: "paging"
+        }
+    });
+});
 </script>
 
 
+
     </script>
-        {{-- ================= DONE BUTTON ================= --}}
+{{-- ================= DONE BUTTON ================= --}}
+<script>
+    document.querySelectorAll('.doneBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.nextElementSibling;
+            const modalContent = modal.querySelector('.modalContent');
+            const start = new Date(this.dataset.start);
+            const timeInput = modal.querySelector('.timeInput');
+            const solutionInput = modal.querySelector('.solutionInput');
+            const notesContainer = modal.querySelector('.notesContainer');
+            const notesInput = modal.querySelector('.notesInput');
+            const manualCheckbox = modal.querySelector('.manualCheckbox');
+            const form = modal.parentElement.querySelector('.doneForm');
 
-        <script>
-            document.querySelectorAll('.doneBtn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const modal = this.nextElementSibling;
-                    const modalContent = modal.querySelector('.modalContent');
-                    const start = new Date(this.dataset.start);
-                    const timeInput = modal.querySelector('.timeInput');
-                    const solutionInput = modal.querySelector('.solutionInput');
-                    const notesContainer = modal.querySelector('.notesContainer');
-                    const notesInput = modal.querySelector('.notesInput');
-                    const manualCheckbox = modal.querySelector('.manualCheckbox');
-                    const form = modal.parentElement.querySelector('.doneForm');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('flex');
+                modalContent.classList.remove('opacity-0', 'scale-95');
+                modalContent.classList.add('opacity-100', 'scale-100');
+            }, 10);
 
-                    // Tampilkan modal dengan transisi
-                    modal.classList.remove('hidden');
-                    setTimeout(() => {
-                        modal.classList.add('flex');
-                        modalContent.classList.remove('opacity-0', 'scale-95');
-                        modalContent.classList.add('opacity-100', 'scale-100');
-                    }, 10);
+            const calcAutoTime = () => {
+                if (!manualCheckbox.checked && start) {
+                    const now = new Date();
+                    const diff = Math.floor((now - start) / (1000 * 60));
+                    timeInput.value = diff > 0 ? diff : 0;
+                }
+            };
+            calcAutoTime();
 
-                    // Auto hitung time spent
-                    const calcAutoTime = () => {
-                        if (!manualCheckbox.checked && start) {
-                            const now = new Date();
-                            const diff = Math.floor((now - start) / (1000 * 60));
-                            timeInput.value = diff > 0 ? diff : 0;
-                        }
-                    };
+            manualCheckbox.addEventListener('change', () => {
+                if (manualCheckbox.checked) {
+                    timeInput.removeAttribute('readonly');
+                    timeInput.classList.remove('bg-gray-100');
+                    notesContainer.classList.remove('hidden');
+                } else {
+                    timeInput.setAttribute('readonly', true);
+                    timeInput.classList.add('bg-gray-100');
+                    notesContainer.classList.add('hidden');
+                    notesInput.value = '';
                     calcAutoTime();
-
-                    // Toggle manual
-                    manualCheckbox.addEventListener('change', () => {
-                        if (manualCheckbox.checked) {
-                            timeInput.removeAttribute('readonly');
-                            timeInput.classList.remove('bg-gray-100');
-                            notesContainer.classList.remove('hidden');
-                        } else {
-                            timeInput.setAttribute('readonly', true);
-                            timeInput.classList.add('bg-gray-100');
-                            notesContainer.classList.add('hidden');
-                            notesInput.value = '';
-                            calcAutoTime();
-                        }
-                    });
-
-                    // Cancel
-                    modal.querySelector('.cancelBtn').onclick = () => {
-                        modalContent.classList.remove('opacity-100', 'scale-100');
-                        modalContent.classList.add('opacity-0', 'scale-95');
-                        setTimeout(() => {
-                            modal.classList.remove('flex');
-                            modal.classList.add('hidden');
-                        }, 200);
-                    };
-
-                    // Save dengan validasi
-                    modal.querySelector('.saveBtn').onclick = () => {
-                        if (!solutionInput.value.trim()) {
-                            alert('Kolom Solution wajib diisi!');
-                            solutionInput.focus();
-                            return;
-                        }
-                        if (!notesContainer.classList.contains('hidden') && !notesInput.value.trim()) {
-                            alert('Kolom Notes wajib diisi saat manual!');
-                            notesInput.focus();
-                            return;
-                        }
-
-                        form.querySelector('.hiddenTimeSpent').value = timeInput.value;
-                        form.querySelector('.hiddenSolution').value = solutionInput.value;
-                        form.querySelector('.hiddenNotes').value = notesInput.value;
-                        form.submit();
-                    };
-                });
+                }
             });
-        </script>
 
+            modal.querySelector('.cancelBtn').onclick = () => {
+                modalContent.classList.remove('opacity-100', 'scale-100');
+                modalContent.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    modal.classList.remove('flex');
+                    modal.classList.add('hidden');
+                }, 200);
+            };
 
-        {{-- ================= SAVE BUTTON ================= --}}
-        <script>
             modal.querySelector('.saveBtn').onclick = () => {
-                // ambil form hidden yang berada di satu td dengan modal
-                const form = modal.parentElement.querySelector('.doneForm');
+                if (!solutionInput.value.trim()) {
+                    alert('Kolom Solution wajib diisi!');
+                    solutionInput.focus();
+                    return;
+                }
+                if (!notesContainer.classList.contains('hidden') && !notesInput.value.trim()) {
+                    alert('Kolom Notes wajib diisi saat manual!');
+                    notesInput.focus();
+                    return;
+                }
 
                 form.querySelector('.hiddenTimeSpent').value = timeInput.value;
                 form.querySelector('.hiddenSolution').value = solutionInput.value;
                 form.querySelector('.hiddenNotes').value = notesInput.value;
-
                 form.submit();
-            }
-        </script>
+            };
+        });
+    });
+</script>
+
 
 </x-app-layout>
