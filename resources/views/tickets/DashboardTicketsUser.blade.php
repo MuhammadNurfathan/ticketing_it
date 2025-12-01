@@ -461,7 +461,7 @@
             // ===== Desktop DataTable =====
             if (window.innerWidth >= 1024) {
                 new DataTable(".datatable", {
-                    responsive: true,
+                    responsive: false,
                     pageLength: 5,
                     lengthMenu: [
                         [5, 10, 25, 50, -1],

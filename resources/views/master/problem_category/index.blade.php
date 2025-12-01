@@ -98,7 +98,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     new DataTable(".datatable", {
-        responsive: true,
+        responsive: false,
         pageLength: 10,
         layout: {
             topStart: "pageLength",   // ✔️ fitur resmi v2

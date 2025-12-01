@@ -151,7 +151,7 @@
     </div>
 
     <script>
-        const NEUTRAL_COLOR = '#999999';
+        const NEUTRAL_COLOR = '#6B7280';
 
         function isDarkMode() {
             return document.documentElement.classList.contains('dark');

@@ -167,7 +167,7 @@
                                 </label>
                                 <input type="datetime-local" id="start_datetime" name="start_date"
                                     value="{{ old('start_date') }}"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                                    class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
                    focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             </div>
@@ -184,7 +184,7 @@
                                 </label>
                                 <input type="datetime-local" id="end_datetime" name="end_date"
                                     value="{{ old('end_date') }}"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                                    class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
                    focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             </div>
@@ -548,7 +548,24 @@ $(function() {
         });
     </script>
 
-    {{-- Custom Scrollbar Styling --}}
+    <style>
+    /* Styling untuk date input di light mode */
+    .date-input::-webkit-calendar-picker-indicator {
+        filter: invert(0);
+        cursor: pointer;
+    }
+    
+    /* Styling untuk date input di dark mode */
+    .dark .date-input::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+    
+    /* Opsional: ubah opacity saat hover */
+    .date-input::-webkit-calendar-picker-indicator:hover {
+        opacity: 0.7;
+    }
+</style>
     <style>
         #search-results::-webkit-scrollbar,
         #assets-results::-webkit-scrollbar {

@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class ProjectReportController extends Controller
 {
-    public function ProjectQueue(Request $request){
+    public function ProjectQueue(Request $request)
+    {
         $year = $request->query('year', now()->year);
 
         $ProjectQueue = ProjectHeader::with(['priority', 'requestor', 'developer', 'status'])
@@ -23,7 +24,8 @@ class ProjectReportController extends Controller
         ]);
     }
 
-    public function gantChart(Request $request){
+    public function gantChart(Request $request)
+    {
         $year = $request->query('year', now()->year);
 
         $startOfYear = "{$year}-01-01";
@@ -36,7 +38,8 @@ class ProjectReportController extends Controller
             'end_date',
             'effective_end_date',
             'progress_percent',
-            'status_id'
+            'status_id',
+            'is_late',
         )
             ->where(function ($query) use ($year) {
                 $query->whereYear('start_date', '<=', $year)
@@ -74,13 +77,18 @@ class ProjectReportController extends Controller
                 'progress' => intval($p->progress_percent),
                 'status_id' => $p->status_id,
                 'status_name' => $p->status->status_name ?? 'Unknown',
+                'is_late' => $p->status->status_name === 'Done'
+                    ? ($p->is_late == 1 ? 'Late' : 'On Time')
+                    : '',
+
             ];
         });
 
         return response()->json($data);
     }
 
-    public function summary(Request $request){
+    public function summary(Request $request)
+    {
         $year = $request->query('year', now()->year);
         $summary = ProjectHeader::summary($year);
         return response()->json($summary);

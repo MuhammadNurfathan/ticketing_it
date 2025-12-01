@@ -23,13 +23,13 @@
                     Start Date
                 </label>
                 <input type="date" name="start_date" value="{{ $start }}"
-                    class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+                    class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <div>
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
                 <input type="date" name="end_date"
-                    value="{{ $end }}"class="border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
+                    value="{{ $end }}" class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <button type="submit"
@@ -706,7 +706,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
     new DataTable(".datatable", {
-        responsive: true,
+        responsive: false,
         pageLength: 10,
         layout: {
             topStart: "pageLength",   // ✔️ fitur resmi v2
@@ -861,7 +861,24 @@
             });
         });
     </script>
-
+<style>
+    /* Styling untuk date input di light mode */
+    .date-input::-webkit-calendar-picker-indicator {
+        filter: invert(0);
+        cursor: pointer;
+    }
+    
+    /* Styling untuk date input di dark mode */
+    .dark .date-input::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+        cursor: pointer;
+    }
+    
+    /* Opsional: ubah opacity saat hover */
+    .date-input::-webkit-calendar-picker-indicator:hover {
+        opacity: 0.7;
+    }
+</style>
 
     <x-modal-table name="project-history-1" title="Project History" max-width="7xl">
         @include('project.history')
@@ -956,7 +973,7 @@
                     Progress Date
                 </label>
                 <input type="datetime-local" name="progress_date" id="modal_progress_date"
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
+                    class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
             </div>
 
@@ -1092,14 +1109,14 @@
                         Start Date & Time <span class="text-red-500">*</span>
                     </label>
                     <input type="datetime-local" name="start_date"
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         End Date & Time <span class="text-red-500">*</span>
                     </label>
                     <input type="datetime-local" name="end_date"
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                 </div>
             </div>
 

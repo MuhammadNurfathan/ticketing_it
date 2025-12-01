@@ -275,7 +275,7 @@
                     ganttContainer.innerHTML = '';
                     const tasks = projects.map(p => ({
                         id: p.id,
-                        name: `${p.name} - [ ${p.status_name} - ${p.progress}% ]`,
+                        name: `${p.name} - [ ${p.status_name} - ${p.progress}% ] ${p.is_late}`,
                         start: `${year}-${String(p.month_start).padStart(2, '0')}-${String(p.day_start).padStart(2, '0')}`,
                         end: `${year}-${String(p.month_end).padStart(2, '0')}-${String(p.day_end).padStart(2, '0')}`,
                         progress: p.progress,

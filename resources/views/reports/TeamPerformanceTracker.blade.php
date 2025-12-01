@@ -20,7 +20,7 @@
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Mulai
                             </label>
                             <input type="date" id="start_date" name="start_date"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                                class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
                         </div>
 
                         <div>
@@ -28,13 +28,13 @@
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Akhir
                             </label>
                             <input type="date" id="end_date" name="end_date"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                                class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
                         </div>
 
                         <div class="flex items-end">
                             <button type="button" id="previewBtn"
                                 class="w-full px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
-                                👁️ Preview
+                                Preview
                             </button>
                         </div>
                     </form>
@@ -208,16 +208,14 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
                         Tickets by Support (Per Hari)
                     </h2>
-
                     <div class="flex flex-col sm:flex-row gap-3 mb-6">
                         <input type="date" id="date"
-                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2 date-input">
                         <button id="filterBtn"
                             class="px-6 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg font-medium text-sm transition-colors">
                             Filter
                         </button>
                     </div>
-
                     <div id="ticketsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
                 </div>
             </div>
@@ -225,157 +223,160 @@
         </div>
     </div>
 
-    {{-- Preview Modal Script --}}
-    <script>
-        document.getElementById('previewBtn').addEventListener('click', async () => {
-            const start = document.getElementById('start_date').value;
-            const end = document.getElementById('end_date').value;
+    <style>
+        /* Styling untuk date input di light mode */
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
 
-            if (!start || !end) {
-                alert('Isi tanggal mulai dan tanggal akhir terlebih dahulu.');
+        /* Styling untuk date input di dark mode */
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Opsional: ubah opacity saat hover */
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
+        }
+    </style>
+
+{{-- Preview Modal Script --}}
+<script>
+    document.getElementById('previewBtn').addEventListener('click', async () => {
+        const start = document.getElementById('start_date').value;
+        const end = document.getElementById('end_date').value;
+
+        if (!start || !end) {
+            alert('Isi tanggal mulai dan tanggal akhir terlebih dahulu.');
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/tickets/preview?start_date=${start}&end_date=${end}`);
+            const result = await res.json();
+
+            if (!result.data || result.data.length === 0) {
+                alert('Tidak ada data pada rentang tanggal tersebut.');
                 return;
             }
 
-            try {
-                const res = await fetch(`/api/tickets/preview?start_date=${start}&end_date=${end}`);
-                const result = await res.json();
+            const tbody = document.getElementById('previewTableBody');
+            tbody.innerHTML = '';
 
-                if (!result.data || result.data.length === 0) {
-                    alert('Tidak ada data pada rentang tanggal tersebut.');
-                    return;
-                }
+            result.data.forEach(t => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.ticket_code}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.requestor_name}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.support_name}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.problem}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.status}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.start_date}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.end_date}</td>
+                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.time_spent}</td>
+                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.is_late}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.created_at}</td>
+                `;
+                tbody.appendChild(row);
+            });
 
-                const tbody = document.getElementById('previewTableBody');
-                tbody.innerHTML = '';
-
-                result.data.forEach(t => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
-                    row.innerHTML = `
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.ticket_code}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.requestor_name}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.support_name}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.problem}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.status}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.start_date}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.end_date}</td>
-                <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.time_spent}</td>
-                <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.is_late}</td>
-                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.created_at}</td>
-            `;
-                    tbody.appendChild(row);
-                });
-
-                const modal = document.getElementById('previewModal');
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
-
-            } catch (err) {
-                console.error(err);
-                alert('Gagal memuat preview.');
-            }
-        });
-
-        document.getElementById('closePreview').addEventListener('click', () => {
             const modal = document.getElementById('previewModal');
-            modal.querySelector('div').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
-        });
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
 
-        document.getElementById('confirmDownload').addEventListener('click', () => {
-            const start = document.getElementById('start_date').value;
-            const end = document.getElementById('end_date').value;
-            window.location.href = `/api/tickets/export?start_date=${start}&end_date=${end}`;
-            document.getElementById('previewModal').classList.add('hidden');
-        });
-    </script>
-
-    {{-- Tickets by Support Script --}}
-    <script>
-        async function loadTickets() {
-            const date = document.getElementById('date').value;
-            const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
-
-            try {
-                const res = await fetch(url);
-                const json = await res.json();
-                const data = json.data || {};
-
-                const supports = {
-                    ticketsAzi: 'Azi',
-                    ticketsApri: 'Apri',
-                    ticketsBayu: 'Bayu',
-                    ticketsFatih: 'Fatih'
-                };
-
-                const container = document.getElementById('ticketsContainer');
-                let html = '';
-
-                for (const key in supports) {
-                    const tickets = data[key] || [];
-                    html += `
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
-                    <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">${supports[key]}</h3>
-                    <div class="space-y-2">
-                        ${
-                            tickets.length
-                                ? tickets.map(t => `
-                                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
-                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                                        </div>
-                                                    `).join('')
-                                : '<p class="text-center text-gray-400 dark:text-gray-500 italic">Tidak ada tiket</p>'
-                        }
-                    </div>
-                </div>
-            `;
-                }
-
-                container.innerHTML = html;
-
-            } catch (err) {
-                console.error('Error loading tickets:', err);
-                document.getElementById('ticketsContainer').innerHTML =
-                    '<p class="text-center text-red-500">Gagal memuat tiket</p>';
-            }
+        } catch (err) {
+            console.error(err);
+            alert('Gagal memuat preview.');
         }
+    });
 
-        // Event listener
-        document.getElementById('filterBtn').addEventListener('click', loadTickets);
+    document.getElementById('closePreview').addEventListener('click', () => {
+        const modal = document.getElementById('previewModal');
+        modal.querySelector('div').classList.replace('scale-100', 'scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 200);
+    });
 
-        // Load awal
-        loadTickets();
-    </script>
+    document.getElementById('confirmDownload').addEventListener('click', () => {
+        const start = document.getElementById('start_date').value;
+        const end = document.getElementById('end_date').value;
+        window.location.href = `/api/tickets/export?start_date=${start}&end_date=${end}`;
+        document.getElementById('previewModal').classList.add('hidden');
+    });
+</script>
 
- {{-- Bar & Time Charts Script --}}
+{{-- Tickets by Support Script --}}
+<script>
+    async function loadTickets() {
+        const date = document.getElementById('date').value;
+        const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+
+        try {
+            const res = await fetch(url);
+            const json = await res.json();
+            const data = json.data || {};
+
+            const supports = {
+                ticketsAzi: 'Azi',
+                ticketsApri: 'Apri',
+                ticketsBayu: 'Bayu',
+                ticketsFatih: 'Fatih'
+            };
+
+            const container = document.getElementById('ticketsContainer');
+            let html = '';
+
+            for (const key in supports) {
+                const tickets = data[key] || [];
+                html += `
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
+                        <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">${supports[key]}</h3>
+                        <div class="space-y-2">
+                            ${
+                                tickets.length
+                                    ? tickets.map(t => `
+                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
+                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
+                                        </div>
+                                    `).join('')
+                                    : '<p class="text-center text-gray-400 dark:text-gray-500 italic">Tidak ada tiket</p>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+        } catch (err) {
+            console.error('Error loading tickets:', err);
+            document.getElementById('ticketsContainer').innerHTML =
+                '<p class="text-center text-red-500">Gagal memuat tiket</p>';
+        }
+    }
+
+    document.getElementById('filterBtn').addEventListener('click', loadTickets);
+    loadTickets();
+</script>
+
+{{-- Bar & Time Charts Script --}}
 <script type="module">
-const NEUTRAL_COLOR = '#999999';
-let barChart, timeChart;
+const NEUTRAL_COLOR = '#6B7280';
+const BAR_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
-function isDarkMode() {
-    return document.documentElement.classList.contains('dark');
-}
+let barChart = null;
+let timeChart = null;
 
-function getTextColor() {
-    return NEUTRAL_COLOR;
-}
+// Utility functions
+const isDarkMode = () => document.documentElement.classList.contains('dark');
+const getTextColor = () => '#6B7280';
+const getGridColor = () => NEUTRAL_COLOR;
 
-function getGridColor() {
-    return NEUTRAL_COLOR;
-}
-
-function getBgColor() {
-    return isDarkMode() ? '#1f2937' : '#ffffff';
-}
-
-// Warna default dataset (terang)
-function getBarColors() {
-    return ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
-}
-
-// Opsi dasar untuk semua chart
+// Base chart options
 function getBaseChartOptions(extraOptions = {}) {
     return {
         responsive: true,
@@ -385,7 +386,7 @@ function getBaseChartOptions(extraOptions = {}) {
                 display: true,
                 position: 'top',
                 labels: {
-                    color: getTextColor(),
+                    color: NEUTRAL_COLOR,
                     font: { size: 12 },
                     padding: 15
                 }
@@ -400,92 +401,125 @@ function getBaseChartOptions(extraOptions = {}) {
         },
         scales: {
             x: {
-                grid: { color: getGridColor(), drawBorder: false },
-                ticks: { color: getTextColor(), font: { size: 11 } }
+                border: { display: false },
+                grid: { 
+                    color: NEUTRAL_COLOR,
+                    drawBorder: false 
+                },
+                ticks: { 
+                    color: NEUTRAL_COLOR, 
+                    font: { size: 11 } 
+                }
             },
             y: {
                 beginAtZero: true,
-                grid: { color: getGridColor(), drawBorder: false },
-                ticks: { color: getTextColor(), font: { size: 11 }, stepSize: 1 }
+                border: { display: false },
+                grid: { 
+                    color: NEUTRAL_COLOR,
+                    drawBorder: false 
+                },
+                ticks: { 
+                    color: NEUTRAL_COLOR, 
+                    font: { size: 11 }, 
+                    stepSize: 1 
+                }
             }
         },
         ...extraOptions
     };
 }
 
-// Fungsi umum load chart, dengan opsi darkTotal untuk timeChart
-async function loadChart(url, canvas, container, loading, noData, chartInstance, extraOptions = {}, darkTotal = false) {
+// Generic chart loader
+async function loadChart(config) {
+    const { url, canvas, container, loading, noData, instance, extraOptions = {}, useNeutralForTotal = false } = config;
+
     loading.classList.remove('hidden');
     container.classList.add('hidden');
     noData.classList.add('hidden');
 
-    if (chartInstance) {
-        chartInstance.destroy();
-        chartInstance = null;
+    if (instance) {
+        instance.destroy();
     }
 
     try {
-        const res = await fetch(url).then(r => r.json());
+        const res = await fetch(url);
+        const data = await res.json();
+        
         loading.classList.add('hidden');
 
-        if (res.success && res.data.datasets.length > 0) {
+        if (data.success && data.data.datasets.length > 0) {
             container.classList.remove('hidden');
 
-            chartInstance = new Chart(canvas, {
+            const datasets = data.data.datasets.map((ds, i) => {
+                let color = BAR_COLORS[i % BAR_COLORS.length];
+                
+                // Use neutral color for "Total Time Spent" if flag is set
+                if (useNeutralForTotal && ds.label === 'Total Time Spent') {
+                    color = NEUTRAL_COLOR;
+                }
+
+                return {
+                    ...ds,
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 2
+                };
+            });
+
+            return new Chart(canvas, {
                 type: 'bar',
                 data: {
-                    labels: res.data.labels,
-                    datasets: res.data.datasets.map((ds, i) => {
-                        let color = getBarColors()[i % getBarColors().length];
-
-                        // Total Time Spent hanya gelap kalau darkTotal = true
-                        if (darkTotal && ds.label === 'Total Time Spent') color = '#1f2937';
-
-                        return {
-                            ...ds,
-                            backgroundColor: color,
-                            borderColor: color,
-                            borderWidth: 2
-                        };
-                    })
+                    labels: data.data.labels,
+                    datasets: datasets
                 },
                 options: getBaseChartOptions(extraOptions)
             });
         } else {
             noData.classList.remove('hidden');
+            return null;
         }
     } catch (e) {
-        console.error(e);
+        console.error('Chart loading error:', e);
         loading.classList.add('hidden');
         noData.classList.remove('hidden');
+        return null;
     }
-
-    return chartInstance;
 }
 
-// Load Bar Chart → semua terang
+// Load Bar Chart (all datasets colorful)
 async function loadBarChart(year) {
-    barChart = await loadChart(
-        `/api/chart-tickets-by-dev?year=${year}`,
-        document.getElementById('myBarChart'),
-        document.getElementById('barChartContainer'),
-        document.getElementById('barLoadingIndicator'),
-        document.getElementById('barNoDataMessage'),
-        barChart
-    );
+    barChart = await loadChart({
+        url: `/api/chart-tickets-by-dev?year=${year}`,
+        canvas: document.getElementById('myBarChart'),
+        container: document.getElementById('barChartContainer'),
+        loading: document.getElementById('barLoadingIndicator'),
+        noData: document.getElementById('barNoDataMessage'),
+        instance: barChart,
+        useNeutralForTotal: false
+    });
 }
 
-// Load Time Chart → Total Time Spent gelap
+// Load Time Chart (Total Time Spent uses neutral color)
 async function loadTimeChart(year) {
-    timeChart = await loadChart(
-        `/api/chart-time-spent-by-dev?year=${year}`,
-        document.getElementById('timeSpentChart'),
-        document.getElementById('timeChartContainer'),
-        document.getElementById('timeLoadingIndicator'),
-        document.getElementById('timeNoDataMessage'),
-        timeChart,
-        {
+    timeChart = await loadChart({
+        url: `/api/chart-time-spent-by-dev?year=${year}`,
+        canvas: document.getElementById('timeSpentChart'),
+        container: document.getElementById('timeChartContainer'),
+        loading: document.getElementById('timeLoadingIndicator'),
+        noData: document.getElementById('timeNoDataMessage'),
+        instance: timeChart,
+        useNeutralForTotal: true,
+        extraOptions: {
             plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: NEUTRAL_COLOR,
+                        font: { size: 12 },
+                        padding: 15
+                    }
+                },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
@@ -500,31 +534,50 @@ async function loadTimeChart(year) {
             scales: {
                 y: {
                     beginAtZero: true,
+                    border: { display: false },
+                    grid: { 
+                        color: NEUTRAL_COLOR,
+                        drawBorder: false 
+                    },
                     ticks: {
+                        color: NEUTRAL_COLOR,
+                        font: { size: 11 },
                         callback: function(value) {
                             const hours = Math.floor(value / 60);
                             const mins = value % 60;
                             return `${hours}j ${mins}m`;
                         }
                     }
+                },
+                x: {
+                    border: { display: false },
+                    grid: { 
+                        color: NEUTRAL_COLOR,
+                        drawBorder: false 
+                    },
+                    ticks: { 
+                        color: NEUTRAL_COLOR, 
+                        font: { size: 11 } 
+                    }
                 }
             }
-        },
-        true // darkTotal = true
-    );
+        }
+    });
 }
 
-// Init
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     const currentYear = new Date().getFullYear();
     const barYear = document.getElementById('bar_year');
     const timeYear = document.getElementById('time_year');
 
+    // Populate year options
     for (let y = currentYear; y >= currentYear - 5; y--) {
         barYear.innerHTML += `<option value="${y}">${y}</option>`;
         timeYear.innerHTML += `<option value="${y}">${y}</option>`;
     }
 
+    // Event listeners
     document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
     document.getElementById('resetBarBtn').addEventListener('click', () => {
         barYear.value = currentYear;
@@ -536,10 +589,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTimeChart(currentYear);
     });
 
+    // Initial load
     loadBarChart(currentYear);
     loadTimeChart(currentYear);
 
-    // Observer untuk dark mode
+    // Dark mode observer
     new MutationObserver(() => {
         if (barChart) loadBarChart(barYear.value);
         if (timeChart) loadTimeChart(timeYear.value);
@@ -549,6 +603,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
 
 </x-app-layout>
