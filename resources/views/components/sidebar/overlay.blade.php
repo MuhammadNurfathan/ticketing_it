@@ -1,6 +1,7 @@
-<!-- Mobile Overlay - Muncul kalau sidebar dibuka di mobile -->
-<div x-show="isSidebarOpen && isMobile" 
-     @click="toggleSidebar()"
+
+<!-- Jadi ini (pakai lg:hidden aja): -->
+<div x-show="isSidebarOpen" 
+     @click="isSidebarOpen = false"
      x-transition:enter="transition-opacity ease-linear duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"

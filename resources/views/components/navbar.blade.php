@@ -9,14 +9,14 @@
 
     <!-- Left Section -->
     <div class="flex items-center gap-3">
-        <!-- Hamburger Button (Mobile Only) -->
+        <!-- Hamburger Button (Mobile Only) - GANTI @click -->
         <x-button
             type="button"
             class="lg:hidden"
             icon-only
             variant="secondary"
             sr-text="Open main menu"
-            x-on:click="toggleSidebar()"
+            @click="isSidebarOpen = !isSidebarOpen"
         >
             <x-heroicon-o-menu
                 aria-hidden="true"
@@ -26,19 +26,20 @@
 
         <!-- Logo & App Name (Mobile Only) -->
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2 lg:hidden">
-            <span class="text-base font-bold text-gray-800 dark:text-white">TICKETING IT</span>
+            <x-application-logo aria-hidden="true" class="w-8 h-8" />
+            <span class="text-base font-bold text-gray-800 dark:text-white">Ticketing IT</span>
         </a>
     </div>
 
     <!-- Right Section -->
     <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Dark Mode Toggle -->
+        <!-- Dark Mode Toggle - GANTI x-on:click -->
         <x-button
             type="button"
             icon-only
             variant="secondary"
             sr-text="Toggle dark mode"
-            x-on:click="toggleTheme"
+            @click="isDarkMode = !isDarkMode"
         >
             <x-heroicon-o-moon
                 x-show="!isDarkMode"
@@ -53,7 +54,17 @@
             />
         </x-button>
 
-    
+        <!-- Notifications (Desktop Only) -->
+        <x-button
+            type="button"
+            class="hidden lg:inline-flex relative"
+            icon-only
+            variant="secondary"
+            sr-text="Notifications"
+        >
+            <x-heroicon-o-bell aria-hidden="true" class="w-5 h-5" />
+            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        </x-button>
 
         <!-- User Dropdown -->
         <x-dropdown align="right" width="48">
@@ -92,7 +103,12 @@
                 <!-- Profile -->
                 <x-dropdown-link :href="route('profile.edit')">
                     {{ __('Profile') }}
-                </x-dropdown-link>  
+                </x-dropdown-link>
+
+                <!-- Settings (Optional) -->
+                <x-dropdown-link href="#">
+                    {{ __('Settings') }}
+                </x-dropdown-link>
 
                 <div class="border-t dark:border-gray-700"></div>
 

@@ -16,14 +16,14 @@
         </template>
     </a>
 
-    <!-- Toggle button - HANYA untuk Desktop & Mobile Close -->
+    <!-- Toggle button - GANTI @click -->
     <x-button
         type="button"
         iconOnly
         srText="Toggle sidebar"
         variant="secondary"
         x-show="isSidebarOpen || isSidebarHovered"
-        @click="toggleSidebar()"
+        @click="isSidebarOpen = !isSidebarOpen"
     >
         <!-- Desktop: Fold icons -->
         <x-icons.menu-fold-right x-show="!isSidebarOpen" aria-hidden="true" class="hidden w-6 h-6 lg:block" />
