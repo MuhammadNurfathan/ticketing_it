@@ -1,4 +1,3 @@
-
 import "./bootstrap";
 import DataTable from "datatables.net";
 import DataTableResponsive from "datatables.net-responsive";
@@ -6,12 +5,10 @@ import Swal from "sweetalert2";
 import "datatables.net-dt/css/dataTables.dataTables.css";
 import "datatables.net-responsive-dt/css/responsive.dataTables.css";
 
-
 DataTable.use(DataTableResponsive);
 
 window.DataTable = DataTable;
 window.Swal = Swal;
-
 
 import Chart from "chart.js/auto";
 window.Chart = Chart;
@@ -40,26 +37,12 @@ import "perfect-scrollbar/css/perfect-scrollbar.css";
 
 window.PerfectScrollbar = PerfectScrollbar;
 
+// ===== SATU-SATUNYA ALPINE INITIALIZATION =====
 document.addEventListener("alpine:init", () => {
   Alpine.data("mainState", () => {
     let lastScrollTop = 0;
 
-    const init = function () {
-      window.addEventListener("scroll", () => {
-        const st = window.pageYOffset || document.documentElement.scrollTop;
-
-        this.scrollingDown = st > lastScrollTop && st > 0;
-        this.scrollingUp = st < lastScrollTop;
-
-        if (st === 0) {
-          this.scrollingDown = false;
-          this.scrollingUp = false;
-        }
-
-        lastScrollTop = Math.max(st, 0);
-      });
-    };
-
+    // Helper functions untuk theme
     const getTheme = () => {
       const darkMode = window.localStorage.getItem("dark");
       if (darkMode !== null) return JSON.parse(darkMode);
@@ -70,30 +53,83 @@ document.addEventListener("alpine:init", () => {
 
     const setTheme = (value) => {
       window.localStorage.setItem("dark", value);
+      window.localStorage.setItem("darkMode", value);
     };
 
     return {
-      init,
+      // ===== INITIALIZATION =====
+      init() {
+        // Watch for dark mode changes
+        this.$watch("isDarkMode", (val) => {
+          setTheme(val);
+        });
+
+        // Handle scroll events
+        window.addEventListener("scroll", () => {
+          const st = window.pageYOffset || document.documentElement.scrollTop;
+
+          this.scrollingDown = st > lastScrollTop && st > 0;
+          this.scrollingUp = st < lastScrollTop;
+
+          if (st === 0) {
+            this.scrollingDown = false;
+            this.scrollingUp = false;
+          }
+
+          lastScrollTop = Math.max(st, 0);
+        });
+
+        // Initial responsive check
+        this.handleWindowResize();
+      },
+
+      // ===== STATE =====
       isDarkMode: getTheme(),
+      isSidebarOpen: window.innerWidth >= 1024,
+      isSidebarHovered: false,
+      isMobile: window.innerWidth < 1024,
+      scrollingDown: false,
+      scrollingUp: false,
+      showSearch: false, // 👈 Ini yang hilang!
+
+      // ===== METHODS =====
       toggleTheme() {
         this.isDarkMode = !this.isDarkMode;
-        setTheme(this.isDarkMode);
       },
-      isSidebarOpen: window.innerWidth > 1024,
-      isSidebarHovered: false,
+
+      toggleDarkMode() {
+        this.isDarkMode = !this.isDarkMode;
+      },
+
+      toggleSidebar() {
+        this.isSidebarOpen = !this.isSidebarOpen;
+      },
+
+      toggleSearch() {
+        this.showSearch = !this.showSearch;
+      },
+
       handleSidebarHover(value) {
         if (window.innerWidth < 1024) return;
         this.isSidebarHovered = value;
       },
+
       handleWindowResize() {
-        this.isSidebarOpen = window.innerWidth > 1024;
+        const width = window.innerWidth;
+        this.isMobile = width < 1024;
+
+        // Auto manage sidebar based on screen size
+        if (this.isMobile) {
+          this.isSidebarOpen = false;
+          this.showSearch = false; // Close search on mobile
+        } else {
+          this.isSidebarOpen = true;
+        }
       },
-      scrollingDown: false,
-      scrollingUp: false,
     };
   });
 });
 
-// Start Alpine
+// ===== START ALPINE HANYA SEKALI! =====
 Alpine.plugin(collapse);
 Alpine.start();

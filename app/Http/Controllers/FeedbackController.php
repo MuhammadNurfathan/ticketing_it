@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\feedback;
+use App\Models\Feedback;
 use App\Models\Ticket;
 
 use Illuminate\Http\Request;
@@ -11,8 +11,8 @@ class FeedbackController extends Controller
 {
     public function index()
     {
-        $Rate =number_format(feedback::avg('rating'),1) ;
-        $feedback = feedback::latest()->get();
+        $Rate =number_format(Feedback::avg('rating'),1) ;
+        $feedback = Feedback::latest()->get();
         return view('feedback.index', compact('feedback','Rate'));
     }
 

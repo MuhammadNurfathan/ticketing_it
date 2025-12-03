@@ -45,12 +45,12 @@
                             <div
                                 class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
                             </div>
-                            <p class="mt-4 text-gray-600 dark:text-gray-400">Memuat data...</p>
+                            <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                         </div>
 
                         <div id="lineNoDataMessage"
                             class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden z-10">
-                            Tidak ada data untuk ditampilkan
+                            No Data Available
                         </div>
 
                         <div id="lineChartContainer" class="w-full p-4">
@@ -105,7 +105,7 @@
                         <div
                             class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
                         </div>
-                        <p class="mt-4 text-gray-600 dark:text-gray-400">Memuat data...</p>
+                        <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                     </div>
 
                     <div id="pieChartContainer" class="flex justify-center items-center" style="min-height: 400px;">
@@ -115,7 +115,7 @@
                     </div>
 
                     <div id="pieNoDataMessage" class="text-center py-12 hidden">
-                        <p class="text-gray-500 dark:text-gray-400">Tidak ada data untuk ditampilkan</p>
+                        <p class="text-gray-500 dark:text-gray-400">No Data Available</p>
                     </div>
                 </div>
 
@@ -169,7 +169,6 @@
             return isDarkMode() ? '#1f2937' : '#ffffff';
         }
 
-
         let pieChart, lineChart;
 
         async function loadStats(startDate = null, endDate = null) {
@@ -177,6 +176,7 @@
             const avgEl = document.getElementById('avgResolutionTime');
             const slaEl = document.getElementById('slaPercentage');
             let url = '/api/tickets/statistik';
+
             const params = new URLSearchParams();
             if (startDate) params.append('start_date', startDate);
             if (endDate) params.append('end_date', endDate);
@@ -185,9 +185,10 @@
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                fullEl.innerText = data.success ? data.data.fullResolutionTime:'-';
-                avgEl.innerText = data.success ? data.data.avgResolutionTime: '-';
-                slaEl.innerText = data.success ? data.data.slaPercentage + '%': '-';
+
+                fullEl.innerText = data.success ? data.data.fullResolutionTime : '-';
+                avgEl.innerText = data.success ? data.data.avgResolutionTime : '-';
+                slaEl.innerText = data.success ? data.data.slaPercentage + '%' : '-';
             } catch (err) {
                 console.error(err);
                 fullEl.innerText = '-';
@@ -197,7 +198,9 @@
         }
 
         function generateColors(count) {
-            const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16',
+            const colors = [
+                '#3b82f6', '#ef4444', '#10b981', '#f59e0b',
+                '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16',
                 '#f97316', '#6366f1'
             ];
             return Array.from({
@@ -205,9 +208,13 @@
             }, (_, i) => colors[i % colors.length]);
         }
 
+        // =========================
+        //        PIE CHART
+        // =========================
         async function loadPieChart() {
             const start = document.getElementById('pie_start_date').value;
             const end = document.getElementById('pie_end_date').value;
+
             const container = document.getElementById('pieChartContainer');
             const noData = document.getElementById('pieNoDataMessage');
             const loading = document.getElementById('pieLoadingIndicator');
@@ -221,10 +228,8 @@
             loading.classList.remove('hidden');
             container.classList.add('hidden');
             noData.classList.add('hidden');
-            if (pieChart) {
-                pieChart.destroy();
-                pieChart = null;
-            }
+
+            if (pieChart) pieChart.destroy();
 
             let url = '/api/reports/tickets-by-category';
             const params = new URLSearchParams();
@@ -235,12 +240,16 @@
             try {
                 const res = await fetch(url);
                 const data = await res.json();
+
                 loading.classList.add('hidden');
-                if (data.data && data.data.length) {
+
+                if (data.data && data.data.length > 0) {
                     container.classList.remove('hidden');
+
                     const labels = data.data.map(i => i.category || 'Unknown');
                     const values = data.data.map(i => i.total || 0);
                     const colors = generateColors(data.data.length);
+
                     pieChart = new Chart(canvas, {
                         type: 'pie',
                         data: {
@@ -254,7 +263,6 @@
                         },
                         options: {
                             responsive: true,
-                            maintainAspectRatio: true,
                             plugins: {
                                 legend: {
                                     position: 'bottom',
@@ -265,20 +273,15 @@
                                         },
                                         padding: 15
                                     }
-                                },
-                                tooltip: {
-                                    backgroundColor: isDarkMode() ? '#ffffff' : '#374151',
-                                    titleColor: getTextColor(),
-                                    bodyColor: getTextColor(),
-                                    borderColor: getGridColor(),
-                                    borderWidth: 1
                                 }
                             }
                         }
                     });
+
                 } else {
                     noData.classList.remove('hidden');
                 }
+
             } catch (err) {
                 console.error(err);
                 loading.classList.add('hidden');
@@ -286,8 +289,12 @@
             }
         }
 
+        // =========================
+        //        LINE CHART
+        // =========================
         async function loadLineChart() {
             const year = document.getElementById('line_year').value || new Date().getFullYear();
+
             const container = document.getElementById('lineChartContainer');
             const noData = document.getElementById('lineNoDataMessage');
             const loading = document.getElementById('lineLoadingIndicator');
@@ -296,110 +303,102 @@
             loading.classList.remove('hidden');
             container.classList.add('hidden');
             noData.classList.add('hidden');
-            if (lineChart) {
-                lineChart.destroy();
-                lineChart = null;
-            }
+
+            if (lineChart) lineChart.destroy();
 
             try {
                 const res = await fetch(`/api/reports/tickets-done-per-month?year=${year}`);
                 const data = await res.json();
+
                 loading.classList.add('hidden');
-                if (data.data && data.data.length) {
-                    container.classList.remove('hidden');
-                    const labels = data.data.map(i => i.month || '');
-                    const values = data.data.map(i => i.total || 0);
-                    lineChart = new Chart(canvas, {
-                        type: 'line',
-                        data: {
-                            labels,
-                            datasets: [{
-                                label: 'Ticket Selesai',
-                                data: values,
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4,
-                                borderColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
-                                backgroundColor: isDarkMode() ? 'rgba(59,130,246,0.1)' :
-                                    'rgba(96,165,250,0.1)',
-                                pointRadius: 4,
-                                pointBackgroundColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
-                                pointBorderColor: getBgColor(),
-                                pointBorderWidth: 2
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    labels: {
-                                        color: getTextColor(),
-                                        font: {
-                                            size: 12
-                                        },
-                                        padding: 15
-                                    }
-                                },
-                                tooltip: {
-                                    backgroundColor: isDarkMode() ? '#ffffff' : '#374151',
-                                    titleColor: getTextColor(),
-                                    bodyColor: getTextColor(),
-                                    borderColor: getGridColor(),
-                                    borderWidth: 1
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    grid: {
-                                        color: getGridColor(),
-                                        drawBorder: false
-                                    },
-                                    ticks: {
-                                        color: getTextColor(),
-                                        font: {
-                                            size: 11
-                                        }
-                                    }
-                                },
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: getGridColor(),
-                                        drawBorder: false
-                                    },
-                                    ticks: {
-                                        color: getTextColor(),
-                                        font: {
-                                            size: 11
-                                        },
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    noData.classList.remove('hidden');
+
+                if (data.data && data.data.length > 0) {
+
+    const labels = data.data.map(i => i.month || '');
+    const values = data.data.map(i => i.total || 0);
+
+    // 🚨 NEW: jika semua total = 0 → jangan tampilkan chart
+    const allZero = values.every(v => v === 0);
+    if (allZero) {
+        container.classList.add('hidden');
+        noData.classList.remove('hidden');
+        return;
+    }
+
+    noData.classList.add('hidden');
+    container.classList.remove('hidden');
+
+    lineChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Ticket Selesai',
+                data: values,
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                borderColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
+                backgroundColor: isDarkMode()
+                    ? 'rgba(59,130,246,0.15)'
+                    : 'rgba(96,165,250,0.15)',
+                pointRadius: 4,
+                pointBackgroundColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
+                pointBorderColor: getBgColor(),
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    ticks: { color: getTextColor() },
+                    grid: { color: '#6B7280' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: getTextColor(),
+                        callback: value => Number.isInteger(value) ? value : null,
+                        precision: 0
+                    },
+                    grid: { color: '#6B7280' }
                 }
+            }
+        }
+    });
+
+} else {
+    container.classList.add('hidden');
+    noData.classList.remove('hidden');
+}
+
+
             } catch (err) {
                 console.error(err);
                 loading.classList.add('hidden');
+                container.classList.add('hidden');
                 noData.classList.remove('hidden');
             }
         }
+
+
+
+        // =========================
+        //     ON PAGE LOAD
+        // =========================
 
         document.addEventListener('DOMContentLoaded', () => {
             const pieStart = document.getElementById('pie_start_date');
             const pieEnd = document.getElementById('pie_end_date');
             const lineYear = document.getElementById('line_year');
+
             const today = new Date();
-            const thirtyDaysAgo = new Date(today);
-            thirtyDaysAgo.setDate(today.getDate() - 30);
+            const minus30 = new Date(today);
+            minus30.setDate(today.getDate() - 30);
+
             pieEnd.valueAsDate = today;
-            pieStart.valueAsDate = thirtyDaysAgo;
+            pieStart.valueAsDate = minus30;
             lineYear.value = today.getFullYear();
 
             loadPieChart();
@@ -410,12 +409,14 @@
                 loadPieChart();
                 loadStats(pieStart.value, pieEnd.value);
             });
+
             document.getElementById('resetPieBtn').addEventListener('click', () => {
-                pieStart.valueAsDate = thirtyDaysAgo;
+                pieStart.valueAsDate = minus30;
                 pieEnd.valueAsDate = today;
                 loadPieChart();
                 loadStats(pieStart.value, pieEnd.value);
             });
+
             document.getElementById('filterLineBtn').addEventListener('click', loadLineChart);
             document.getElementById('resetLineBtn').addEventListener('click', () => {
                 lineYear.value = today.getFullYear();
@@ -425,15 +426,18 @@
             const observer = new MutationObserver(() => {
                 Chart.defaults.color = getTextColor();
                 Chart.defaults.borderColor = getGridColor();
+
                 if (pieChart) loadPieChart();
                 if (lineChart) loadLineChart();
             });
+
             observer.observe(document.documentElement, {
                 attributes: true,
                 attributeFilter: ['class']
             });
         });
     </script>
+
 
     <style>
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -453,5 +457,5 @@
             max-height: 400px;
         }
     </style>
-    
+
 </x-app-layout>

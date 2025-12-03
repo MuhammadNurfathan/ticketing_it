@@ -75,16 +75,23 @@ Route::middleware(['auth', 'role:2'])->group(function () {
     Route::get('/reports/ProjectMonitoring', function () { return view('reports.ProjectMonitoring'); })->name('reports.ProjectMonitoring');
 });
 
-// File ticket
 Route::get('/ticket-files/{filename}', function ($filename) {
+    // bersihkan nama file
     $filename = basename($filename);
+
+    // path ke file sebenarnya
     $path = storage_path('app/public/tickets/' . $filename);
-    if (!file_exists($path)) abort(404, 'File tidak ditemukan');
+
+    if (!file_exists($path)) {
+        abort(404, 'File tidak ditemukan');
+    }
+
     return response()->file($path, [
-        'Content-Type' => mime_content_type($path),
-        'Content-Disposition' => 'inline; filename="' . $filename . '"',
-        'Cache-Control' => 'public, max-age=31536000',
+        'Content-Type'        => mime_content_type($path),
+        'Content-Disposition' => 'inline; filename="'.$filename.'"',
     ]);
-})->name('ticket.file');
+})
+->middleware(['auth', 'role:1,2,3'])
+->name('ticket.file');
 
 require __DIR__ . '/auth.php';

@@ -1,7 +1,7 @@
 <?php
 // routes/api.php
 
-use App\Http\Controllers\api\ProjectReportController;
+use App\Http\Controllers\API\ProjectReportController;
 use App\Http\Controllers\API\TicketReportController;
 use Illuminate\Support\Facades\Route;
 

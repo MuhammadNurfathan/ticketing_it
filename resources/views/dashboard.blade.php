@@ -1,8 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('TICKETING IT') }}
-        </h2>
+
     </x-slot>
 
     <div class="py-8 sm:py-12">

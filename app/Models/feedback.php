@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Traits\Timestamp;
 use Illuminate\Database\Eloquent\Model;
 
-class feedback extends Model
+class Feedback extends Model
 {
     use SoftDeletes;
     protected $fillable = ['ticket_id','description','rating'];

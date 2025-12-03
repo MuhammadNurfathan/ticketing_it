@@ -91,7 +91,7 @@ class TicketsController extends Controller
         }
         $data = Ticket::data();
 
-        return view('tickets.createUser', [
+        return view('tickets.CreateUser', [
             'users'          => $data['users'],
             'categories'     => $data['categories'],
             'generateticket' => $data['generateticket'],
@@ -311,23 +311,34 @@ class TicketsController extends Controller
 
     public function updateStatusDone(Request $request, Ticket $ticket)
     {
+        // Validasi input
         $validated = $request->validate([
             'status_id'  => 'required|integer',
             'time_spent' => 'nullable|integer',
             'solution'   => 'required|string',
             'notes'      => 'nullable|string',
         ]);
-
+    
+        // Hitung time_spent
         $timeSpent = $validated['time_spent'] ?? $ticket->time_spent ?? 0;
-        $validated['is_late'] = $timeSpent > 480;
         $validated['time_spent'] = $timeSpent;
-
+    
+        // Tandai apakah terlambat (lebih dari 480 menit / 8 jam)
+        $validated['is_late'] = $timeSpent > 480;
+    
+        // Jika status Done (3), set end_date sekarang
+        if ($validated['status_id'] == 3) {
+            $validated['end_date'] = now();
+        }
+    
+        // Update ticket dengan data validasi
         $ticket->update($validated);
-
+    
+        // Kirim notifikasi Done
         if ($validated['status_id'] == 3) {
             $this->sendDoneNotification($ticket);
         }
-
+    
         return back()->with('success', 'Ticket updated successfully.');
     }
 }

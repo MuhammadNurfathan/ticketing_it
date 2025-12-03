@@ -209,9 +209,9 @@
 
                     if (data.length === 0) {
                         tbody.innerHTML =
-                            `<tr><td colspan="8" class="text-center py-8 text-gray-400 italic">No Data</td></tr>`;
+                            `<tr><td colspan="8" class="text-center py-8 text-gray-400 italic">No Data Available</td></tr>`;
                         cardBody.innerHTML =
-                            `<div class="text-center py-4 text-gray-400 italic">No Data</div>`;
+                            `<div class="text-center py-4 text-gray-400 italic">No Data Available</div>`;
                         return;
                     }
 
@@ -268,7 +268,7 @@
                     const projects = await res.json();
                     if (!projects.length) {
                         ganttContainer.innerHTML =
-                            `<p class="text-center text-gray-500 py-8 italic">No Data Gantt Chart.</p>`;
+                            `<p class="text-center text-gray-500 py-8 italic">No Data Available.</p>`;
                         return;
                     }
 

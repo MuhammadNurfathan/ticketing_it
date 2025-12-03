@@ -323,14 +323,16 @@
                                         {{ $ticket->request_date?->format('Y-m-d') }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        @if ($ticket->image)
-                                            <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
-                                                class="text-blue-600 underline">
-                                                Lihat File
-                                            </a>
-                                        @else
-                                            <span class="text-gray-500 text-sm italic">No media</span>
-                                        @endif
+                                       @if ($ticket->image)
+    <a href="{{ route('ticket.file', basename($ticket->image)) }}"
+       target="_blank"
+       class="text-blue-600 underline">
+        Lihat File
+    </a>
+@else
+    <span class="text-gray-500 text-sm italic">No media</span>
+@endif
+
                                     </td>
                                     @auth
                                         @if (Auth::user()->role_id != 3)
@@ -514,14 +516,16 @@
 
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    @if ($ticket->image)
-                                        <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank"
-                                            class="text-blue-600 underline">
-                                            Lihat File
-                                        </a>
-                                    @else
-                                        <span class="text-gray-500 text-sm italic">No media</span>
-                                    @endif
+                                   @if ($ticket->image)
+    <a href="{{ route('ticket.file', basename($ticket->image)) }}"
+       target="_blank"
+       class="text-blue-600 underline">
+        Lihat File
+    </a>
+@else
+    <span class="text-gray-500 text-sm italic">No media</span>
+@endif
+
                                 </td>
 
                                 @auth
@@ -654,9 +658,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
-
-
-    </script>
 {{-- ================= DONE BUTTON ================= --}}
 <script>
     document.querySelectorAll('.doneBtn').forEach(btn => {

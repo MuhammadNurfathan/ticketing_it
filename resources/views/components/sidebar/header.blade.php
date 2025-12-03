@@ -16,17 +16,20 @@
         </template>
     </a>
 
-    <!-- Toggle button -->
+    <!-- Toggle button - HANYA untuk Desktop & Mobile Close -->
     <x-button
         type="button"
         iconOnly
         srText="Toggle sidebar"
         variant="secondary"
         x-show="isSidebarOpen || isSidebarHovered"
-        @click="isSidebarOpen = !isSidebarOpen"
+        @click="toggleSidebar()"
     >
+        <!-- Desktop: Fold icons -->
         <x-icons.menu-fold-right x-show="!isSidebarOpen" aria-hidden="true" class="hidden w-6 h-6 lg:block" />
         <x-icons.menu-fold-left x-show="isSidebarOpen" aria-hidden="true" class="hidden w-6 h-6 lg:block" />
+        
+        <!-- Mobile: X icon untuk close -->
         <x-heroicon-o-x aria-hidden="true" class="w-6 h-6 lg:hidden" />
     </x-button>
 </div>

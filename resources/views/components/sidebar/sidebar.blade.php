@@ -6,7 +6,8 @@
             '-translate-x-full w-64 md:w-16 md:translate-x-0': !isSidebarOpen && !isSidebarHovered,
         }" 
         style="transition-property: width, transform; transition-duration: 150ms;"
-        @mouseenter="handleSidebarHover(true)" @mouseleave="handleSidebarHover(false)"
+        @mouseenter="handleSidebarHover(true)" 
+        @mouseleave="handleSidebarHover(false)"
 >
     <x-sidebar.header />
 

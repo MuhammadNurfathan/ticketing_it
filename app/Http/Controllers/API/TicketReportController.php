@@ -12,51 +12,57 @@ use Carbon\Carbon;
 
 class TicketReportController extends Controller
 {
-    public function ticketsByCategory(Request $request)
-    {
-        try {
-            $request->validate([
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date|after_or_equal:start_date',
-            ]);
+public function ticketsByCategory(Request $request)
+{
+    try {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
 
-            $query = Ticket::select('problem_category_id', DB::raw('count(*) as total'))
-                ->with('problemCategory:id,problem_category_name');
+        // Ambil tiket DONE saja
+        $query = Ticket::select('problem_category_id', DB::raw('COUNT(*) as total'))
+            ->with('problemCategory:id,problem_category_name');
 
-            if ($request->start_date) {
-                $startDate = Carbon::parse($request->start_date)->startOfDay();
-                $query->where('created_at', '>=', $startDate);
-            }
-
-            if ($request->end_date) {
-                $endDate = Carbon::parse($request->end_date)->endOfDay();
-                $query->where('created_at', '<=', $endDate);
-            }
-
-            $tickets = $query->groupBy('problem_category_id')->get();
-
-            $data = $tickets->map(function ($ticket) {
-                return [
-                    'category' => $ticket->problemCategory?->problem_category_name ?? 'Unknown',
-                    'total' => $ticket->total
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $data,
-                'filters' => [
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+        // --- FIX TERPENTING ---
+        // Kamu tidak punya completed_at → jadi pakai end_date
+        if ($request->start_date) {
+            $start = Carbon::parse($request->start_date)->startOfDay();
+            $query->where('end_date', '>=', $start);
         }
+
+        if ($request->end_date) {
+            $end = Carbon::parse($request->end_date)->endOfDay();
+            $query->where('end_date', '<=', $end);
+        }
+        // ----------------------
+
+        $tickets = $query->groupBy('problem_category_id')->get();
+
+        $data = $tickets->map(function ($ticket) {
+            return [
+                'category' => $ticket->problemCategory?->problem_category_name ?? 'Unknown',
+                'total' => $ticket->total
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'filters' => [
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     public function ticketsDonePerMonth(Request $request)
     {

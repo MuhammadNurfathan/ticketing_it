@@ -139,11 +139,11 @@
                             <div
                                 class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
                             </div>
-                            <p class="mt-4 text-gray-600 dark:text-gray-400">Memuat data...</p>
+                            <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                         </div>
                         <div id="barNoDataMessage"
                             class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden z-10">
-                            Tidak ada data untuk ditampilkan
+                            No Data Available
                         </div>
                         <div id="barChartContainer" class="w-full p-4">
                             <canvas id="myBarChart"></canvas>
@@ -188,11 +188,11 @@
                             <div
                                 class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
                             </div>
-                            <p class="mt-4 text-gray-600 dark:text-gray-400">Memuat data...</p>
+                            <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                         </div>
                         <div id="timeNoDataMessage"
                             class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden z-10">
-                            Tidak ada data untuk ditampilkan
+                            No Data Available
                         </div>
                         <div id="timeChartContainer" class="w-full p-4">
                             <canvas id="timeSpentChart"></canvas>
@@ -242,33 +242,33 @@
         }
     </style>
 
-{{-- Preview Modal Script --}}
-<script>
-    document.getElementById('previewBtn').addEventListener('click', async () => {
-        const start = document.getElementById('start_date').value;
-        const end = document.getElementById('end_date').value;
+    {{-- Preview Modal Script --}}
+    <script>
+        document.getElementById('previewBtn').addEventListener('click', async () => {
+            const start = document.getElementById('start_date').value;
+            const end = document.getElementById('end_date').value;
 
-        if (!start || !end) {
-            alert('Isi tanggal mulai dan tanggal akhir terlebih dahulu.');
-            return;
-        }
-
-        try {
-            const res = await fetch(`/api/tickets/preview?start_date=${start}&end_date=${end}`);
-            const result = await res.json();
-
-            if (!result.data || result.data.length === 0) {
-                alert('Tidak ada data pada rentang tanggal tersebut.');
+            if (!start || !end) {
+                alert('Isi tanggal mulai dan tanggal akhir terlebih dahulu.');
                 return;
             }
 
-            const tbody = document.getElementById('previewTableBody');
-            tbody.innerHTML = '';
+            try {
+                const res = await fetch(`/api/tickets/preview?start_date=${start}&end_date=${end}`);
+                const result = await res.json();
 
-            result.data.forEach(t => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
-                row.innerHTML = `
+                if (!result.data || result.data.length === 0) {
+                    alert('There is no data in that date range.');
+                    return;
+                }
+
+                const tbody = document.getElementById('previewTableBody');
+                tbody.innerHTML = '';
+
+                result.data.forEach(t => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
+                    row.innerHTML = `
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.ticket_code}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.requestor_name}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.support_name}</td>
@@ -280,328 +280,364 @@
                     <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.is_late}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.created_at}</td>
                 `;
-                tbody.appendChild(row);
-            });
+                    tbody.appendChild(row);
+                });
 
+                const modal = document.getElementById('previewModal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
+
+            } catch (err) {
+                console.error(err);
+                alert('Gagal memuat preview.');
+            }
+        });
+
+        document.getElementById('closePreview').addEventListener('click', () => {
             const modal = document.getElementById('previewModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
+            modal.querySelector('div').classList.replace('scale-100', 'scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        });
 
-        } catch (err) {
-            console.error(err);
-            alert('Gagal memuat preview.');
-        }
-    });
+        document.getElementById('confirmDownload').addEventListener('click', () => {
+            const start = document.getElementById('start_date').value;
+            const end = document.getElementById('end_date').value;
+            window.location.href = `/api/tickets/export?start_date=${start}&end_date=${end}`;
+            document.getElementById('previewModal').classList.add('hidden');
+        });
+    </script>
 
-    document.getElementById('closePreview').addEventListener('click', () => {
-        const modal = document.getElementById('previewModal');
-        modal.querySelector('div').classList.replace('scale-100', 'scale-95');
-        setTimeout(() => modal.classList.add('hidden'), 200);
-    });
+    {{-- Tickets by Support Script --}}
+    <script>
+        async function loadTickets() {
+            const date = document.getElementById('date').value;
+            const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
 
-    document.getElementById('confirmDownload').addEventListener('click', () => {
-        const start = document.getElementById('start_date').value;
-        const end = document.getElementById('end_date').value;
-        window.location.href = `/api/tickets/export?start_date=${start}&end_date=${end}`;
-        document.getElementById('previewModal').classList.add('hidden');
-    });
-</script>
+            try {
+                const res = await fetch(url);
+                const json = await res.json();
+                const data = json.data || {};
 
-{{-- Tickets by Support Script --}}
-<script>
-    async function loadTickets() {
-        const date = document.getElementById('date').value;
-        const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+                const supports = {
+                    ticketsAzi: 'Azi',
+                    ticketsApri: 'Apri',
+                    ticketsBayu: 'Bayu',
+                    ticketsFatih: 'Fatih'
+                };
 
-        try {
-            const res = await fetch(url);
-            const json = await res.json();
-            const data = json.data || {};
+                const container = document.getElementById('ticketsContainer');
+                let html = '';
 
-            const supports = {
-                ticketsAzi: 'Azi',
-                ticketsApri: 'Apri',
-                ticketsBayu: 'Bayu',
-                ticketsFatih: 'Fatih'
-            };
-
-            const container = document.getElementById('ticketsContainer');
-            let html = '';
-
-            for (const key in supports) {
-                const tickets = data[key] || [];
-                html += `
+                for (const key in supports) {
+                    const tickets = data[key] || [];
+                    html += `
                     <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
                         <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">${supports[key]}</h3>
                         <div class="space-y-2">
                             ${
                                 tickets.length
                                     ? tickets.map(t => `
-                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                        </div>
-                                    `).join('')
-                                    : '<p class="text-center text-gray-400 dark:text-gray-500 italic">Tidak ada tiket</p>'
+                                                <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
+                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
+                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
+                                                </div>
+                                            `).join('')
+                                    : '<p class="text-center text-gray-400 dark:text-gray-500 italic">No Data Available</p>'
                             }
                         </div>
                     </div>
                 `;
+                }
+
+                container.innerHTML = html;
+
+            } catch (err) {
+                console.error('Error loading tickets:', err);
+                document.getElementById('ticketsContainer').innerHTML =
+                    '<p class="text-center text-red-500">Gagal memuat tiket</p>';
             }
-
-            container.innerHTML = html;
-
-        } catch (err) {
-            console.error('Error loading tickets:', err);
-            document.getElementById('ticketsContainer').innerHTML =
-                '<p class="text-center text-red-500">Gagal memuat tiket</p>';
         }
-    }
 
-    document.getElementById('filterBtn').addEventListener('click', loadTickets);
-    loadTickets();
-</script>
+        document.getElementById('filterBtn').addEventListener('click', loadTickets);
+        loadTickets();
+    </script>
 
-{{-- Bar & Time Charts Script --}}
-<script type="module">
-const NEUTRAL_COLOR = '#6B7280';
-const BAR_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+    {{-- Bar & Time Charts Script --}}
+    <script type="module">
+        const NEUTRAL_COLOR = '#6B7280';
+        const BAR_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
-let barChart = null;
-let timeChart = null;
+        let barChart = null;
+        let timeChart = null;
 
-// Utility functions
-const isDarkMode = () => document.documentElement.classList.contains('dark');
-const getTextColor = () => '#6B7280';
-const getGridColor = () => NEUTRAL_COLOR;
+        // Utility functions
+        const isDarkMode = () => document.documentElement.classList.contains('dark');
+        const getTextColor = () => '#6B7280';
+        const getGridColor = () => NEUTRAL_COLOR;
 
-// Base chart options
-function getBaseChartOptions(extraOptions = {}) {
-    return {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-                labels: {
-                    color: NEUTRAL_COLOR,
-                    font: { size: 12 },
-                    padding: 15
-                }
-            },
-            tooltip: {
-                backgroundColor: isDarkMode() ? '#374151' : '#fff',
-                titleColor: getTextColor(),
-                bodyColor: getTextColor(),
-                borderColor: getGridColor(),
-                borderWidth: 1
-            }
-        },
-        scales: {
-            x: {
-                border: { display: false },
-                grid: { 
-                    color: NEUTRAL_COLOR,
-                    drawBorder: false 
-                },
-                ticks: { 
-                    color: NEUTRAL_COLOR, 
-                    font: { size: 11 } 
-                }
-            },
-            y: {
-                beginAtZero: true,
-                border: { display: false },
-                grid: { 
-                    color: NEUTRAL_COLOR,
-                    drawBorder: false 
-                },
-                ticks: { 
-                    color: NEUTRAL_COLOR, 
-                    font: { size: 11 }, 
-                    stepSize: 1 
-                }
-            }
-        },
-        ...extraOptions
-    };
-}
-
-// Generic chart loader
-async function loadChart(config) {
-    const { url, canvas, container, loading, noData, instance, extraOptions = {}, useNeutralForTotal = false } = config;
-
-    loading.classList.remove('hidden');
-    container.classList.add('hidden');
-    noData.classList.add('hidden');
-
-    if (instance) {
-        instance.destroy();
-    }
-
-    try {
-        const res = await fetch(url);
-        const data = await res.json();
-        
-        loading.classList.add('hidden');
-
-        if (data.success && data.data.datasets.length > 0) {
-            container.classList.remove('hidden');
-
-            const datasets = data.data.datasets.map((ds, i) => {
-                let color = BAR_COLORS[i % BAR_COLORS.length];
-                
-                // Use neutral color for "Total Time Spent" if flag is set
-                if (useNeutralForTotal && ds.label === 'Total Time Spent') {
-                    color = NEUTRAL_COLOR;
-                }
-
-                return {
-                    ...ds,
-                    backgroundColor: color,
-                    borderColor: color,
-                    borderWidth: 2
-                };
-            });
-
-            return new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels: data.data.labels,
-                    datasets: datasets
-                },
-                options: getBaseChartOptions(extraOptions)
-            });
-        } else {
-            noData.classList.remove('hidden');
-            return null;
-        }
-    } catch (e) {
-        console.error('Chart loading error:', e);
-        loading.classList.add('hidden');
-        noData.classList.remove('hidden');
-        return null;
-    }
-}
-
-// Load Bar Chart (all datasets colorful)
-async function loadBarChart(year) {
-    barChart = await loadChart({
-        url: `/api/chart-tickets-by-dev?year=${year}`,
-        canvas: document.getElementById('myBarChart'),
-        container: document.getElementById('barChartContainer'),
-        loading: document.getElementById('barLoadingIndicator'),
-        noData: document.getElementById('barNoDataMessage'),
-        instance: barChart,
-        useNeutralForTotal: false
-    });
-}
-
-// Load Time Chart (Total Time Spent uses neutral color)
-async function loadTimeChart(year) {
-    timeChart = await loadChart({
-        url: `/api/chart-time-spent-by-dev?year=${year}`,
-        canvas: document.getElementById('timeSpentChart'),
-        container: document.getElementById('timeChartContainer'),
-        loading: document.getElementById('timeLoadingIndicator'),
-        noData: document.getElementById('timeNoDataMessage'),
-        instance: timeChart,
-        useNeutralForTotal: true,
-        extraOptions: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        color: NEUTRAL_COLOR,
-                        font: { size: 12 },
-                        padding: 15
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const minutes = context.raw;
-                            const hours = Math.floor(minutes / 60);
-                            const mins = minutes % 60;
-                            return `${context.dataset.label}: ${hours} jam ${mins} menit`;
+        // Base chart options
+        function getBaseChartOptions(extraOptions = {}) {
+            return {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: NEUTRAL_COLOR,
+                            font: {
+                                size: 12
+                            },
+                            padding: 15
                         }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    border: { display: false },
-                    grid: { 
-                        color: NEUTRAL_COLOR,
-                        drawBorder: false 
                     },
-                    ticks: {
-                        color: NEUTRAL_COLOR,
-                        font: { size: 11 },
-                        callback: function(value) {
-                            const hours = Math.floor(value / 60);
-                            const mins = value % 60;
-                            return `${hours}j ${mins}m`;
+                    tooltip: {
+                        backgroundColor: isDarkMode() ? '#374151' : '#fff',
+                        titleColor: getTextColor(),
+                        bodyColor: getTextColor(),
+                        borderColor: getGridColor(),
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            color: NEUTRAL_COLOR,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: NEUTRAL_COLOR,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        border: {
+                            display: false
+                        },
+                        grid: {
+                            color: NEUTRAL_COLOR,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: NEUTRAL_COLOR,
+                            font: {
+                                size: 11
+                            },
+                            stepSize: 1
                         }
                     }
                 },
-                x: {
-                    border: { display: false },
-                    grid: { 
-                        color: NEUTRAL_COLOR,
-                        drawBorder: false 
-                    },
-                    ticks: { 
-                        color: NEUTRAL_COLOR, 
-                        font: { size: 11 } 
-                    }
+                ...extraOptions
+            };
+        }
+
+        // Chart loader universal FIXED
+        async function loadChart(config) {
+            const {
+                url,
+                canvas,
+                container,
+                loading,
+                noData,
+                instance,
+                extraOptions = {},
+                useNeutralForTotal = false
+            } = config;
+
+            loading.classList.remove('hidden');
+            container.classList.add('hidden');
+            noData.classList.add('hidden');
+
+            if (instance) instance.destroy();
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                loading.classList.add('hidden');
+
+                // ❗ FIX: CEK KALO DATASET KOSONG ATAU SEMUA NILAI = 0
+                if (
+                    !data.success ||
+                    !data.data ||
+                    !data.data.datasets ||
+                    data.data.datasets.length === 0 ||
+                    data.data.datasets.every(ds => ds.data.every(v => v === 0))
+                ) {
+                    noData.classList.remove('hidden');
+                    return null;
                 }
+
+                container.classList.remove('hidden');
+
+                // Build datasets
+                const datasets = data.data.datasets.map((ds, i) => {
+                    let color = BAR_COLORS[i % BAR_COLORS.length];
+
+                    if (useNeutralForTotal && ds.label === 'Total Time Spent') {
+                        color = NEUTRAL_COLOR;
+                    }
+
+                    return {
+                        ...ds,
+                        backgroundColor: color,
+                        borderColor: color,
+                        borderWidth: 2
+                    };
+                });
+
+                return new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: data.data.labels,
+                        datasets: datasets
+                    },
+                    options: getBaseChartOptions(extraOptions)
+                });
+
+            } catch (e) {
+                console.error('Chart loading error:', e);
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+                return null;
             }
         }
-    });
-}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    const currentYear = new Date().getFullYear();
-    const barYear = document.getElementById('bar_year');
-    const timeYear = document.getElementById('time_year');
 
-    // Populate year options
-    for (let y = currentYear; y >= currentYear - 5; y--) {
-        barYear.innerHTML += `<option value="${y}">${y}</option>`;
-        timeYear.innerHTML += `<option value="${y}">${y}</option>`;
-    }
+        // Load Bar Chart (all datasets colorful)
+        async function loadBarChart(year) {
+            barChart = await loadChart({
+                url: `/api/chart-tickets-by-dev?year=${year}`,
+                canvas: document.getElementById('myBarChart'),
+                container: document.getElementById('barChartContainer'),
+                loading: document.getElementById('barLoadingIndicator'),
+                noData: document.getElementById('barNoDataMessage'),
+                instance: barChart,
+                useNeutralForTotal: false
+            });
+        }
 
-    // Event listeners
-    document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
-    document.getElementById('resetBarBtn').addEventListener('click', () => {
-        barYear.value = currentYear;
-        loadBarChart(currentYear);
-    });
-    document.getElementById('filterTimeBtn').addEventListener('click', () => loadTimeChart(timeYear.value));
-    document.getElementById('resetTimeBtn').addEventListener('click', () => {
-        timeYear.value = currentYear;
-        loadTimeChart(currentYear);
-    });
+        // Load Time Chart (Total Time Spent uses neutral color)
+        async function loadTimeChart(year) {
+            timeChart = await loadChart({
+                url: `/api/chart-time-spent-by-dev?year=${year}`,
+                canvas: document.getElementById('timeSpentChart'),
+                container: document.getElementById('timeChartContainer'),
+                loading: document.getElementById('timeLoadingIndicator'),
+                noData: document.getElementById('timeNoDataMessage'),
+                instance: timeChart,
+                useNeutralForTotal: true,
+                extraOptions: {
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: NEUTRAL_COLOR,
+                                font: {
+                                    size: 12
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const minutes = context.raw;
+                                    const hours = Math.floor(minutes / 60);
+                                    const mins = minutes % 60;
+                                    return `${context.dataset.label}: ${hours} jam ${mins} menit`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                color: NEUTRAL_COLOR,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: NEUTRAL_COLOR,
+                                font: {
+                                    size: 11
+                                },
+                                callback: function(value) {
+                                    const hours = Math.floor(value / 60);
+                                    const mins = value % 60;
+                                    return `${hours}j ${mins}m`;
+                                }
+                            }
+                        },
+                        x: {
+                            border: {
+                                display: false
+                            },
+                            grid: {
+                                color: NEUTRAL_COLOR,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: NEUTRAL_COLOR,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    // Initial load
-    loadBarChart(currentYear);
-    loadTimeChart(currentYear);
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentYear = new Date().getFullYear();
+            const barYear = document.getElementById('bar_year');
+            const timeYear = document.getElementById('time_year');
 
-    // Dark mode observer
-    new MutationObserver(() => {
-        if (barChart) loadBarChart(barYear.value);
-        if (timeChart) loadTimeChart(timeYear.value);
-    }).observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class']
-    });
-});
-</script>
+            // Populate year options
+            for (let y = currentYear; y >= currentYear - 5; y--) {
+                barYear.innerHTML += `<option value="${y}">${y}</option>`;
+                timeYear.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+
+            // Event listeners
+            document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
+            document.getElementById('resetBarBtn').addEventListener('click', () => {
+                barYear.value = currentYear;
+                loadBarChart(currentYear);
+            });
+            document.getElementById('filterTimeBtn').addEventListener('click', () => loadTimeChart(timeYear.value));
+            document.getElementById('resetTimeBtn').addEventListener('click', () => {
+                timeYear.value = currentYear;
+                loadTimeChart(currentYear);
+            });
+
+            // Initial load
+            loadBarChart(currentYear);
+            loadTimeChart(currentYear);
+
+            // Dark mode observer
+            new MutationObserver(() => {
+                if (barChart) loadBarChart(barYear.value);
+                if (timeChart) loadTimeChart(timeYear.value);
+            }).observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+    </script>
 
 </x-app-layout>
