@@ -45,7 +45,9 @@ document.addEventListener("alpine:init", () => {
     const getTheme = () => {
       const darkMode = window.localStorage.getItem("dark");
       if (darkMode !== null) return JSON.parse(darkMode);
-      return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
+      return (
+        window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false
+      );
     };
 
     const setTheme = (value) => {
@@ -77,7 +79,7 @@ document.addEventListener("alpine:init", () => {
 
       // ===== INIT =====
       init() {
-        // Watch for dark mode changes
+        // Watch untuk dark mode
         this.$watch("isDarkMode", (val) => setTheme(val));
 
         // Handle scroll events
@@ -92,18 +94,23 @@ document.addEventListener("alpine:init", () => {
           lastScrollTop = Math.max(st, 0);
         });
 
-        // cek system preference
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          this.isDarkMode = true;
+        // ===== localStorage sebagai prioritas =====
+        const stored = window.localStorage.getItem("dark");
+        if (stored !== null) {
+          this.isDarkMode = JSON.parse(stored);
+        } else {
+          // jika belum ada, baru pakai system preference
+          this.isDarkMode = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
         }
 
         // Initial window resize
         this.handleWindowResize();
-      }
+      },
     };
   });
 });
-
 
 // ===== START ALPINE =====
 Alpine.plugin(collapse);

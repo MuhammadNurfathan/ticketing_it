@@ -79,45 +79,46 @@
 
 
                         @php
-    $selectedAsset = null;
+                            $selectedAsset = null;
 
-    // Ambil asset dari ticket yang sedang diedit
-    if (isset($ticket) && $ticket->assets_id) {
-        $selectedAsset = $assets->firstWhere('id', $ticket->assets_id);
-    }
+                            // Ambil asset dari ticket yang sedang diedit
+                            if (isset($ticket) && $ticket->assets_id) {
+                                $selectedAsset = $assets->firstWhere('id', $ticket->assets_id);
+                            }
 
-    // Override dengan old() kalau validasi gagal
-    if (old('assets_id')) {
-        $selectedAsset = $assets->firstWhere('id', old('assets_id'));
-    }
+                            // Override dengan old() kalau validasi gagal
+                            if (old('assets_id')) {
+                                $selectedAsset = $assets->firstWhere('id', old('assets_id'));
+                            }
 
-    $selectedText = $selectedAsset 
-        ? ($selectedAsset->assets_name . ' - ' . $selectedAsset->assets_code . ' - ' . $selectedAsset->check_out_to)
-        : '';
-@endphp
+                            $selectedText = $selectedAsset
+                                ? $selectedAsset->assets_name .
+                                    ' - ' .
+                                    $selectedAsset->assets_code .
+                                    ' - ' .
+                                    $selectedAsset->check_out_to
+                                : '';
+                        @endphp
 
-                                               {{-- Assets --}}
-<div class="mb-4 relative">
-    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        Choose Assets
-    </label>
-  <input 
-    type="text" 
-    id="assets-search" 
-    placeholder="Cari assets..." 
-    value="{{ $selectedText }}"
-    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-/>
+                        {{-- Assets --}}
+                        <div class="mb-4 relative">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Choose Assets
+                            </label>
+                            <input type="text" id="assets-search" placeholder="Cari assets..."
+                                value="{{ $selectedText }}"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
 
-    <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}" >
-    <ul id="assets-results"
-        class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
-        @foreach ($assets as $ass)
-            <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                data-id="{{ $ass->id }}">{{ $ass->assets_name }} - {{ $ass->assets_code }} - {{ $ass->check_out_to }}</li>
-        @endforeach
-    </ul>
-</div>
+                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}">
+                            <ul id="assets-results"
+                                class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
+                                @foreach ($assets as $ass)
+                                    <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
+                                        data-id="{{ $ass->id }}">{{ $ass->assets_name }} -
+                                        {{ $ass->assets_code }} - {{ $ass->check_out_to }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
 
 
 
@@ -228,7 +229,7 @@
                         <div id="solution-container"
                             class="mb-4 {{ in_array(old('status_id', $ticket->status_id), [2, 3]) ? '' : 'hidden' }}">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Solution <span class="text-red-500">*</span>
+                                Solution
                             </label>
                             <textarea name="solution" id="solution" rows="3" placeholder="Masukkan solusi penyelesaian..."
                                 minlength="10"
@@ -259,7 +260,7 @@
                                             <source src="{{ route('ticket.file', $filename) }}" type="video/mp4">
                                         </video>
                                     @endif
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">📎 {{ $filename }}
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">ðŸ“Ž {{ $filename }}
                                     </p>
                                 </div>
                             @else
@@ -286,185 +287,185 @@
             </div>
         </div>
     </div>
-{{-- Assets Search --}}
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script>
-$(function() {
-    const $input = $('#assets-search');
-    const $results = $('#assets-results');
-    const $hidden = $('#assets-id');
+    {{-- Assets Search --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        $(function() {
+            const $input = $('#assets-search');
+            const $results = $('#assets-results');
+            const $hidden = $('#assets-id');
 
-    // Tampilkan list saat focus
-    $input.on('focus', () => $results.removeClass('hidden'));
+            // Tampilkan list saat focus
+            $input.on('focus', () => $results.removeClass('hidden'));
 
-    // Filter list saat ketik
-    $input.on('input', function() {
-        const val = $(this).val().toLowerCase();
-        let hasVisible = false;
+            // Filter list saat ketik
+            $input.on('input', function() {
+                const val = $(this).val().toLowerCase();
+                let hasVisible = false;
 
-        $results.children('li').each(function() {
-            const text = $(this).text().toLowerCase();
-            const match = text.includes(val);
-            $(this).toggleClass('hidden', !match);
-            if (match) hasVisible = true;
+                $results.children('li').each(function() {
+                    const text = $(this).text().toLowerCase();
+                    const match = text.includes(val);
+                    $(this).toggleClass('hidden', !match);
+                    if (match) hasVisible = true;
+                });
+
+                $results.toggleClass('hidden', !hasVisible);
+            });
+
+            // Pilih item
+            $results.on('click', 'li', function() {
+                $input.val($(this).text());
+                $hidden.val($(this).data('id'));
+                $results.addClass('hidden');
+            });
+
+            // Klik di luar â†’ sembunyikan list
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#assets-search, #assets-results').length) {
+                    $results.addClass('hidden');
+                }
+            });
         });
+    </script>
 
-        $results.toggleClass('hidden', !hasVisible);
-    });
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const statusSelect = document.getElementById("status-select");
+            const startContainer = document.getElementById("start-date-container");
+            const endContainer = document.getElementById("end-date-container");
+            const timeContainer = document.getElementById("time-spent-container");
+            const solutionContainer = document.getElementById("solution-container");
+            const notesContainer = document.getElementById("notes-container");
 
-    // Pilih item
-    $results.on('click', 'li', function() {
-        $input.val($(this).text());
-        $hidden.val($(this).data('id'));
-        $results.addClass('hidden');
-    });
+            const startInput = document.getElementById("start_datetime");
+            const endInput = document.getElementById("end_datetime");
+            const timeInput = document.getElementById("time_spent");
+            const solutionField = document.getElementById("solution");
+            const notesField = document.getElementById("notes");
+            const manualCheckbox = document.getElementById("manual_time");
 
-    // Klik di luar → sembunyikan list
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest('#assets-search, #assets-results').length) {
-            $results.addClass('hidden');
-        }
-    });
-});
-</script>
+            // Restore old status jika ada error
+            @if (old('status_id'))
+                statusSelect.value = "{{ old('status_id') }}";
+                const event = new Event('change');
+                statusSelect.dispatchEvent(event);
+            @endif
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const statusSelect = document.getElementById("status-select");
-    const startContainer = document.getElementById("start-date-container");
-    const endContainer = document.getElementById("end-date-container");
-    const timeContainer = document.getElementById("time-spent-container");
-    const solutionContainer = document.getElementById("solution-container");
-    const notesContainer = document.getElementById("notes-container");
+            // === STATUS CHANGE HANDLER ===
+            statusSelect.addEventListener("change", function() {
+                const statusId = parseInt(this.value);
 
-    const startInput = document.getElementById("start_datetime");
-    const endInput = document.getElementById("end_datetime");
-    const timeInput = document.getElementById("time_spent");
-    const solutionField = document.getElementById("solution");
-    const notesField = document.getElementById("notes");
-    const manualCheckbox = document.getElementById("manual_time");
+                // Sembunyikan semua field dulu
+                startContainer.classList.add("hidden");
+                endContainer.classList.add("hidden");
+                timeContainer.classList.add("hidden");
+                solutionContainer.classList.add("hidden");
 
-    // Restore old status jika ada error
-    @if (old('status_id'))
-        statusSelect.value = "{{ old('status_id') }}";
-        const event = new Event('change');
-        statusSelect.dispatchEvent(event);
-    @endif
+                // Hapus required semua dulu
+                startInput.removeAttribute("required");
+                endInput.removeAttribute("required");
+                timeInput.removeAttribute("required");
+                solutionField.removeAttribute("required");
 
-    // === STATUS CHANGE HANDLER ===
-    statusSelect.addEventListener("change", function() {
-        const statusId = parseInt(this.value);
+                // Field sesuai status
+                if (statusId === 2) { // IN PROGRESS
+                    startContainer.classList.remove("hidden");
+                    startInput.setAttribute("required", "required");
+                } else if (statusId === 3) { // DONE
+                    startContainer.classList.remove("hidden");
+                    endContainer.classList.remove("hidden");
+                    timeContainer.classList.remove("hidden");
+                    solutionContainer.classList.remove("hidden");
 
-        // Sembunyikan semua field dulu
-        startContainer.classList.add("hidden");
-        endContainer.classList.add("hidden");
-        timeContainer.classList.add("hidden");
-        solutionContainer.classList.add("hidden");
+                    startInput.setAttribute("required", "required");
+                    endInput.setAttribute("required", "required");
+                    timeInput.setAttribute("required", "required");
+                    solutionField.setAttribute("required", "required");
+                }
+            });
 
-        // Hapus required semua dulu
-        startInput.removeAttribute("required");
-        endInput.removeAttribute("required");
-        timeInput.removeAttribute("required");
-        solutionField.removeAttribute("required");
-
-        // Field sesuai status
-        if (statusId === 2) { // IN PROGRESS
-            startContainer.classList.remove("hidden");
-            startInput.setAttribute("required", "required");
-        } else if (statusId === 3) { // DONE
-            startContainer.classList.remove("hidden");
-            endContainer.classList.remove("hidden");
-            timeContainer.classList.remove("hidden");
-            solutionContainer.classList.remove("hidden");
-
-            startInput.setAttribute("required", "required");
-            endInput.setAttribute("required", "required");
-            timeInput.setAttribute("required", "required");
-            solutionField.setAttribute("required", "required");
-        }
-    });
-
-    // === Update minimum end date ===
-    function updateEndDateMin() {
-        if (startInput.value) {
-            endInput.min = startInput.value;
-            if (endInput.value && endInput.value < startInput.value) {
-                endInput.value = '';
-                timeInput.value = '';
+            // === Update minimum end date ===
+            function updateEndDateMin() {
+                if (startInput.value) {
+                    endInput.min = startInput.value;
+                    if (endInput.value && endInput.value < startInput.value) {
+                        endInput.value = '';
+                        timeInput.value = '';
+                    }
+                } else {
+                    endInput.removeAttribute('min');
+                }
             }
-        } else {
-            endInput.removeAttribute('min');
-        }
-    }
 
-    startInput.addEventListener('change', updateEndDateMin);
-    startInput.addEventListener('input', updateEndDateMin);
-    updateEndDateMin();
+            startInput.addEventListener('change', updateEndDateMin);
+            startInput.addEventListener('input', updateEndDateMin);
+            updateEndDateMin();
 
-    // === Auto calculate time spent ===
-    function hitungTimeSpent() {
-        if (manualCheckbox.checked) return; // skip kalau manual
-        const start = new Date(startInput.value);
-        const end = new Date(endInput.value);
-        if (!isNaN(start) && !isNaN(end) && end > start) {
-            timeInput.value = Math.floor((end - start) / 60000); // menit
-        } else {
-            timeInput.value = "";
-        }
-    }
+            // === Auto calculate time spent ===
+            function hitungTimeSpent() {
+                if (manualCheckbox.checked) return; // skip kalau manual
+                const start = new Date(startInput.value);
+                const end = new Date(endInput.value);
+                if (!isNaN(start) && !isNaN(end) && end > start) {
+                    timeInput.value = Math.floor((end - start) / 60000); // menit
+                } else {
+                    timeInput.value = "";
+                }
+            }
 
-    startInput.addEventListener('change', hitungTimeSpent);
-    startInput.addEventListener('input', hitungTimeSpent);
-    endInput.addEventListener('change', hitungTimeSpent);
-    endInput.addEventListener('input', hitungTimeSpent);
+            startInput.addEventListener('change', hitungTimeSpent);
+            startInput.addEventListener('input', hitungTimeSpent);
+            endInput.addEventListener('change', hitungTimeSpent);
+            endInput.addEventListener('input', hitungTimeSpent);
 
-    // Hitung saat page load jika ada nilai
-    hitungTimeSpent();
+            // Hitung saat page load jika ada nilai
+            hitungTimeSpent();
 
-    // === Manual input toggle ===
-    // Manual time checkbox
-manualCheckbox.addEventListener("change", function() {
-    if (this.checked) {
-        timeInput.removeAttribute("readonly");
+            // === Manual input toggle ===
+            // Manual time checkbox
+            manualCheckbox.addEventListener("change", function() {
+                if (this.checked) {
+                    timeInput.removeAttribute("readonly");
 
-        // Ganti kelas bg sesuai tema tapi tetap editable
-        timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-        timeInput.classList.add("bg-gray-50", "dark:bg-gray-800"); 
+                    // Ganti kelas bg sesuai tema tapi tetap editable
+                    timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+                    timeInput.classList.add("bg-gray-50", "dark:bg-gray-800");
 
-        notesContainer.classList.remove("hidden");
-        notesField.setAttribute("required", "required");
-    } else {
-        timeInput.setAttribute("readonly", true);
+                    notesContainer.classList.remove("hidden");
+                    notesField.setAttribute("required", "required");
+                } else {
+                    timeInput.setAttribute("readonly", true);
 
-        // Kembalikan bg default readonly
-        timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
-        timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+                    // Kembalikan bg default readonly
+                    timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
+                    timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
 
-        hitungTimeSpent();
-        notesContainer.classList.add("hidden");
-        notesField.removeAttribute("required");
-    }
-});
+                    hitungTimeSpent();
+                    notesContainer.classList.add("hidden");
+                    notesField.removeAttribute("required");
+                }
+            });
 
-});
-</script>   
+        });
+    </script>
 
     <style>
-    /* Styling untuk date input di light mode */
-    .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(0);
-        cursor: pointer;
-    }
-    
-    /* Styling untuk date input di dark mode */
-    .dark .date-input::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
-    }
-    
-    /* Opsional: ubah opacity saat hover */
-    .date-input::-webkit-calendar-picker-indicator:hover {
-        opacity: 0.7;
-    }
-</style>
+        /* Styling untuk date input di light mode */
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
+
+        /* Styling untuk date input di dark mode */
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Opsional: ubah opacity saat hover */
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
+        }
+    </style>
 </x-app-layout>

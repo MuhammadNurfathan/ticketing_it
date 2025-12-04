@@ -145,7 +145,6 @@ class TicketsController extends Controller
             'time_spent.required'          => 'Time Spent wajib diisi',
             'time_spent.min'               => 'Time Spent minimal 1 menit',
             'solution.required'            => 'Solution wajib diisi',
-            'solution.min'                 => 'Solution minimal 10 karakter',
         ];
 
         if (!$isFromUser) {
@@ -163,7 +162,7 @@ class TicketsController extends Controller
                 $rules['start_date'] = 'required|date';
                 $rules['end_date'] = 'required|date|after:start_date';
                 $rules['time_spent'] = 'required|integer|min:1';
-                $rules['solution'] = 'required|string|min:10';
+                $rules['solution'] = 'required|string';
             }
         } else {
             $rules['image'] = 'nullable|file|mimes:jpg,jpeg,png,mp4|max:5120';
@@ -193,7 +192,7 @@ class TicketsController extends Controller
 
         if (!$isFromUser && $request->status_id == 3 && $ticket->user && $ticket->user->email) {
             $ticket->user->notify(
-                (new TicketDoneNotification($ticket))->delay(now()->addSeconds(15))
+                (new TicketDoneNotification($ticket))
             );
         }
 
@@ -206,7 +205,7 @@ class TicketsController extends Controller
     {
         if ($ticket->user && $ticket->user->email) {
             $ticket->user->notify(
-                (new TicketDoneNotification($ticket))->delay(now()->addMinutes(1))
+                (new TicketDoneNotification($ticket))
             );
         }
     }
@@ -232,7 +231,6 @@ class TicketsController extends Controller
             'end_date.after'       => 'End Date harus setelah Start Date',
             'time_spent.required'  => 'Time Spent wajib diisi',
             'solution.required'    => 'Solution wajib diisi',
-            'solution.min'         => 'Solution minimal 10 karakter',
             'notes.min'            => 'Notes minimal 5 karakter',
         ];
 
@@ -248,7 +246,7 @@ class TicketsController extends Controller
             $rules['start_date']  = 'required|date';
             $rules['end_date']    = 'required|date|after:start_date';
             $rules['time_spent']  = 'required|integer|min:1';
-            $rules['solution']    = 'required|string|min:10';
+            $rules['solution']    = 'required|string';
         }
 
         if ($request->has('notes') && !empty($request->notes)) {
@@ -309,7 +307,7 @@ class TicketsController extends Controller
             ->with('success', 'Status tiket berhasil diperbarui.');
     }
 
-    public function updateStatusDone(Request $request, Ticket $ticket)
+   public function updateStatusDone(Request $request, Ticket $ticket)
     {
         // Validasi input
         $validated = $request->validate([
@@ -341,4 +339,5 @@ class TicketsController extends Controller
     
         return back()->with('success', 'Ticket updated successfully.');
     }
+
 }
