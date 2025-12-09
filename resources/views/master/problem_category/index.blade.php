@@ -60,7 +60,7 @@
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $pc->problem_category_name }}
+                                    {{ $pc->problem_category_name ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">

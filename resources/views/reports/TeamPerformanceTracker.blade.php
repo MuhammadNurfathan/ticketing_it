@@ -273,7 +273,7 @@
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.requestor_name}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.support_name}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.problem}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.status}</td>
+                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.status_name}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.start_date}</td>
                     <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.end_date}</td>
                     <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.time_spent}</td>

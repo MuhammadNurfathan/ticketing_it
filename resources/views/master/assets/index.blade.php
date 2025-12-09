@@ -68,31 +68,31 @@
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $index + 1 }}
+                                    {{ $index + 1  }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->assets_code }}
+                                    {{ $assets->assets_code ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->assets_name }}
+                                    {{ $assets->assets_name ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->check_out_to }}
+                                    {{ $assets->check_out_to ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->category }}
+                                    {{ $assets->category ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->status }}
+                                    {{ $assets->status ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $assets->location }}
+                                    {{ $assets->location ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">

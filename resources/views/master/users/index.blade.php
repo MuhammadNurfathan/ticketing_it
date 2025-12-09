@@ -66,11 +66,11 @@
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $user->username }}
+                                    {{ $user->username ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $user->email }}
+                                    {{ $user->email ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">

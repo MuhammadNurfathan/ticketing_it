@@ -66,7 +66,7 @@
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $role->created_at->format('d M Y') }}
+                                    {{ $role->created_at ? $role->created_at->format('d M Y') : '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -101,18 +101,18 @@
 
     </div>
 
-   <script>
-document.addEventListener("DOMContentLoaded", () => {
-    new DataTable(".datatable", {
-        responsive: false,
-        pageLength: 10,
-        layout: {
-            topStart: "pageLength",   // ✔️ fitur resmi v2
-            topEnd: "search",
-            bottomStart: "info",
-            bottomEnd: "paging"
-        }
-    });
-});
-</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            new DataTable(".datatable", {
+                responsive: false,
+                pageLength: 10,
+                layout: {
+                    topStart: "pageLength", // ✔️ fitur resmi v2
+                    topEnd: "search",
+                    bottomStart: "info",
+                    bottomEnd: "paging"
+                }
+            });
+        });
+    </script>
 </x-app-layout>

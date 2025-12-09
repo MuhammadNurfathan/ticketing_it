@@ -56,7 +56,7 @@
                                     {{ $index + 1 }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $location->location_name }}</td>
+                                    {{ $location->location_name ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     <div class="flex space-x-2">
