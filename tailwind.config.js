@@ -29,6 +29,7 @@ module.exports = {
                     "eval-1": "#F7F8FA",
                     "eval-2": "#F0F2F5",
                     "eval-3": "#E8EAED",
+                    "eval-4": "#F4F4F4",
                     text: "#000000",
                     "text-secondary": "#4B5563",
                     "text-muted": "#9CA3AF",
