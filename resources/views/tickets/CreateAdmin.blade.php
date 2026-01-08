@@ -29,14 +29,7 @@
                         @csrf
                         <input type="hidden" name="from" value="admin">
 
-                        {{-- Ticket Code --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Ticket Code <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="ticket_code" value="{{ $generateticket }}" readonly required
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                        </div>
+
 
                         {{-- User --}}
                         <div class="mb-4 relative">
@@ -54,6 +47,14 @@
                                         data-id="{{ $user->id }}">{{ $user->name }}</li>
                                 @endforeach
                             </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nama Pembuat <span class="text-red-500">*</span>
+                            </label>
+                            <textarea name="nama_pembuat" placeholder="Enter Nama Pembuat..." 
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
 
                         {{-- IT Support --}}

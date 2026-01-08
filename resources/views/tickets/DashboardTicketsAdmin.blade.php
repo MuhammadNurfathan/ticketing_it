@@ -324,7 +324,7 @@
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                        @if ($ticket->image)
-    <a href="{{ route('ticket.file', basename($ticket->image)) }}"
+    <a href="{{ asset('storage/tickets/' . basename($ticket->image)) }}"
        target="_blank"
        class="text-blue-600 underline">
         Lihat File
@@ -463,13 +463,6 @@
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
                                 Image</th>
 
-                            @auth
-                                @if (Auth::user()->role_id != 3)
-                                    <th
-                                        class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                        Action</th>
-                                @endif
-                            @endauth
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-dark-eval-1">
@@ -517,7 +510,7 @@
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                    @if ($ticket->image)
-    <a href="{{ route('ticket.file', basename($ticket->image)) }}"
+    <a href="{{ asset('storage/tickets/' . basename($ticket->image)) }}"
        target="_blank"
        class="text-blue-600 underline">
         Lihat File
@@ -527,23 +520,6 @@
 @endif
 
                                 </td>
-
-                                @auth
-                                    @if (Auth::user()->role_id != 3)
-                                        <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                            <form action="{{ route('DashboardTicketsAdmin.updateStatus', $ticket->id) }}"
-                                                method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="status_id" value="2">
-                                                <button
-                                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-                                                    onclick="return confirm('Apakah Anda Yakin?')">
-                                                    Cancel
-                                                </button>
-                                            </form>
-                                        </td>
-                                    @endif
-                                @endauth
                             </tr>
                         @endforeach
                     </tbody>

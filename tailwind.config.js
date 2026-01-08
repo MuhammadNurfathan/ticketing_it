@@ -25,7 +25,7 @@ module.exports = {
                     "text-muted": "#6B7280",
                 },
                 light: {
-                    bg: "red-500",
+                    bg: "#FFFFFF", // ✅ FIX
                     "eval-1": "#F7F8FA",
                     "eval-2": "#F0F2F5",
                     "eval-3": "#E8EAED",
@@ -33,7 +33,7 @@ module.exports = {
                     text: "#000000",
                     "text-secondary": "#4B5563",
                     "text-muted": "#9CA3AF",
-                }
+                },
             },
         },
     },

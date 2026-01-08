@@ -54,7 +54,7 @@
             />
         </x-button>
 
-        <!-- Notifications (Desktop Only) -->
+        <!-- Notifications (Desktop Only)
         <x-button
             type="button"
             class="hidden lg:inline-flex relative"
@@ -64,7 +64,7 @@
         >
             <x-heroicon-o-bell aria-hidden="true" class="w-5 h-5" />
             <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-        </x-button>
+        </x-button> -->
 
         <!-- User Dropdown -->
         <x-dropdown align="right" width="48">

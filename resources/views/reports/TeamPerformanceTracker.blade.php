@@ -216,7 +216,7 @@
                             Filter
                         </button>
                     </div>
-                    <div id="ticketsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                    <div id="ticketsContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6"></div>
                 </div>
             </div>
 
@@ -308,7 +308,7 @@
     </script>
 
     {{-- Tickets by Support Script --}}
-    <script>
+    {{-- <script>
         async function loadTickets() {
             const date = document.getElementById('date').value;
             const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
@@ -361,7 +361,68 @@
 
         document.getElementById('filterBtn').addEventListener('click', loadTickets);
         loadTickets();
-    </script>
+    </script> --}}
+<script>
+async function loadTickets() {
+    const date = document.getElementById('date').value;
+    const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+
+    try {
+        const res = await fetch(url);
+        const json = await res.json();
+        const supports = json.data || [];
+
+        const container = document.getElementById('ticketsContainer');
+        let html = '';
+
+        supports.forEach(support => {
+            html += `
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
+                <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">
+                    ${support.support_name}
+                </h3>
+
+                <div class="space-y-2">
+                    ${
+                        support.tickets.length
+                            ? support.tickets.map(t => `
+                                <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        <b>Kode:</b> ${t.ticket_code}
+                                    </p>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        <b>Problem:</b> ${t.problem ?? '-'}
+                                    </p>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                                        <b>Solution:</b> ${t.solution ?? '-'}
+                                    </p>
+                                </div>
+                            `).join('')
+                            : `<p class="text-center text-gray-400 dark:text-gray-500 italic">
+                                No Data Available
+                               </p>`
+                    }
+                </div>
+            </div>
+            `;
+        });
+
+        container.innerHTML = html || `
+            <p class="text-center col-span-full text-gray-400 italic">
+                Tidak ada data support
+            </p>
+        `;
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('ticketsContainer').innerHTML =
+            '<p class="text-center text-red-500">Gagal memuat tiket</p>';
+    }
+}
+
+document.getElementById('filterBtn').addEventListener('click', loadTickets);
+loadTickets();
+</script>
 
     {{-- Bar & Time Charts Script --}}
     <script type="module">

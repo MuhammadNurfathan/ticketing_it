@@ -119,6 +119,59 @@
                     </div>
                 </div>
 
+                {{-- BAR CHART - Time Spent per Department --}}
+                <div
+                    class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                            Total Time Spent per Department
+                        </h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Pilih Tahun
+                                </label>
+                                <select id="dept_time_year"
+                                    class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 text-sm px-3 py-2">
+                                </select>
+                            </div>
+
+                            <div class="flex items-end">
+                                <button id="filterDeptTimeBtn"
+                                    class="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm">
+                                    Filter
+                                </button>
+                            </div>
+
+                            <div class="flex items-end">
+                                <button id="resetDeptTimeBtn"
+                                    class="w-full bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg text-sm">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative flex justify-center items-center min-h-[400px]">
+                            <div id="deptTimeLoading"
+                                class="absolute inset-0 flex flex-col justify-center items-center bg-white/90 rounded-lg hidden z-10">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                                <p class="mt-4 text-gray-600">Load Data...</p>
+                            </div>
+
+                            <div id="deptTimeNoData"
+                                class="absolute inset-0 flex justify-center items-center text-gray-500 hidden z-10">
+                                No Data Available
+                            </div>
+
+                            <div id="deptTimeChartContainer" class="w-full p-4">
+                                <canvas id="timeSpentDepartmentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 {{-- Stats --}}
                 <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -150,6 +203,125 @@
         </div>
     </div>
 
+
+    <script>
+        let deptTimeChart = null;
+
+        async function loadDeptTimeChart(year) {
+            const canvas = document.getElementById('timeSpentDepartmentChart');
+            const container = document.getElementById('deptTimeChartContainer');
+            const loading = document.getElementById('deptTimeLoading');
+            const noData = document.getElementById('deptTimeNoData');
+
+            loading.classList.remove('hidden');
+            container.classList.add('hidden');
+            noData.classList.add('hidden');
+
+            if (deptTimeChart) {
+                deptTimeChart.destroy();
+                deptTimeChart = null;
+            }
+
+            try {
+                const res = await fetch(`/api/chart-time-spent-by-department?year=${year}`);
+                const json = await res.json();
+
+                loading.classList.add('hidden');
+
+                // API returns { success, data: { labels: [...], datasets: [...] } }
+                if (!json.data || !json.data.datasets || json.data.datasets.length === 0) {
+                    noData.classList.remove('hidden');
+                    return;
+                }
+
+                // Create datasets - one per department with monthly data
+                const datasets = [];
+                const colors = generateColors(json.data.datasets.length);
+                const monthLabels = json.data.labels; // ['Jan', 'Feb', ..., 'Des']
+
+                json.data.datasets.forEach((ds, index) => {
+                    const total = (ds.data && ds.data.length > 0) 
+                        ? ds.data.reduce((sum, val) => sum + (val || 0), 0) 
+                        : 0;
+                    
+                    if (total > 0) {
+                        datasets.push({
+                            label: ds.label,
+                            data: ds.data || [],
+                            backgroundColor: colors[index],
+                            borderColor: colors[index],
+                            borderWidth: 1,
+                            tension: 0.1
+                        });
+                    }
+                });
+
+                // 🚨 PENTING: cek apakah semua nilai = 0
+                if (datasets.length === 0) {
+                    noData.classList.remove('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+
+                deptTimeChart = new Chart(canvas, {
+                    type: 'bar',
+                    data: {
+                        labels: monthLabels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: value => {
+                                        const h = Math.floor(value / 60);
+                                        const m = value % 60;
+                                        return `${h}j ${m}m`;
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: getTextColor()
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: getTextColor(),
+                                    font: {
+                                        size: 12
+                                    },
+                                    padding: 15,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => {
+                                        const m = ctx.raw;
+                                        const h = Math.floor(m / 60);
+                                        const mm = m % 60;
+                                        return `${ctx.dataset.label}: ${h} jam ${mm} menit`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                loading.classList.add('hidden');
+                noData.classList.remove('hidden');
+            }
+        }
+    </script>
     <script>
         const NEUTRAL_COLOR = '#6B7280';
 
@@ -314,64 +486,70 @@
 
                 if (data.data && data.data.length > 0) {
 
-    const labels = data.data.map(i => i.month || '');
-    const values = data.data.map(i => i.total || 0);
+                    const labels = data.data.map(i => i.month || '');
+                    const values = data.data.map(i => i.total || 0);
 
-    // 🚨 NEW: jika semua total = 0 → jangan tampilkan chart
-    const allZero = values.every(v => v === 0);
-    if (allZero) {
-        container.classList.add('hidden');
-        noData.classList.remove('hidden');
-        return;
-    }
+                    // 🚨 NEW: jika semua total = 0 → jangan tampilkan chart
+                    const allZero = values.every(v => v === 0);
+                    if (allZero) {
+                        container.classList.add('hidden');
+                        noData.classList.remove('hidden');
+                        return;
+                    }
 
-    noData.classList.add('hidden');
-    container.classList.remove('hidden');
+                    noData.classList.add('hidden');
+                    container.classList.remove('hidden');
 
-    lineChart = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Ticket Selesai',
-                data: values,
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true,
-                borderColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
-                backgroundColor: isDarkMode()
-                    ? 'rgba(59,130,246,0.15)'
-                    : 'rgba(96,165,250,0.15)',
-                pointRadius: 4,
-                pointBackgroundColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
-                pointBorderColor: getBgColor(),
-                pointBorderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    ticks: { color: getTextColor() },
-                    grid: { color: '#6B7280' }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: getTextColor(),
-                        callback: value => Number.isInteger(value) ? value : null,
-                        precision: 0
-                    },
-                    grid: { color: '#6B7280' }
+                    lineChart = new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Ticket Selesai',
+                                data: values,
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                borderColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
+                                backgroundColor: isDarkMode() ?
+                                    'rgba(59,130,246,0.15)' :
+                                    'rgba(96,165,250,0.15)',
+                                pointRadius: 4,
+                                pointBackgroundColor: isDarkMode() ? '#3b82f6' : '#60a5fa',
+                                pointBorderColor: getBgColor(),
+                                pointBorderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: getTextColor()
+                                    },
+                                    grid: {
+                                        color: '#6B7280'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: getTextColor(),
+                                        callback: value => Number.isInteger(value) ? value : null,
+                                        precision: 0
+                                    },
+                                    grid: {
+                                        color: '#6B7280'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                } else {
+                    container.classList.add('hidden');
+                    noData.classList.remove('hidden');
                 }
-            }
-        }
-    });
-
-} else {
-    container.classList.add('hidden');
-    noData.classList.remove('hidden');
-}
 
 
             } catch (err) {
@@ -388,22 +566,42 @@
         //     ON PAGE LOAD
         // =========================
 
+        function populateYearDropdown(selectElementId) {
+            const currentYear = new Date().getFullYear();
+            const select = document.getElementById(selectElementId);
+            
+            for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) option.selected = true;
+                select.appendChild(option);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const pieStart = document.getElementById('pie_start_date');
             const pieEnd = document.getElementById('pie_end_date');
             const lineYear = document.getElementById('line_year');
+            const deptTimeYear = document.getElementById('dept_time_year');
 
             const today = new Date();
             const minus30 = new Date(today);
             minus30.setDate(today.getDate() - 30);
+            const currentYear = today.getFullYear();
 
             pieEnd.valueAsDate = today;
             pieStart.valueAsDate = minus30;
-            lineYear.value = today.getFullYear();
+            lineYear.value = currentYear;
+
+            // Populate year dropdowns
+            populateYearDropdown('line_year');
+            populateYearDropdown('dept_time_year');
 
             loadPieChart();
             loadLineChart();
             loadStats(pieStart.value, pieEnd.value);
+            loadDeptTimeChart(currentYear);
 
             document.getElementById('filterPieBtn').addEventListener('click', () => {
                 loadPieChart();
@@ -419,8 +617,18 @@
 
             document.getElementById('filterLineBtn').addEventListener('click', loadLineChart);
             document.getElementById('resetLineBtn').addEventListener('click', () => {
-                lineYear.value = today.getFullYear();
+                lineYear.value = currentYear;
                 loadLineChart();
+            });
+
+            document.getElementById('filterDeptTimeBtn').addEventListener('click', () => {
+                const year = deptTimeYear.value;
+                loadDeptTimeChart(year);
+            });
+
+            document.getElementById('resetDeptTimeBtn').addEventListener('click', () => {
+                deptTimeYear.value = currentYear;
+                loadDeptTimeChart(currentYear);
             });
 
             const observer = new MutationObserver(() => {
@@ -429,6 +637,7 @@
 
                 if (pieChart) loadPieChart();
                 if (lineChart) loadLineChart();
+                if (deptTimeChart) loadDeptTimeChart(deptTimeYear.value);
             });
 
             observer.observe(document.documentElement, {

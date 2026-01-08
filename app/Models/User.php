@@ -42,4 +42,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class)->withTrashed();
     }
+
+    public function tickets()
+{
+    return $this->hasMany(Ticket::class, 'support_id')->withTrashed();
+}
+
 }

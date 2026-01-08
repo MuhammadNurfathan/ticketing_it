@@ -48,6 +48,16 @@
                             <input type="hidden" name="user_id" value="{{ $ticket->user_id }}">
                         </div>
 
+                           {{-- Problem (READ ONLY) --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Nama Pembuat
+                            </label>
+                            <textarea readonly rows="3"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">{{ $ticket->nama_pembuat }}</textarea>
+                            <input type="hidden" name="nama_pembuat" value="{{ $ticket->nama_pembuat }}">
+                        </div>
+
                         {{-- IT Support (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -252,12 +262,12 @@
                                     @endphp
 
                                     @if (in_array($extension, ['jpg', 'jpeg', 'png']))
-                                        <img src="{{ route('ticket.file', $filename) }}" alt="Ticket Image"
+                                        <img src="{{ asset('storage/tickets/' . $filename) }}" alt="Ticket Image"
                                             class="max-w-md h-40 object-cover rounded border border-gray-300 dark:border-gray-600">
                                     @elseif ($extension == 'mp4')
                                         <video controls
                                             class="max-w-md h-40 rounded border border-gray-300 dark:border-gray-600">
-                                            <source src="{{ route('ticket.file', $filename) }}" type="video/mp4">
+                                            <source src="{{ asset('storage/tickets/' . $filename) }}" type="video/mp4">
                                         </video>
                                     @endif
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">ðŸ“Ž {{ $filename }}

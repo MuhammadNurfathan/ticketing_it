@@ -29,7 +29,8 @@ class Ticket extends Model
         'time_spent',
         'is_late',
         'updated_at',
-        'created_at'
+        'created_at',
+        'nama_pembuat'
     ];
 
     protected $casts =
@@ -104,8 +105,8 @@ class Ticket extends Model
         return $this->scopeByStatus($query, 'Void');
     }
 
-    // ==================== FUNGSI GET DATA ====================
-    public static function data()
+    // ==================== GENERATE TICKET CODE (Called during store) ====================
+    public static function generateTicketCode()
     {
         $lastTicket = self::latest('id')->first();
 
@@ -116,9 +117,13 @@ class Ticket extends Model
             $newNumber = '001';
         }
 
-        $generateticket = "TCK-{$newNumber}";
+        return "TCK-{$newNumber}";
+    }
 
-        // Ambil data lain
+    // ==================== FUNGSI GET DATA ====================
+    public static function data()
+    {
+        // Ambil data untuk form
         $locations  = Location::all();
         $users      = User::all();
         $assets     = Assets::all();
@@ -126,7 +131,6 @@ class Ticket extends Model
         $categories = ProblemCategory::all();
         $developers = User::where('role_id', 1)->get();
         $priorities = Priority::all();
-
 
         return [
             'locations'       => $locations,
@@ -136,7 +140,6 @@ class Ticket extends Model
             'categories'      => $categories,
             'developers'      => $developers,
             'priorities'      => $priorities,
-            'generateticket'  => $generateticket,
         ];
     }
 

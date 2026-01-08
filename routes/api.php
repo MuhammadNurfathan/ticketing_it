@@ -11,9 +11,11 @@ Route::get('/reports/tickets-done-per-month', [TicketReportController::class, 't
 Route::get('/tickets/statistik', [TicketReportController::class, 'statistik']);
 Route::get('/chart-tickets-by-dev', [TicketReportController::class, 'chartTicketsByDev']);
 Route::get('/chart-time-spent-by-dev', [TicketReportController::class, 'chartTimeSpentByDev']);
+
 Route::get('/tickets-by-support', [TicketReportController::class, 'ticketsBySupport']);
 Route::get('/tickets/preview', [TicketReportController::class, 'preview']);
 Route::get('/tickets/export', [TicketReportController::class, 'export']);
 Route::get('/ProjectQueue', [ProjectReportController::class, 'ProjectQueue']);
 Route::get('/ProjectMonitorGraph', [ProjectReportController::class, 'gantChart']);
 Route::get('/SummaryProject', [ProjectReportController::class, 'summary']);
+Route::get('/chart-time-spent-by-department', [TicketReportController::class, 'chartTimeSpentByDepartment']);

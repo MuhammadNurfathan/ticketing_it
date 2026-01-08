@@ -42,7 +42,6 @@ class TicketsController extends Controller
         $users = $data['users'];
         $assets = $data['assets'];
         $categories = $data['categories'];
-        $generateticket = $data['generateticket'];
         $hasDoneWithoutFeedback = Ticket::where('user_id', $userId)->where('status_id', 3)->doesntHave('feedback')->exists();
         $hasDoneTicket = $hasDoneWithoutFeedback;
 
@@ -51,8 +50,7 @@ class TicketsController extends Controller
             'hasDoneTicket',
             'users',
             'assets',
-            'categories',
-            'generateticket'
+            'categories',   
         ));
 
         if ($hasDoneWithoutFeedback) {
@@ -74,7 +72,6 @@ class TicketsController extends Controller
                 'categories' => $data['categories'],
                 'developers' => $data['developers'],
                 'priorities' => $data['priorities'],
-                'generateticket' => $data['generateticket'],
             ]
 
         );
@@ -94,7 +91,6 @@ class TicketsController extends Controller
         return view('tickets.CreateUser', [
             'users'          => $data['users'],
             'categories'     => $data['categories'],
-            'generateticket' => $data['generateticket'],
         ]);
     }
 
@@ -115,22 +111,21 @@ class TicketsController extends Controller
         ]);
     }
 
+    
     public function store(Request $request)
     {
         $isFromUser = $request->input('from') === 'user';
 
         $rules = [
-            'ticket_code'         => 'required',
             'user_id'             => 'required|exists:users,id',
             'problem_category_id' => 'required|exists:problem_categories,id',
             'status_id'           => 'required|exists:status,id',
             'problem'             => 'required|string',
             'assets_id' => 'nullable|integer',
-
+            'nama_pembuat' => 'required|string'
         ];
 
         $messages = [
-            'ticket_code.required'         => 'Ticket code wajib diisi',
             'user_id.required'             => 'User wajib dipilih',
             'problem_category_id.required' => 'Category wajib dipilih',
             'status_id.required'           => 'Status wajib dipilih',
@@ -170,6 +165,8 @@ class TicketsController extends Controller
 
         $validated = $request->validate($rules, $messages);
 
+        // Generate ticket code saat store (bukan sebelumnya)
+        $validated['ticket_code'] = Ticket::generateTicketCode();
         $validated['request_date'] = now();
         $validated['waiting_hour'] = 0;
         $validated['is_late'] = isset($validated['time_spent']) && $validated['time_spent'] > 480;
@@ -200,7 +197,6 @@ class TicketsController extends Controller
         return redirect()->route($route)
             ->with('success', '✅ Ticket berhasil ditambahkan!');
     }
-
     private function sendDoneNotification($ticket)
     {
         if ($ticket->user && $ticket->user->email) {
@@ -219,7 +215,7 @@ class TicketsController extends Controller
             'status_id'   => 'required|exists:status,id',
             'priority_id' => 'required|exists:priority,id',
             'assets_id' => 'nullable|integer',
-
+            'nama_pembuat' => 'required|string',
         ];
 
         $messages = [

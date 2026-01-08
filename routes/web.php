@@ -23,7 +23,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Route login & profile
-Route::get('/', function () { return view('auth/login'); });
+Route::middleware('guest')->group(function () {
+    Route::get('/', function () { return view('auth/login'); });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -63,7 +65,7 @@ Route::middleware(['auth', 'role:1,2,3'])->group(function () {
 });
 
 // Khusus Superadmin (role_id 2)
-Route::middleware(['auth', 'role:2'])->group(function () {
+Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::post('/project/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('project.updateStatus');
     Route::post('/project/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('project.updateProgress');
     Route::post('/project/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
@@ -76,20 +78,23 @@ Route::middleware(['auth', 'role:2'])->group(function () {
 });
 
 Route::get('/ticket-files/{filename}', function ($filename) {
-    // bersihkan nama file
     $filename = basename($filename);
-
-    // path ke file sebenarnya
     $path = storage_path('app/public/tickets/' . $filename);
-
+    
     if (!file_exists($path)) {
-        abort(404, 'File tidak ditemukan');
+        abort(404);
     }
-
-    return response()->file($path, [
-        'Content-Type'        => mime_content_type($path),
-        'Content-Disposition' => 'inline; filename="'.$filename.'"',
-    ]);
+    
+    // Pake readfile langsung (paling reliable)
+    $type = mime_content_type($path) ?: 'application/octet-stream';
+    
+    header('Content-Type: ' . $type);
+    header('Content-Length: ' . filesize($path));
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    header('Cache-Control: public, max-age=31536000');
+    
+    readfile($path);
+    exit;
 })
 ->middleware(['auth', 'role:1,2,3'])
 ->name('ticket.file');
