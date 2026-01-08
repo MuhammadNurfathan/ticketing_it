@@ -107,7 +107,6 @@ class TicketsController extends Controller
             'categories'  => $data['categories'],
             'developers'  => $data['developers'],
             'priorities'  => $data['priorities'],
-            'generateticket' => $data['generateticket'],
         ]);
     }
 

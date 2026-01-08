@@ -60,66 +60,7 @@
                 </div>
             </div>
 
-            {{-- PIE CHART SECTION --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        Ticket Distribution Based on Category
-                    </h3>
-
-                    {{-- Pie Chart Filter --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Start Date
-                            </label>
-                            <input type="date" id="pie_start_date"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                End Date
-                            </label>
-                            <input type="date" id="pie_end_date"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                        </div>
-                        <div class="flex items-end">
-                            <button id="filterPieBtn"
-                                class="bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
-                                Filter
-                            </button>
-                        </div>
-                        <div class="flex items-end">
-                            <button id="resetPieBtn"
-                                class="bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
-                                Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Pie Chart Canvas --}}
-                <div class="p-4 sm:p-6">
-                    <div id="pieLoadingIndicator" class="text-center py-12 hidden">
-                        <div
-                            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
-                        </div>
-                        <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
-                    </div>
-
-                    <div id="pieChartContainer" class="flex justify-center items-center" style="min-height: 400px;">
-                        <div style="max-width: 600px; width: 100%;">
-                            <canvas id="ticketCategoryChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div id="pieNoDataMessage" class="text-center py-12 hidden">
-                        <p class="text-gray-500 dark:text-gray-400">No Data Available</p>
-                    </div>
-                </div>
-
-                {{-- BAR CHART - Time Spent per Department --}}
+                   {{-- BAR CHART - Time Spent per Department --}}
                 <div
                     class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div class="p-4 sm:p-6">
@@ -170,6 +111,69 @@
                         </div>
                     </div>
                 </div>
+
+            {{-- PIE CHART SECTION --}}
+            <div
+                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        Ticket Distribution Based on Category
+                    </h3>
+
+                    {{-- Pie Chart Filter --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Start Date
+                            </label>
+                            <input type="date" id="pie_start_date"
+                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                End Date
+                            </label>
+                            <input type="date" id="pie_end_date"
+                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:border-gray-400 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="filterPieBtn"
+                                class="bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
+                                Filter
+                            </button>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="resetPieBtn"
+                                class="bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+             
+
+                {{-- Pie Chart Canvas --}}
+                <div class="p-4 sm:p-6">
+                    <div id="pieLoadingIndicator" class="text-center py-12 hidden">
+                        <div
+                            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
+                        </div>
+                        <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
+                    </div>
+
+                    <div id="pieChartContainer" class="flex justify-center items-center" style="min-height: 400px;">
+                        <div style="max-width: 600px; width: 100%;">
+                            <canvas id="ticketCategoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="pieNoDataMessage" class="text-center py-12 hidden">
+                        <p class="text-gray-500 dark:text-gray-400">No Data Available</p>
+                    </div>
+                </div>
+
+            
 
 
                 {{-- Stats --}}

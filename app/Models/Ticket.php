@@ -162,30 +162,44 @@ class Ticket extends Model
         ];
     }
 
-    public static function Statistik($query)
-    {
-        $waiting    = (clone $query)->waiting()->count();
-        $inProgress = (clone $query)->inProgress()->count();
-        $done       = (clone $query)->done()->count();
-        $void       = (clone $query)->void()->count();
-        $totalAll   = $waiting + $inProgress + $done + $void;
-        $totalValid = $waiting  + $inProgress + $done;
+  public static function Statistik($query)
+{
+    // ======================== Konstanta ========================
+    $SLA_MINUTES = 480; // 8 jam = 480 menit
 
-        // ======================== Statistik tambahan ========================
-        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // rata-rata menunggu
-        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);  // rata-rata penyelesaian
-        $sumTimeSpent = (clone $query)->sum('time_spent');            // total jam yang dihabiskan
+    // ======================== Status Count ========================
+    $waiting    = (clone $query)->waiting()->count();
+    $inProgress = (clone $query)->inProgress()->count();
+    $done       = (clone $query)->done()->count();
+    $void       = (clone $query)->void()->count();
 
-        $solvedInSLA = (clone $query)->done()->where('time_spent', '<=', 8)->count();
-        $slaPercent  = $totalValid > 0 ? round(($solvedInSLA / $totalValid) * 100, 2) : 0;
+    $totalAll   = $waiting + $inProgress + $done + $void;
+    $totalValid = $waiting + $inProgress + $done; // void tidak dihitung SLA
 
-        return [
-            'avg_waiting'     => $avgWaiting,
-            'avg_time_spent'  => $avgTimeSpent,
-            'sum_time_spent'  => $sumTimeSpent,
-            'sla'             => $slaPercent,
-        ];
-    }
+    // ======================== Statistik Waktu ========================
+    $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // menit / jam sesuai field
+    $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);   // MENIT
+    $sumTimeSpent = (clone $query)->sum('time_spent');             // MENIT
+
+    // ======================== SLA ========================
+    $solvedInSLA = (clone $query)
+        ->done()
+        ->where('time_spent', '<=', $SLA_MINUTES)
+        ->count();
+
+    $slaPercent = $totalValid > 0
+        ? round(($solvedInSLA / $totalValid) * 100, 2)
+        : 0;
+
+    // ======================== Return ========================
+    return [
+        'avg_waiting'     => $avgWaiting,
+        'avg_time_spent'  => $avgTimeSpent,
+        'sum_time_spent'  => $sumTimeSpent,
+        'sla'             => $slaPercent,
+    ];
+}
+
 
  
 }
