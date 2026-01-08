@@ -157,48 +157,70 @@ public static function summary($year = null)
 {
     $baseQuery = self::query();
 
-    // ===== ACTIVE & WAITING (TANPA FILTER TAHUN) =====
-    $active  = (clone $baseQuery)->where('status_id', 2)->count();
+    // ======================
+    // STATUS REAL-TIME (NO YEAR)
+    // ======================
+    $active  = (clone $baseQuery)->where('status_id', 2)->count(); // In Progress
     $waiting = (clone $baseQuery)->where('status_id', 1)->count();
-    $void    = (clone $baseQuery)->where('status_id', 4)->count();
     $pending = (clone $baseQuery)->where('status_id', 6)->count();
+    $void    = (clone $baseQuery)->where('status_id', 4)->count();
 
-    // ===== QUERY KHUSUS YEAR (DONE / CLOSED) =====
-    $yearQuery = self::query();
+    // ======================
+    // TOTAL PROJECT AKTIF DI TAHUN (OVERLAP)
+    // ======================
+    $totalQuery = self::query();
+
     if ($year) {
-        $yearQuery->whereYear('end_date', $year);
+        $totalQuery
+            ->whereDate('start_date', '<=', "$year-12-31")
+            ->where(function ($q) use ($year) {
+                $q->whereNull('effective_end_date')
+                  ->orWhereDate('effective_end_date', '>=', "$year-01-01");
+            });
     }
 
-    $closed = (clone $yearQuery)->where('status_id', 3)->count();
-    $closedOnTime = (clone $yearQuery)
+    $total = $totalQuery
+        ->where('status_id', '!=', 5) // exclude cancelled (kalau ada)
+        ->count();
+
+    // ======================
+    // CLOSED & SLA (BY YEAR)
+    // ======================
+    $closedQuery = self::query();
+
+    if ($year) {
+        $closedQuery->whereYear('effective_end_date', $year);
+    }
+
+    $closed = (clone $closedQuery)->where('status_id', 3)->count();
+
+    $closedOnTime = (clone $closedQuery)
         ->where('status_id', 3)
         ->where('is_late', 0)
         ->count();
 
-    $closedLate = (clone $yearQuery)
+    $closedLate = (clone $closedQuery)
         ->where('status_id', 3)
         ->where('is_late', 1)
         ->count();
 
-    // ===== TOTAL (SEMUA KECUALI PENDING) =====
-    $total = (clone $baseQuery)->where('status_id', '!=', 5)->count();
-
-    // ===== SLA =====
     $sla = $closed > 0
         ? round(($closedOnTime / $closed) * 100, 2)
         : 0;
 
     return [
+        'total'         => $total,
         'active'        => $active,
         'waiting'       => $waiting,
+        'pending'       => $pending,
+        'void'          => $void,
         'closed'        => $closed,
         'closedOnTime'  => $closedOnTime,
         'closedLate'    => $closedLate,
-        'void'          => $void,
-        'pending'       => $pending,
-        'total'         => $total,
         'sla'           => $sla,
     ];
 }
+
+
 
 }

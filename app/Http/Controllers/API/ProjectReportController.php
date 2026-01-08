@@ -90,7 +90,6 @@ class ProjectReportController extends Controller
     public function summary(Request $request)
     {
         $year = $request->query('year', now()->year);
-        $summary = ProjectHeader::summary($year);
-        return response()->json($summary);
+        return response()->json(ProjectHeader::summary($year));
     }
 }
