@@ -182,19 +182,21 @@
                 ]);
             }
 
-            async function loadSummary(year) {
-                try {
-                    const res = await fetch(`{{ url('/api/SummaryProject') }}?year=${year}`);
-                    const data = await res.json();
-                    document.getElementById('all-projects').textContent = data.total ?? '-';
-                    document.getElementById('waiting-projects').textContent = data.waiting ?? '-';
-                    document.getElementById('active-projects').textContent = data.active ?? '-';
-                    document.getElementById('sla-value').textContent = data.sla ? `${data.sla}%` : '0%';
-                } catch {
-                    ['all-projects', 'waiting-projects', 'active-projects', 'sla-value']
-                    .forEach(id => document.getElementById(id).textContent = '-');
-                }
-            }
+         async function loadSummary(year) {
+    try {
+        const res = await fetch(`/api/SummaryProject?year=${year}`);
+        const data = await res.json();
+
+        document.getElementById('all-projects').textContent = data.total ?? '-';
+        document.getElementById('waiting-projects').textContent = data.waiting ?? '-';
+        document.getElementById('active-projects').textContent = data.active ?? '-';
+        document.getElementById('sla-value').textContent = data.sla ? `${data.sla}%` : '0%';
+    } catch {
+        ['all-projects', 'waiting-projects', 'active-projects', 'sla-value']
+            .forEach(id => document.getElementById(id).textContent = '-');
+    }
+}
+
 
             async function loadProjectQueue(year) {
                 tbody.innerHTML =

@@ -153,55 +153,52 @@ class ProjectHeader extends Model
             'generateticket'  => $generateticket,
         ];
     }
+public static function summary($year = null)
+{
+    $baseQuery = self::query();
 
-    public static function summary($year = null)
-    {
-        $query = self::query();
+    // ===== ACTIVE & WAITING (TANPA FILTER TAHUN) =====
+    $active  = (clone $baseQuery)->where('status_id', 2)->count();
+    $waiting = (clone $baseQuery)->where('status_id', 1)->count();
+    $void    = (clone $baseQuery)->where('status_id', 4)->count();
+    $pending = (clone $baseQuery)->where('status_id', 6)->count();
 
-        // filter berdasarkan start_date jika year diberikan
-        if ($year) {
-            $query->whereYear('start_date', $year);
-        }
-
-        // Active = semua yang tidak berstatus "done" (status_id != 3) dan bukan void (status_id != 4)
-        $active = (clone $query)->where('status_id', 2)->count();
-
-        // Closed / Done = status_id == 3
-        $closed = (clone $query)->where('status_id', 3)->count();
-        $closedOnTime = (clone $query)->where('status_id', 3)->where('is_late', 0)->count();
-        $closedLate = (clone $query)->where('status_id', 3)->where('is_late', 1)->count();
-
-        // Total = semua project kecuali pending
-        $total = (clone $query)->where('status_id', '!=', 5)->count();
-        $waiting = (clone $query)->where('status_id', 1)->count();
-
-        // Void = status_id == 4
-        $void = (clone $query)->where('status_id', 4)->count();
-        $pending = (clone $query)->where('status_id', 6)->count();
-
-        // SLA: hitung dari yang DONE (status_id == 3)
-        $done = $closed;
-
-        $doneOnTime = (clone $query)
-            ->where('status_id', 3)
-            ->where('is_late', 0)
-            ->count();
-
-        $sla = $done > 0
-            ? round(($doneOnTime / $done) * 100, 2)
-            : 0;
-
-
-        return [
-            'active' => $active,
-            'closed' => $closed,
-            'sla'    => $sla,
-            'void'   => $void,
-            'total'  => $total,
-            'waiting'  => $waiting,
-            'waiting'  => $waiting,
-            'closedOnTime'  => $closedOnTime,
-            'closedLate'  => $closedLate,
-        ];
+    // ===== QUERY KHUSUS YEAR (DONE / CLOSED) =====
+    $yearQuery = self::query();
+    if ($year) {
+        $yearQuery->whereYear('end_date', $year);
     }
+
+    $closed = (clone $yearQuery)->where('status_id', 3)->count();
+    $closedOnTime = (clone $yearQuery)
+        ->where('status_id', 3)
+        ->where('is_late', 0)
+        ->count();
+
+    $closedLate = (clone $yearQuery)
+        ->where('status_id', 3)
+        ->where('is_late', 1)
+        ->count();
+
+    // ===== TOTAL (SEMUA KECUALI PENDING) =====
+    $total = (clone $baseQuery)->where('status_id', '!=', 5)->count();
+
+    // ===== SLA =====
+    $sla = $closed > 0
+        ? round(($closedOnTime / $closed) * 100, 2)
+        : 0;
+
+    return [
+        'active'        => $active,
+        'waiting'       => $waiting,
+        'closed'        => $closed,
+        'closedOnTime'  => $closedOnTime,
+        'closedLate'    => $closedLate,
+        'void'          => $void,
+        'pending'       => $pending,
+        'total'         => $total,
+        'sla'           => $sla,
+    ];
+}
+
 }
