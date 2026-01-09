@@ -105,15 +105,15 @@
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Feedback</th>
+                                    <th
+                                        class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
+                                        Action</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     IT Support</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Status</th>
-                                <th
-                                    class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -142,20 +142,7 @@
                                     <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
                                         {{ $ticket->feedback->description ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
-                                        {{ $ticket->support->name ?? '-' }}
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
-                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
-                                            {{ $ticket->status->status_name }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
+                                      <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
                                                 class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
@@ -165,6 +152,21 @@
                                             <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
                                         @endif
                                     </td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                        {{ $ticket->support->name ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
+                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 4 ? 'bg-red-500 text-white dark:bg-red-600 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
+                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                                            {{ $ticket->status->status_name }}
+                                        </span>
+                                    </td>
+                                  
                                 </tr>
                             @endforeach
                         </tbody>
