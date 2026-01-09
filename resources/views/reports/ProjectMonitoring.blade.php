@@ -148,28 +148,6 @@
                 </div>
             </div>
 
-            {{-- PROJECT BY DEVELOPER --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        Project by Developer (Per Hari)
-                    </h2>
-
-                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                        <input type="date" id="projectDate"
-                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-400 text-sm px-3 py-2">
-
-                        <button id="projectFilterBtn"
-                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors">
-                            Filter
-                        </button>
-                    </div>
-
-                    <div id="projectsContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                    </div>
-                </div>
-            </div>
 
         </div>
     </div>
@@ -178,82 +156,6 @@
     <link rel="stylesheet" href="{{ asset('css/frappe-gantt.css') }}">
     <script src="{{ asset('js/frappe-gantt.min.js') }}"></script>
 
-
-    <script>
-        async function loadProjects() {
-            const date = document.getElementById('projectDate').value;
-            const url = date ?
-                `/api/projects-by-developer?date=${date}` :
-                `/api/projects-by-developer`;
-
-            try {
-                const res = await fetch(url);
-                const json = await res.json();
-                const developers = json.data || [];
-
-                const container = document.getElementById('projectsContainer');
-                let html = '';
-
-                developers.forEach(dev => {
-                    html += `
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
-                <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">
-                    ${dev.developer_name}
-                </h3>
-
-                <div class="space-y-2">
-                    ${
-                        dev.projects.length
-                        ? dev.projects.map(p => `
-                                <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Project Code:</b> ${p.project_code}
-                                    </p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Project Name:</b> ${p.project_name}
-                                    </p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Memo:</b> ${p.memo ? p.memo : '-'}
-                                    </p>
-
-                                    <div class="flex items-center justify-between mt-2 text-sm">
-                                        <span class="text-gray-600 dark:text-gray-400">
-                                            <b>Status:</b> ${p.status}
-                                        </span>
-                                        <span class="font-semibold text-blue-600 dark:text-blue-400">
-                                            ${p.progress}%
-                                        </span>
-                                    </div>
-                                </div>
-                            `).join('')
-                        : `<p class="text-center text-gray-400 dark:text-gray-500 italic">
-                                No Data Available
-                               </p>`
-                    }
-                </div>
-            </div>
-            `;
-                });
-
-                container.innerHTML = html || `
-            <p class="text-center col-span-full text-gray-400 italic">
-                Tidak ada data project
-            </p>
-        `;
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('projectsContainer').innerHTML =
-                    '<p class="text-center text-red-500">Gagal memuat data project</p>';
-            }
-        }
-
-        document
-            .getElementById('projectFilterBtn')
-            .addEventListener('click', loadProjects);
-
-        loadProjects();
-    </script>
 
 
     <script>

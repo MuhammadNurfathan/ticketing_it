@@ -28,7 +28,7 @@
                         </div>
                         <div class="flex gap-2 w-full sm:w-auto">
                             <button id="filterLineBtn"
-                                class="bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg flex-1 sm:flex-none text-sm transition-colors">
+                                class="dark:bg-gray-100 bg-blue-600 hover:bg-blue-700 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg flex-1 sm:flex-none text-sm transition-colors">
                                 Filter
                             </button>
                             <button id="resetLineBtn"
@@ -80,7 +80,7 @@
 
                             <div class="flex items-end">
                                 <button id="filterDeptTimeBtn"
-                                    class="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm">
+                                    class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm">
                                     Filter
                                 </button>
                             </div>
@@ -138,7 +138,7 @@
                         </div>
                         <div class="flex items-end">
                             <button id="filterPieBtn"
-                                class="bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
+                                class="bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg w-full text-sm transition-colors">
                                 Filter
                             </button>
                         </div>

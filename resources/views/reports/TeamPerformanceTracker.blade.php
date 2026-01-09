@@ -33,7 +33,7 @@
 
                                 <div class="flex items-end">
                                     <button type="button" id="previewBtn"
-                                        class="w-full px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
+                                        class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
                                         Preview
                                     </button>
                                 </div>
@@ -121,7 +121,7 @@
                         </div>
                         <div class="flex items-end">
                             <button id="filterBarBtn"
-                                class="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
                                 Filter
                             </button>
                         </div>
@@ -170,7 +170,7 @@
                         </div>
                         <div class="flex items-end">
                             <button id="filterTimeBtn"
-                                class="w-full bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
+                                class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
                                 Filter
                             </button>
                         </div>
@@ -212,7 +212,7 @@
                         <input type="date" id="date"
                             class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2 date-input">
                         <button id="filterBtn"
-                            class="px-6 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg font-medium text-sm transition-colors">
+                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg font-medium text-sm transition-colors">
                             Filter
                         </button>
                     </div>

@@ -146,56 +146,85 @@
                     <tbody class="bg-white dark:bg-dark-eval-1">
                         @foreach ($inProgressProject as $project)
                             <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                <!-- Project Code: Center -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->project_code ?? '-' }}
+                                </td>
+
+                                <!-- Project Name: Left -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_name ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-left">
+                                    {{ $project->project_name ?? '-' }}
+                                </td>
+
+                                <!-- Requestor: Left -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->requestor->name ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-left">
+                                    {{ $project->requestor->name ?? '-' }}
+                                </td>
+
+                                <!-- Priority: Center -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->priority->priority_name }}
+                                </td>
+
+                                <!-- Progress %: Right -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_percent ?? '-' }}%</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-right">
+                                    {{ $project->progress_percent ?? '-' }}%
+                                </td>
+
+                                <!-- Progress Date: Center -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_date ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->progress_date ?? '-' }}
+                                </td>
+
+                                <!-- Description: Left + Wrap -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text max-w-xs">
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text max-w-xs text-left">
                                     <div class="whitespace-normal break-words">
                                         {{ $project->description ?? '-' }}
                                     </div>
                                 </td>
 
+                                <!-- Start Date: Center -->
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->start_date ?? '-' }}
+                                </td>
 
+                                <!-- End Date: Center -->
+                                <td
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->end_date ?? '-' }}
+                                </td>
 
+                                <!-- Actual Start: Center -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->start_date ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
+                                    {{ $project->actual_start_date ?? '-' }}
+                                </td>
+
+                                <!-- Total Pending Minutes: Right -->
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->end_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->actual_start_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->total_pending_minutes ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-right">
+                                    {{ $project->total_pending_minutes ?? '-' }}
+                                </td>
+
+                                <!-- Lihat Detail Button: Center -->
+                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                     <button onclick="showProjectModal({{ $project->id }})"
                                         class="text-blue-500 hover:underline">
                                         Lihat Detail
                                     </button>
                                 </td>
 
+                                <!-- Action Buttons: Center -->
                                 <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                                     <div class="flex justify-center items-center gap-2">
-                                        <!-- Update Progress -->
                                         <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
                                             data-code="{{ $project->project_code }}"
                                             data-name="{{ $project->project_name }}"
@@ -204,24 +233,20 @@
                                             class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200">
                                             Update
                                         </button>
-
-                                        <!-- Pending -->
                                         <button onclick="openPendingModal({{ $project->id }})"
                                             class="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200">
                                             Pending
                                         </button>
-
-                                        <!-- Void -->
                                         <button onclick="openVoidModal({{ $project->id }})"
                                             class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
                                             Void
                                         </button>
                                     </div>
                                 </td>
-
                             </tr>
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
         </div>
