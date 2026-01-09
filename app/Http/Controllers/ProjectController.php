@@ -139,6 +139,7 @@ class ProjectController extends Controller
             'status_id'        => 'required|integer',
             'memo'             => 'nullable|string',
             'developer_name'   => 'nullable|string',
+            'progress_date'   => 'required|date',
         ]);
 
         $progressPercent = $validatedHeader['progress_percent'];
@@ -152,7 +153,7 @@ class ProjectController extends Controller
         $updateData = [
             'progress_percent'   => $progressPercent,
             'status_id'          => $statusId,
-            'progress_date'      => now(),
+            'progress_date'      => $validatedHeader['progress_date'],
             'memo'               => $validatedHeader['memo'] ?? null,
             'effective_end_date' => $effectiveEndDate,
 
