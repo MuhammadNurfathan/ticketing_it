@@ -174,7 +174,7 @@ class ProjectController extends Controller
 
         ProjectDetail::create([
             'project_header_id' => $project->id,
-            'progress_date'     => now(),
+            'progress_date'     => $validatedHeader['Progress_date'] ?? now(),
             'progress_percent'  => $progressPercent,
             'status_id'         => $statusId,
             'memo'              => $validatedHeader['memo'] ?? null,
