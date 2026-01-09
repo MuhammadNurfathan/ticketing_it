@@ -53,10 +53,6 @@ class ProjectHeader extends Model
         return $this->belongsTo(User::class, 'requestor_id')->withTrashed();
     }
 
-    public function developer()
-    {
-        return $this->belongsTo(User::class, 'dev_id')->withTrashed();
-    }
     public function priority()
     {
         return $this->belongsTo(Priority::class, 'priority_id')->withTrashed();

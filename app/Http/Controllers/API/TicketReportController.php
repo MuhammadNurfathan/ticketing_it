@@ -240,93 +240,97 @@ class TicketReportController extends Controller
         ]);
     }
 
-public function chartTimeSpentByDepartment(Request $request)
-{
-    $year = $request->input('year', now()->year);
+    public function chartTimeSpentByDepartment(Request $request)
+    {
+        $year = $request->input('year', now()->year);
 
-    // Ambil total menit per department per bulan
-    $tickets = Ticket::selectRaw('
+        // Ambil total menit per department per bulan
+        $tickets = Ticket::selectRaw('
             departments.id as department_id,
             MONTH(tickets.end_date) as month,
             COALESCE(SUM(tickets.time_spent), 0) as total_minutes
         ')
-        ->join('users', 'tickets.user_id', '=', 'users.id')
-        ->join('departments', 'users.department_id', '=', 'departments.id')
-        ->whereYear('tickets.end_date', $year)
-        ->groupBy('departments.id', 'month')
-        ->get();
+            ->join('users', 'tickets.user_id', '=', 'users.id')
+            ->join('departments', 'users.department_id', '=', 'departments.id')
+            ->whereYear('tickets.end_date', $year)
+            ->groupBy('departments.id', 'month')
+            ->get();
 
-    $months = range(1, 12);
+        $months = range(1, 12);
 
-    // 🔥 AMBIL SEMUA department + location (walaupun kosong)
-    $departments = Department::with('location')->get();
+        // 🔥 AMBIL SEMUA department + location (walaupun kosong)
+        $departments = Department::with('location')->get();
 
-    $datasets = [];
+        $datasets = [];
 
-    foreach ($departments as $department) {
-        $data = [];
+        foreach ($departments as $department) {
+            $data = [];
 
-        foreach ($months as $m) {
-            $minutes = $tickets
-                ->where('department_id', $department->id)
-                ->where('month', $m)
-                ->sum('total_minutes');
+            foreach ($months as $m) {
+                $minutes = $tickets
+                    ->where('department_id', $department->id)
+                    ->where('month', $m)
+                    ->sum('total_minutes');
 
-            $data[] = (int) $minutes;
-        }
+                $data[] = (int) $minutes;
+            }
 
-        // ✅ JANGAN DI-SKIP
-        $datasets[] = [
-            'label' => $department->department_name
-                . ($department->location ? ' - ' . $department->location->location_name : ''),
-            'data' => $data,
-        ];
-    }
-
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-            'datasets' => $datasets
-        ]
-    ]);
-}
-
-
-    public function ticketsBySupport(Request $request)
-    {
-        $date = $request->query('date', now()->toDateString());
-
-        $tickets = Ticket::with('support:id,name')
-            ->whereIn('status_id', [3, 5])
-            ->whereDate('end_date', $date)
-            ->select('id', 'ticket_code', 'problem', 'solution', 'support_id')
-            ->get()
-            ->groupBy('support_id');
-
-        $result = [];
-
-        foreach ($tickets as $supportId => $items) {
-            $result[] = [
-                'support_id'   => $supportId,
-                'support_name' => $items->first()->support->name ?? 'Unknown',
-                'tickets'      => $items->map(function ($t) {
-                    return [
-                        'ticket_code' => $t->ticket_code,
-                        'problem'     => $t->problem,
-                        'solution'    => $t->solution,
-                    ];
-                })->values()
+            // ✅ JANGAN DI-SKIP
+            $datasets[] = [
+                'label' => $department->department_name
+                    . ($department->location ? ' - ' . $department->location->location_name : ''),
+                'data' => $data,
             ];
         }
 
         return response()->json([
-            'data' => $result,
-            'filter' => [
-                'date' => $date,
-            ],
+            'success' => true,
+            'data' => [
+                'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                'datasets' => $datasets
+            ]
         ]);
     }
+
+
+public function ticketsBySupport(Request $request)
+{
+    $date = $request->query('date', now()->toDateString());
+
+    $supports = User::where('role_id', 1)
+        ->with([
+            'tickets' => function ($q) use ($date) {
+                $q->whereIn('status_id', [3, 5])
+                  ->whereDate('end_date', $date)
+                  ->select('id', 'ticket_code', 'problem', 'solution', 'support_id');
+            }
+        ])
+        ->select('id', 'name')
+        ->get();
+
+    $result = $supports->map(function ($support) {
+        return [
+            'support_id'   => $support->id,
+            'support_name' => $support->name,
+            'tickets'      => $support->tickets->map(function ($t) {
+                return [
+                    'ticket_code' => $t->ticket_code,
+                    'problem'     => $t->problem,
+                    'solution'    => $t->solution,
+                ];
+            })->values(),
+        ];
+    });
+
+    return response()->json([
+        'data' => $result,
+        'filter' => [
+            'date' => $date,
+        ],
+    ]);
+}
+
+
 
 
     // public function ticketsBySupport(Request $request)

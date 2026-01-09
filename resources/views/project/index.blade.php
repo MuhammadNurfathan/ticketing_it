@@ -93,7 +93,7 @@
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor Date
+                                Project Name
                             </th>
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
@@ -737,13 +737,14 @@
             });
 
             $(document).on('change', '.dev-checkbox', function() {
-                const selected = [];
-                $('.dev-checkbox:checked').each(function() {
-                    selected.push($(this).val());
-                });
-                const result = selected.join(' | ') || 'Pilih Developer...';
-                $('#selected-text').text(result);
-                $('#developer_name').val(selected.join(' | '));
+                // ❌ Uncheck semua dulu
+                $('.dev-checkbox').not(this).prop('checked', false);
+
+                // ✅ Ambil value yang dipilih
+                const selected = $(this).is(':checked') ? $(this).val() : '';
+
+                $('#selected-text').text(selected || 'Pilih Developer...');
+                $('#developer_name').val(selected);
             });
 
             // =================== Edit Modal ==================

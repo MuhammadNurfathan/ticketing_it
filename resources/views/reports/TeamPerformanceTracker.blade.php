@@ -8,100 +8,100 @@
     <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
         <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-            {{-- DOWNLOAD DATA SECTION --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Download Data Tickets</h2>
+                    {{-- DOWNLOAD DATA SECTION --}}
+                    <div
+                        class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div class="p-4 sm:p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Download Data Tickets</h2>
 
-                    <form id="exportForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div>
-                            <label for="start_date"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Mulai
-                            </label>
-                            <input type="date" id="start_date" name="start_date"
-                                class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                            <form id="exportForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="start_date"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Mulai
+                                    </label>
+                                    <input type="date" id="start_date" name="start_date"
+                                        class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                                </div>
+
+                                <div>
+                                    <label for="end_date"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Akhir
+                                    </label>
+                                    <input type="date" id="end_date" name="end_date"
+                                        class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
+                                </div>
+
+                                <div class="flex items-end">
+                                    <button type="button" id="previewBtn"
+                                        class="w-full px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
+                                        Preview
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-
-                        <div>
-                            <label for="end_date"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Akhir
-                            </label>
-                            <input type="date" id="end_date" name="end_date"
-                                class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                        </div>
-
-                        <div class="flex items-end">
-                            <button type="button" id="previewBtn"
-                                class="w-full px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
-                                Preview
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            {{-- MODAL PREVIEW --}}
-            <div id="previewModal"
-                class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div
-                    class="bg-white dark:bg-dark-eval-1 rounded-2xl shadow-2xl w-11/12 max-w-6xl p-6 transform scale-95 transition-all">
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Preview Data Tickets</h3>
-
-                    <div class="overflow-x-auto max-h-[60vh] border border-gray-200 dark:border-gray-700 rounded-lg">
-                        <table class="min-w-full text-sm">
-                            <thead class="bg-gray-50 dark:bg-dark-eval-2 sticky top-0">
-                                <tr>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Ticket Code</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Requestor</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Support</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Problem</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Status</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Start</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        End</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Time (min)</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Late</th>
-                                    <th
-                                        class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                        Created</th>
-                                </tr>
-                            </thead>
-                            <tbody id="previewTableBody"
-                                class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-dark-eval-1">
-                            </tbody>
-                        </table>
                     </div>
 
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button id="closePreview"
-                            class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors text-sm font-medium">
-                            Tutup
-                        </button>
-                        <button id="confirmDownload"
-                            class="px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg transition-colors text-sm font-medium">
-                            💾 Download CSV
-                        </button>
+                    {{-- MODAL PREVIEW --}}
+                    <div id="previewModal"
+                        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                        <div
+                            class="bg-white dark:bg-dark-eval-1 rounded-2xl shadow-2xl w-11/12 max-w-6xl p-6 transform scale-95 transition-all">
+                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Preview Data Tickets</h3>
+
+                            <div class="overflow-x-auto max-h-[60vh] border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <table class="min-w-full text-sm">
+                                    <thead class="bg-gray-50 dark:bg-dark-eval-2 sticky top-0">
+                                        <tr>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Ticket Code</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Requestor</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Support</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Problem</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Status</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Start</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                End</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Time (min)</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Late</th>
+                                            <th
+                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
+                                                Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="previewTableBody"
+                                        class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-dark-eval-1">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button id="closePreview"
+                                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors text-sm font-medium">
+                                    Tutup
+                                </button>
+                                <button id="confirmDownload"
+                                    class="px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg transition-colors text-sm font-medium">
+                                    💾 Download CSV
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
             {{-- BAR CHART - Tickets per Developer --}}
             <div
@@ -362,21 +362,21 @@
         document.getElementById('filterBtn').addEventListener('click', loadTickets);
         loadTickets();
     </script> --}}
-<script>
-async function loadTickets() {
-    const date = document.getElementById('date').value;
-    const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+    <script>
+        async function loadTickets() {
+            const date = document.getElementById('date').value;
+            const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
 
-    try {
-        const res = await fetch(url);
-        const json = await res.json();
-        const supports = json.data || [];
+            try {
+                const res = await fetch(url);
+                const json = await res.json();
+                const supports = json.data || [];
 
-        const container = document.getElementById('ticketsContainer');
-        let html = '';
+                const container = document.getElementById('ticketsContainer');
+                let html = '';
 
-        supports.forEach(support => {
-            html += `
+                supports.forEach(support => {
+                    html += `
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
                 <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">
                     ${support.support_name}
@@ -386,43 +386,43 @@ async function loadTickets() {
                     ${
                         support.tickets.length
                             ? support.tickets.map(t => `
-                                <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Kode:</b> ${t.ticket_code}
-                                    </p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Problem:</b> ${t.problem ?? '-'}
-                                    </p>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">
-                                        <b>Solution:</b> ${t.solution ?? '-'}
-                                    </p>
-                                </div>
-                            `).join('')
+                                    <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                                            <b>Kode:</b> ${t.ticket_code}
+                                        </p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                                            <b>Problem:</b> ${t.problem ?? '-'}
+                                        </p>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                                            <b>Solution:</b> ${t.solution ?? '-'}
+                                        </p>
+                                    </div>
+                                `).join('')
                             : `<p class="text-center text-gray-400 dark:text-gray-500 italic">
-                                No Data Available
-                               </p>`
+                                    No Data Available
+                                   </p>`
                     }
                 </div>
             </div>
             `;
-        });
+                });
 
-        container.innerHTML = html || `
+                container.innerHTML = html || `
             <p class="text-center col-span-full text-gray-400 italic">
                 Tidak ada data support
             </p>
         `;
 
-    } catch (err) {
-        console.error(err);
-        document.getElementById('ticketsContainer').innerHTML =
-            '<p class="text-center text-red-500">Gagal memuat tiket</p>';
-    }
-}
+            } catch (err) {
+                console.error(err);
+                document.getElementById('ticketsContainer').innerHTML =
+                    '<p class="text-center text-red-500">Gagal memuat tiket</p>';
+            }
+        }
 
-document.getElementById('filterBtn').addEventListener('click', loadTickets);
-loadTickets();
-</script>
+        document.getElementById('filterBtn').addEventListener('click', loadTickets);
+        loadTickets();
+    </script>
 
     {{-- Bar & Time Charts Script --}}
     <script type="module">

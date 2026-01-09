@@ -19,3 +19,6 @@ Route::get('/ProjectQueue', [ProjectReportController::class, 'ProjectQueue']);
 Route::get('/ProjectMonitorGraph', [ProjectReportController::class, 'gantChart']);
 Route::get('/SummaryProject', [ProjectReportController::class, 'summary']);
 Route::get('/chart-time-spent-by-department', [TicketReportController::class, 'chartTimeSpentByDepartment']);
+Route::get('/projects-by-developer', [ProjectReportController::class, 'projectByDeveloper']);
+Route::get('/projects/preview', [ProjectReportController::class, 'previewProject']);
+Route::get('/projects/export', [ProjectReportController::class, 'exportProject']);

@@ -75,6 +75,7 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::get('/reports/ExcecutiveTicketsInsight', function () { return view('reports.ExcecutiveTicketsInsight'); })->name('reports.ExcecutiveTicketsInsight');
     Route::get('/reports/TeamPerformanceTracker', function () { return view('reports.TeamPerformanceTracker'); })->name('reports.TeamPerformanceTracker');
     Route::get('/reports/ProjectMonitoring', function () { return view('reports.ProjectMonitoring'); })->name('reports.ProjectMonitoring');
+    Route::get('/reports/ProjectTracking', function () { return view('reports.ProjectTracking'); })->name('reports.ProjectTracking');
 });
 
 Route::get('/ticket-files/{filename}', function ($filename) {
