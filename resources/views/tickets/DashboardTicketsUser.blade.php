@@ -105,9 +105,9 @@
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     Feedback</th>
-                                    <th
-                                        class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                        Action</th>
+                                <th
+                                    class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
+                                    Action</th>
                                 <th
                                     class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
                                     IT Support</th>
@@ -129,20 +129,21 @@
                                     <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                    <td
+                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs whitespace-normal break-words">
                                         {{ $ticket->problem }}
                                     </td>
 
                                     <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
                                         {{ $ticket->solution ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
                                         {{ $ticket->feedback->description ?? '-' }}
                                     </td>
-                                      <td class="px-4 py-4 text-center">
+                                    <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
                                                 class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
@@ -166,7 +167,7 @@
                                             {{ $ticket->status->status_name }}
                                         </span>
                                     </td>
-                                  
+
                                 </tr>
                             @endforeach
                         </tbody>

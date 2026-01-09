@@ -165,8 +165,12 @@
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $project->progress_date ?? '-' }}</td>
                                 <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->description ?? '-' }}</td>
+                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text max-w-xs">
+                                    <div class="whitespace-normal break-words">
+                                        {{ $project->description ?? '-' }}
+                                    </div>
+                                </td>
+
 
 
                                 <td
