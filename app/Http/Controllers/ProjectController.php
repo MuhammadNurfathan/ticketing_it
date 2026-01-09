@@ -133,57 +133,51 @@ class ProjectController extends Controller
     }
 
     public function update(Request $request, ProjectHeader $project)
-    {
-        $validatedHeader = $request->validate([
-            'progress_percent' => 'required|numeric|min:0|max:100',
-            'status_id'        => 'required|integer',
-            'memo'             => 'nullable|string',
-            'developer_name'   => 'nullable|string',
-            'progress_date'   => 'required|date',
-        ]);
-
-        $progressPercent = $validatedHeader['progress_percent'];
-        $statusId = $validatedHeader['status_id'];
-
-        $totalPendingMinutes = (int) $project->pendings()->whereNotNull('duration_minutes')->sum('duration_minutes');
-
-        $endDate = \Carbon\Carbon::parse($project->end_date);
-        $effectiveEndDate = $endDate->copy()->addMinutes($totalPendingMinutes);
-
-        $updateData = [
-            'progress_percent'   => $progressPercent,
-            'status_id'          => $statusId,
-            'progress_date'      => $validatedHeader['progress_date'],
-            'memo'               => $validatedHeader['memo'] ?? null,
-            'effective_end_date' => $effectiveEndDate,
-
-        ];
-
-        if ($statusId == 3 && $progressPercent == 100) {
-            $actualEndDate = now();
-
-            $isLate = $actualEndDate->greaterThan($effectiveEndDate) ? 1 : 0;
-
-            $updateData['actual_end_date'] = $actualEndDate;
-            $updateData['is_late'] = $isLate;
-
-            $updateData['total_pending_minutes'] = $totalPendingMinutes;
-        }
-
-        $project->update($updateData);
-
-        ProjectDetail::create([
-            'project_header_id' => $project->id,
-            'progress_date'     => $validatedHeader['Progress_date'] ?? now(),
-            'progress_percent'  => $progressPercent,
-            'status_id'         => $statusId,
-            'memo'              => $validatedHeader['memo'] ?? null,
-            'developer_name'    => $validatedHeader['developer_name'] ?? null,
-        ]);
-
-        return redirect()->route('project.index')
-            ->with('success', 'Progress project berhasil diperbarui dan disimpan ke detail.');
+{
+    $validatedHeader = $request->validate([
+        'progress_percent' => 'required|numeric|min:0|max:100',
+        'status_id'        => 'required|integer',
+        'memo'             => 'nullable|string',
+        'developer_name'   => 'nullable|string',
+        'progress_date'    => 'required|date',
+    ]);
+    
+    $progressPercent = $validatedHeader['progress_percent'];
+    $statusId = $validatedHeader['status_id'];
+    $totalPendingMinutes = (int) $project->pendings()->whereNotNull('duration_minutes')->sum('duration_minutes');
+    $endDate = \Carbon\Carbon::parse($project->end_date);
+    $effectiveEndDate = $endDate->copy()->addMinutes($totalPendingMinutes);
+    
+    $updateData = [
+        'progress_percent'   => $progressPercent,
+        'status_id'          => $statusId,
+        'progress_date'      => $validatedHeader['progress_date'],
+        'memo'               => $validatedHeader['memo'] ?? null,
+        'effective_end_date' => $effectiveEndDate,
+    ];
+    
+    if ($statusId == 3 && $progressPercent == 100) {
+        $actualEndDate = now();
+        $isLate = $actualEndDate->greaterThan($effectiveEndDate) ? 1 : 0;
+        $updateData['actual_end_date'] = $actualEndDate;
+        $updateData['is_late'] = $isLate;
+        $updateData['total_pending_minutes'] = $totalPendingMinutes;
     }
+    
+    $project->update($updateData);
+    
+    ProjectDetail::create([
+        'project_header_id' => $project->id,
+        'progress_date'     => $validatedHeader['progress_date'], // FIXED: pake dari request
+        'progress_percent'  => $progressPercent,
+        'status_id'         => $statusId,
+        'memo'              => $validatedHeader['memo'] ?? null,
+        'developer_name'    => $validatedHeader['developer_name'] ?? null,
+    ]);
+    
+    return redirect()->route('project.index')
+        ->with('success', 'Progress project berhasil diperbarui dan disimpan ke detail.');
+}
 
     public function updateStatus(Request $request, ProjectHeader $project)
     {
