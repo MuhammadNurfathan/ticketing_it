@@ -11,57 +11,57 @@
     <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
         <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-         {{-- DOWNLOAD DATA PROJECT --}}
-<div
-    class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-    <div class="p-4 sm:p-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-            Download Data Project
-        </h2>
+            {{-- DOWNLOAD DATA PROJECT --}}
+            <div
+                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="p-4 sm:p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+                        Download Data Project
+                    </h2>
 
-        <form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
- {{-- TANGGAL MULAI --}}
-            <div>
-                <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
-                <input type="date" id="start_date"
-                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 
+                    <form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        {{-- TANGGAL MULAI --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tanggal Mulai</label>
+                            <input type="date" id="start_date"
+                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 
                            bg-white dark:bg-dark-eval-2 px-3 py-2 text-sm">
-            </div>
+                        </div>
 
-            {{-- TANGGAL AKHIR --}}
-            <div>
-                <label class="block text-sm font-medium mb-1">Tanggal Akhir</label>
-                <input type="date" id="end_date"
-                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 
+                        {{-- TANGGAL AKHIR --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Tanggal Akhir</label>
+                            <input type="date" id="end_date"
+                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 
                            bg-white dark:bg-dark-eval-2 px-3 py-2 text-sm">
-            </div>
+                        </div>
 
-            {{-- PRESET --}}
-            <div>
-                <label class="block text-sm font-medium mb-1">Preset Tanggal</label>
-                <select id="datePreset"
-                    class="w-full rounded-lg border-gray-300 dark:border-gray-600 
+                        {{-- PRESET --}}
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Preset Tanggal</label>
+                            <select id="datePreset"
+                                class="w-full rounded-lg border-gray-300 dark:border-gray-600 
                            bg-white dark:bg-dark-eval-2 px-3 py-2 text-sm">
-                    <option value="this_month" selected>Bulan Ini</option>
-                    <option value="today">Hari Ini</option>
-                    <option value="last_7_days">7 Hari Terakhir</option>
-                    <option value="">Custom</option>
-                </select>
-            </div>
+                                <option value="this_month" selected>Bulan Ini</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="last_7_days">7 Hari Terakhir</option>
+                                <option value="">Custom</option>
+                            </select>
+                        </div>
 
-           
-            {{-- PREVIEW --}}
-            <div>
-                <button type="button" id="previewBtn"
-                    class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 
+
+                        {{-- PREVIEW --}}
+                        <div>
+                            <button type="button" id="previewBtn"
+                                class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 
                            text-white rounded-lg text-sm font-medium">
-                    Preview
-                </button>
-            </div>
+                                Preview
+                            </button>
+                        </div>
 
-        </form>
-    </div>
-</div>
+                    </form>
+                </div>
+            </div>
 
             {{-- MODAL PREVIEW --}}
             <div id="previewModal"
@@ -178,9 +178,13 @@
         const startInp = document.getElementById('start_date');
         const endInp = document.getElementById('end_date');
 
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
+        function formatDateLocal(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
         }
+
 
         function applyPreset(type) {
             const today = new Date();
@@ -195,6 +199,7 @@
                     start = new Date(today.getFullYear(), today.getMonth(), 1);
                     end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
                     break;
+
 
                 case 'last_7_days':
                     start = new Date();
@@ -212,8 +217,8 @@
                     return; // custom
             }
 
-            startInp.value = formatDate(start);
-            endInp.value = formatDate(end);
+            startInp.value = formatDateLocal(start);
+            endInp.value = formatDateLocal(end);
         }
 
         // default load → Bulan Ini
@@ -257,32 +262,32 @@
                     ${
                         dev.projects.length
                         ? dev.projects.map(p => `
-                                    <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                        <div class="space-y-1.5">
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Project Code:</span> ${p.project_code}
-                                            </p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Project Name:</span> ${p.project_name}
-                                            </p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Status:</span> 
-                                                <span class="text-blue-600 dark:text-blue-400">${p.status}</span>
-                                            </p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Progress:</span> 
-                                                <span class="font-bold text-blue-600 dark:text-blue-400">${p.progress}%</span>
-                                            </p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Progress Date:</span> 
-                                                <span class="text-gray-600 dark:text-gray-400">${p.progress_date}</span>
-                                            </p>
-                                            <p class="text-sm text-gray-700 dark:text-gray-300">
-                                                <span class="font-semibold">Memo:</span> ${p.memo || '-'}
-                                            </p>
+                                        <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                            <div class="space-y-1.5">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Project Code:</span> ${p.project_code}
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Project Name:</span> ${p.project_name}
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Status:</span> 
+                                                    <span class="text-blue-600 dark:text-blue-400">${p.status}</span>
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Progress:</span> 
+                                                    <span class="font-bold text-blue-600 dark:text-blue-400">${p.progress}%</span>
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Progress Date:</span> 
+                                                    <span class="text-gray-600 dark:text-gray-400">${p.progress_date}</span>
+                                                </p>
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">
+                                                    <span class="font-semibold">Memo:</span> ${p.memo || '-'}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                `).join('')
+                                    `).join('')
                         : `<p class="text-center text-gray-400 dark:text-gray-500 italic">No Data Available</p>`
                     }
                 </div>
