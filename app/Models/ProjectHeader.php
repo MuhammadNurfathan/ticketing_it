@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProjectHeader extends Model
 {
     use HasFactory, SoftDeletes;
+    
     protected $table = 'project_header';
+    
     protected $fillable = [
         'project_code',
         'project_name',
@@ -20,9 +22,8 @@ class ProjectHeader extends Model
         'priority_id',
         'status_id',
         'progress_percent',
-        'progress_date',
-        'start_date',
-        'end_date',
+        'start_date',           // ✅ TAMBAHIN INI
+        'end_date',             // ✅ TAMBAHIN INI
         'actual_start_date',
         'actual_end_date',
         'effective_end_date',
@@ -31,11 +32,15 @@ class ProjectHeader extends Model
         'notes'
     ];
 
-    protected $date = [
-        'progress_date',
-        'start_date',
-        'end_date',
-        'deleted_at'
+    // ✅ GANTI $date (typo) jadi $casts
+    protected $casts = [
+        'request_date' => 'datetime',
+        'start_date' => 'datetime',        // ✅ TAMBAHIN INI
+        'end_date' => 'datetime',          // ✅ TAMBAHIN INI
+        'actual_start_date' => 'datetime',
+        'actual_end_date' => 'datetime',
+        'effective_end_date' => 'datetime',
+        'is_late' => 'boolean',
     ];
 
     public function details()
@@ -62,7 +67,7 @@ class ProjectHeader extends Model
     {
         return $this->hasMany(Pending::class, 'id_project_header');
     }
-
+    
 
     public function scopeBetweenRequestDates($query, $start, $end)
     {

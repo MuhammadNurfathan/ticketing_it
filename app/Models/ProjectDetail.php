@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProjectDetail extends Model
 {
-  use HasFactory;
+    use HasFactory; // ✅ HAPUS SoftDeletes
+    
     protected $table = 'project_detail';
+    
     protected $fillable = [
         'project_header_id',
         'progress_date',
@@ -19,9 +20,8 @@ class ProjectDetail extends Model
         'developer_name',
     ];
 
-    protected $dates = [
-        'progress_date',
-        'deleted_at',
+    protected $casts = [
+        'progress_date' => 'datetime',
     ];
 
     public function header(){
@@ -29,8 +29,6 @@ class ProjectDetail extends Model
     }
 
     public function status(){
-        return $this->belongsTo(Status::class,'status_id')->withTrashed();
+        return $this->belongsTo(Status::class, 'status_id')->withTrashed();
     }
-
-
 }
