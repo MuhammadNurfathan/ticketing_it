@@ -209,9 +209,19 @@
                         {{-- Cards Container --}}
                         <div id="mobileCards" class="space-y-4">
 
-                            @php
-                                $sortedMobile = $myTicket->sortByDesc(fn($t) => $t->status_id == 3 ? 1 : 0);
-                            @endphp
+               @php
+$sortedMobile = $myTicket->sortByDesc(function($t) {
+    switch($t->status_id) {
+        case 3: return 4; // Done = paling tinggi
+        case 2: 
+        case 1: return 3; // In Progress / Waiting = setelah Done
+        case 5: return 2; // Feedback
+        case 4: return 1; // Void = paling bawah
+        default: return 0;
+    }
+})->sortByDesc('request_date'); // ticket terbaru dulu dalam group
+@endphp
+
 
                             @foreach ($sortedMobile as $ticket)
                                 <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4
@@ -223,7 +233,11 @@
                                     data-status="{{ strtolower($ticket->status->status_name) }}"
                                     data-support="{{ strtolower($ticket->support->name ?? '') }}"
                                     data-feedback="{{ strtolower($ticket->feedback->description ?? '') }}"
-                                    data-priority="{{ $ticket->status_id == 3 ? '1' : '0' }}">
+                                    data-priority="{{ 
+        $ticket->status_id == 3 ? 4 :
+        ($ticket->status_id == 1 || $ticket->status_id == 2 ? 3 :
+        ($ticket->status_id == 5 ? 2 : 1))
+     }}">
 
                                     {{-- Header --}}
                                     <div class="flex justify-between items-start mb-3">
@@ -455,24 +469,19 @@
         document.addEventListener("DOMContentLoaded", () => {
             // ===== Desktop DataTable =====
             if (window.innerWidth >= 1024) {
-                new DataTable(".datatable", {
-                    responsive: false,
-                    pageLength: 5,
-                    lengthMenu: [
-                        [5, 10, 25, 50, -1],
-                        [5, 10, 25, 50, "All"]
-                    ],
-                    order: [
-                        [8, "desc"],
-                        [0, "desc"],
-                    ],
-                    layout: {
-                        topStart: "pageLength",
-                        topEnd: "search",
-                        bottomStart: "info",
-                        bottomEnd: "paging"
-                    }
-                });
+               new DataTable(".datatable", {
+    responsive: false,
+    pageLength: 5,
+    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+    order: [], // **kosongkan**, biar urutan backend tetap dipakai
+    layout: {
+        topStart: "pageLength",
+        topEnd: "search",
+        bottomStart: "info",
+        bottomEnd: "paging"
+    }
+});
+
             }
 
             // ===== Mobile Pagination =====

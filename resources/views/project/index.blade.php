@@ -732,20 +732,26 @@
 
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: false,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength", // ✔️ fitur resmi v2
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
-            });
-        });
-    </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    new DataTable(".datatable", {
+        responsive: false,        // non-responsive, bisa diubah true kalau mau
+        pageLength: 3,            // default rows per page
+        lengthMenu: [              // pilihan Page Length
+            [3, 5, 10, 25, 50, -1], // nilai internal
+            [3, 5, 10, 25, 50, "All"] // label yang muncul di dropdown
+        ],
+        order: [[0, "desc"]],     // default sort, kolom pertama descending
+        layout: {
+            topStart: "pageLength", // tampilkan dropdown page length
+            topEnd: "search",       // search box
+            bottomStart: "info",    // info tabel
+            bottomEnd: "paging"     // pagination
+        }
+    });
+});
+</script>
+
 
 
     <script>

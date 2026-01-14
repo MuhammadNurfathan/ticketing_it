@@ -61,7 +61,7 @@
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $f->ticket->user->name ?? '-' }}
+                                    {{ $f->ticket->nama_pembuat ?? '-' }}
                                 </td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">

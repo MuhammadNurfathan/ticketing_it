@@ -140,7 +140,7 @@
                                     {{ $ticket->ticket_code }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->user->name ?? '-' }}</td>
+                                    {{ $ticket->nama_pembuat ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->user->department->department_name }} -
@@ -284,9 +284,9 @@
                                 <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     Tanggal Req</th>
-                                <th
+                                <!-- <th
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    Image</th>
+                                    Image</th> -->
 
                                 @auth
                                     @if (Auth::user()->role_id != 3)
@@ -307,7 +307,7 @@
                                         {{ $ticket->ticket_code }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->user->name ?? '-' }}</td>
+                                        {{ $ticket->nama_pembuat ?? '-' }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                         {{ $ticket->user->department->department_name }} -
@@ -320,8 +320,8 @@
                                         {{ $ticket->problem }}</td>
                                     <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                        {{ $ticket->request_date?->format('Y-m-d') }}</td>
-                                    <td
+                                        {{ $ticket->request_date?->format('Y-m-d H:i:s') }}</td>
+                                    <!-- <td
                                         class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                        @if ($ticket->image)
     <a href="{{ asset('storage/tickets/' . basename($ticket->image)) }}"
@@ -333,7 +333,7 @@
     <span class="text-gray-500 text-sm italic">No media</span>
 @endif
 
-                                    </td>
+                                    </td> -->
                                     @auth
                                         @if (Auth::user()->role_id != 3)
                                             <td class="border border-gray-300 dark:border-gray-600 p-2 text-center"
@@ -459,9 +459,9 @@
                             <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                 Status</th>
-                            <th
+                            <!-- <th
                                 class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                Image</th>
+                                Image</th> -->
 
                         </tr>
                     </thead>
@@ -473,7 +473,7 @@
                                     {{ $ticket->ticket_code }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->user->name ?? '-' }}</td>
+                                    {{ $ticket->nama_pembuat ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->user->department->department_name }} -
@@ -507,7 +507,7 @@
 
 
 
-                                <td
+                                <!-- <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                    @if ($ticket->image)
     <a href="{{ asset('storage/tickets/' . basename($ticket->image)) }}"
@@ -519,7 +519,7 @@
     <span class="text-gray-500 text-sm italic">No media</span>
 @endif
 
-                                </td>
+                                </td> -->
                             </tr>
                         @endforeach
                     </tbody>
@@ -568,7 +568,7 @@
                                     {{ $ticket->ticket_code ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $ticket->user->name ?? '-' }}</td>
+                                    {{ $ticket->nama_pembuat ?? '-' }}</td>
                                 <td
                                     class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
                                     {{ $ticket->user->department->department_name }} -
@@ -618,10 +618,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     new DataTable(".datatable", {
         responsive: false,
-        pageLength: 5,                 // default 5
+        pageLength: 3,                 // default 5
         lengthMenu: [                  // pilihan Page Length
-            [5, 10, 25, 50, -1],
-            [5, 10, 25, 50, "All"]
+            [3, 5, 10, 25, 50, -1],
+            [3, 5, 10, 25, 50, "All"]
         ],
         order: [[0, "desc"]],          // default ordering kolom pertama
         layout: {

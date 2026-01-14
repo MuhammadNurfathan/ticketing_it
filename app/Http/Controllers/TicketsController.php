@@ -36,7 +36,17 @@ class TicketsController extends Controller
     public function indexUser()
     {
         $userId = Auth::id();
-        $myTicket = Ticket::where('user_id', $userId)->latest()->get();
+        $myTicket = Ticket::where('user_id', auth()->id())
+    ->orderByRaw("
+        CASE 
+            WHEN status_id = 3 THEN 1       -- Done paling atas
+            WHEN status_id IN (1,2) THEN 2 -- Waiting/In Progress berikutnya
+            ELSE 3                         -- Sisanya
+        END
+    ")
+    ->orderByDesc('request_date')  // ticket terbaru di atas untuk yang sama priority
+    ->get();
+
 
         $data = Ticket::data();
         $users = $data['users'];
