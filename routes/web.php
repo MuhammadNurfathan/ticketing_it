@@ -24,16 +24,20 @@ use Illuminate\Support\Facades\Route;
 
 // Route login & profile
 Route::middleware('guest')->group(function () {
-    Route::get('/', function () { return view('auth/login'); });
+    Route::get('/', function () {
+        return view('auth/login');
+    });
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+
     // Tambahkan name di sini
-    Route::get('/dashboard', function () { return view('dashboard'); })->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 });
 
 
@@ -59,9 +63,14 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
 Route::middleware(['auth', 'role:1,2,3'])->group(function () {
     Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
     Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.indexUser');
+    Route::get('/DashboardTicketsUser/{ticket_id}', [TicketsController::class, 'editUser'])->name('DashboardTicketsUser.edit');
     Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
     Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
     Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
+    Route::put(
+        '/DashboardTicketsUser/update/{id}',
+        [TicketsController::class, 'updateUser']
+    )->name('DashboardTicketsUser.update');
 });
 
 // Khusus Superadmin (role_id 2)
@@ -72,32 +81,40 @@ Route::middleware(['auth', 'role:1,2'])->group(function () {
     Route::post('/project/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('project.continueProgress');
     Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
 
-    Route::get('/reports/ExcecutiveTicketsInsight', function () { return view('reports.ExcecutiveTicketsInsight'); })->name('reports.ExcecutiveTicketsInsight');
-    Route::get('/reports/TeamPerformanceTracker', function () { return view('reports.TeamPerformanceTracker'); })->name('reports.TeamPerformanceTracker');
-    Route::get('/reports/ProjectMonitoring', function () { return view('reports.ProjectMonitoring'); })->name('reports.ProjectMonitoring');
-    Route::get('/reports/ProjectTracking', function () { return view('reports.ProjectTracking'); })->name('reports.ProjectTracking');
+    Route::get('/reports/ExcecutiveTicketsInsight', function () {
+        return view('reports.ExcecutiveTicketsInsight');
+    })->name('reports.ExcecutiveTicketsInsight');
+    Route::get('/reports/TeamPerformanceTracker', function () {
+        return view('reports.TeamPerformanceTracker');
+    })->name('reports.TeamPerformanceTracker');
+    Route::get('/reports/ProjectMonitoring', function () {
+        return view('reports.ProjectMonitoring');
+    })->name('reports.ProjectMonitoring');
+    Route::get('/reports/ProjectTracking', function () {
+        return view('reports.ProjectTracking');
+    })->name('reports.ProjectTracking');
 });
 
 Route::get('/ticket-files/{filename}', function ($filename) {
     $filename = basename($filename);
     $path = storage_path('app/public/tickets/' . $filename);
-    
+
     if (!file_exists($path)) {
         abort(404);
     }
-    
+
     // Pake readfile langsung (paling reliable)
     $type = mime_content_type($path) ?: 'application/octet-stream';
-    
+
     header('Content-Type: ' . $type);
     header('Content-Length: ' . filesize($path));
     header('Content-Disposition: inline; filename="' . $filename . '"');
     header('Cache-Control: public, max-age=31536000');
-    
+
     readfile($path);
     exit;
 })
-->middleware(['auth', 'role:1,2,3'])
-->name('ticket.file');
+    ->middleware(['auth', 'role:1,2,3'])
+    ->name('ticket.file');
 
 require __DIR__ . '/auth.php';

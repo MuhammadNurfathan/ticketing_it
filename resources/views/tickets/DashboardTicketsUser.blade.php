@@ -79,7 +79,8 @@
 
             {{-- Tickets Table/List --}}
 
-            <div class="bg-white rounded-lg dark:bg-dark-eval-1 shadow-md p-4 border border-gray-200 dark:border-gray-700">
+            <div
+                class="bg-white rounded-lg dark:bg-dark-eval-1 shadow-md p-4 border border-gray-200 dark:border-gray-700">
                 <div class="overflow-x-auto py-4" id="desktop-wrapper">
                     <table class="datatable w-full text-gray-900 dark:text-gray-100">
                         <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
@@ -135,10 +136,12 @@
                                     <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
                                         {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
+                                    <td
+                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
                                         {{ $ticket->solution ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
+                                    <td
+                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
                                         {{ $ticket->feedback->description ?? '-' }}
                                     </td>
                                     <td class="px-4 py-4 text-center">
@@ -146,6 +149,11 @@
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
                                                 class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
                                                 Berikan Feedback
+                                            </a>
+                                        @elseif ($ticket->status_id == 1)
+                                            <a href="{{ route('DashboardTicketsUser.edit', $ticket->id) }}"
+                                                class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors">
+                                                Edit
                                             </a>
                                         @else
                                             <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
@@ -176,51 +184,51 @@
                     <div class="p-4 space-y-4">
 
                         {{-- Search & Filter --}}
-                        
 
-                            <div class="flex items-center gap-2 w-full">
 
-                                <!-- SEARCH FLEX -->
-                                <input type="text" id="mobileSearch" placeholder="Search..."
-                                    class="flex-1 min-w-0 px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md
+                        <div class="flex items-center gap-2 w-full">
+
+                            <!-- SEARCH FLEX -->
+                            <input type="text" id="mobileSearch" placeholder="Search..."
+                                class="flex-1 min-w-0 px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md
                            bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
                            placeholder-gray-500 dark:placeholder-gray-400
                            focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:border-transparent" />
 
-                                <!-- SELECT FLEX -->
-                              <select id="mobilePerPage"
-    class="px-2 pr-6 py-1.5 text-xs min-w-[55px] border border-gray-300 dark:border-gray-600 rounded-md
+                            <!-- SELECT FLEX -->
+                            <select id="mobilePerPage"
+                                class="px-2 pr-6 py-1.5 text-xs min-w-[55px] border border-gray-300 dark:border-gray-600 rounded-md
            bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
            focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 appearance-none">
-    <option value="3" selected>3</option>
-    <option value="5">5</option>
-    <option value="10">10</option>
-    <option value="25">25</option>
-    <option value="all">All</option>
-</select>
+                                <option value="3" selected>3</option>
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="all">All</option>
+                            </select>
 
-                            </div>
+                        </div>
 
 
                         {{-- Cards Container --}}
                         <div id="mobileCards" class="space-y-4">
 
 
-               @php
-$sortedMobile = $myTicket->sort(function($a, $b) {
-    // Priority berdasarkan status (semakin kecil = semakin tinggi prioritas)
-    $priorityA = ($a->status_id == 3) ? 1 : (in_array($a->status_id, [1,2]) ? 2 : 3);
-    $priorityB = ($b->status_id == 3) ? 1 : (in_array($b->status_id, [1,2]) ? 2 : 3);
-    
-    // Jika priority berbeda, urutkan berdasarkan priority
-    if ($priorityA != $priorityB) {
-        return $priorityA - $priorityB;
-    }
-    
-    // Jika priority sama, urutkan berdasarkan request_date (terbaru dulu)
-    return $b->request_date <=> $a->request_date;
-});
-@endphp
+                            @php
+                                $sortedMobile = $myTicket->sort(function ($a, $b) {
+                                    // Priority berdasarkan status (semakin kecil = semakin tinggi prioritas)
+                                    $priorityA = $a->status_id == 3 ? 1 : (in_array($a->status_id, [1, 2]) ? 2 : 3);
+                                    $priorityB = $b->status_id == 3 ? 1 : (in_array($b->status_id, [1, 2]) ? 2 : 3);
+
+                                    // Jika priority berbeda, urutkan berdasarkan priority
+                                    if ($priorityA != $priorityB) {
+                                        return $priorityA - $priorityB;
+                                    }
+
+                                    // Jika priority sama, urutkan berdasarkan request_date (terbaru dulu)
+                                    return $b->request_date <=> $a->request_date;
+                                });
+                            @endphp
 
                             @foreach ($sortedMobile as $ticket)
                                 <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4
@@ -232,11 +240,13 @@ $sortedMobile = $myTicket->sort(function($a, $b) {
                                     data-status="{{ strtolower($ticket->status->status_name) }}"
                                     data-support="{{ strtolower($ticket->support->name ?? '') }}"
                                     data-feedback="{{ strtolower($ticket->feedback->description ?? '') }}"
-                                    data-priority="{{ 
-        $ticket->status_id == 3 ? 4 :
-        ($ticket->status_id == 1 || $ticket->status_id == 2 ? 3 :
-        ($ticket->status_id == 5 ? 2 : 1))
-     }}">
+                                    data-priority="{{ $ticket->status_id == 3
+                                        ? 4
+                                        : ($ticket->status_id == 1 || $ticket->status_id == 2
+                                            ? 3
+                                            : ($ticket->status_id == 5
+                                                ? 2
+                                                : 1)) }}">
 
                                     {{-- Header --}}
                                     <div class="flex justify-between items-start mb-3">
@@ -340,17 +350,26 @@ $sortedMobile = $myTicket->sort(function($a, $b) {
                                         @endif
                                     </div>
 
-                                   {{-- Give Feedback Button --}}
-@if ($ticket->status_id == 3)
-    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-        <a href="{{ route('feedback.form', $ticket->id) }}"
-            class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
+                                    {{-- Give Feedback Button --}}
+                                    @if ($ticket->status_id == 3)
+                                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                            <a href="{{ route('feedback.form', $ticket->id) }}"
+                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
             dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
             text-sm font-medium transition-colors shadow-sm">
-            Berikan Feedback
-        </a>
-    </div>
-@endif
+                                                Berikan Feedback
+                                            </a>
+                                        </div>
+                                        @elseif ($ticket->status_id == 1)
+                                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                            <a href="{{ route('DashboardTicketsUser.edit', $ticket->id) }}"
+                                                class="block w-full text-center px-4 py-2 bg-blue-500 hover:bg-blue-600
+            dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
+            text-sm font-medium transition-colors shadow-sm">
+                                                Edit
+                                            </a>
+                                        </div>
+                                    @endif
 
                                 </div>
                             @endforeach
@@ -464,218 +483,223 @@ $sortedMobile = $myTicket->sort(function($a, $b) {
         }
     </style>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    // ===== Desktop DataTable =====
-    if (window.innerWidth >= 1024) {
-        new DataTable(".datatable", {
-            responsive: false,
-            pageLength: 5,
-            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-            order: [],
-            layout: {
-                topStart: "pageLength",
-                topEnd: "search",
-                bottomStart: "info",
-                bottomEnd: "paging"
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // ===== Desktop DataTable =====
+            if (window.innerWidth >= 1024) {
+                new DataTable(".datatable", {
+                    responsive: false,
+                    pageLength: 5,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, "All"]
+                    ],
+                    order: [],
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    }
+                });
             }
-        });
-    }
 
-    // ===== Mobile Pagination =====
-    let currentPage = 1;
-    let perPage = 3; // Default 3 data
-    let filteredCards = [];
+            // ===== Mobile Pagination =====
+            let currentPage = 1;
+            let perPage = 3; // Default 3 data
+            let filteredCards = [];
 
-    const mobileSearch = document.getElementById("mobileSearch");
-    const mobilePerPage = document.getElementById("mobilePerPage");
-    const mobilePagination = document.getElementById("mobilePagination");
-    const mobilePaginationButtons = document.getElementById("mobilePaginationButtons");
-    const mobileInfo = document.getElementById("mobileInfo");
-    const mobileCardsContainer = document.getElementById("mobileCards");
+            const mobileSearch = document.getElementById("mobileSearch");
+            const mobilePerPage = document.getElementById("mobilePerPage");
+            const mobilePagination = document.getElementById("mobilePagination");
+            const mobilePaginationButtons = document.getElementById("mobilePaginationButtons");
+            const mobileInfo = document.getElementById("mobileInfo");
+            const mobileCardsContainer = document.getElementById("mobileCards");
 
-    function getAllCards() {
-        return Array.from(document.querySelectorAll(".ticket-card"));
-    }
-
-    function filterCards() {
-        const searchTerm = mobileSearch.value.toLowerCase().trim();
-        const allCards = getAllCards();
-
-        filteredCards = allCards.filter(card => {
-            const searchText = [
-                card.dataset.code || '',
-                card.dataset.category || '',
-                card.dataset.problem || '',
-                card.dataset.status || '',
-                card.dataset.support || '',
-                card.dataset.feedback || ''
-            ].join(" ").toLowerCase();
-
-            return searchText.includes(searchTerm);
-        });
-
-        // Sort by priority (highest first)
-        filteredCards.sort((a, b) => {
-            const priorityA = parseInt(a.dataset.priority) || 0;
-            const priorityB = parseInt(b.dataset.priority) || 0;
-            return priorityB - priorityA;
-        });
-
-        currentPage = 1;
-        displayCards();
-    }
-
-    function displayCards() {
-        const allCards = getAllCards();
-        
-        // Hide all cards first
-        allCards.forEach(card => {
-            card.style.display = "none";
-        });
-
-        // Check if "All" is selected
-        if (mobilePerPage.value === "all") {
-            filteredCards.forEach(card => {
-                card.style.display = "block";
-            });
-            mobilePagination.style.display = "none";
-            return;
-        }
-
-        // Calculate pagination
-        const start = (currentPage - 1) * perPage;
-        const end = start + perPage;
-        const cardsToShow = filteredCards.slice(start, end);
-
-        // Show cards for current page
-        cardsToShow.forEach(card => {
-            card.style.display = "block";
-        });
-
-        // Update pagination controls
-        updatePagination();
-        updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
-        mobilePagination.style.display = "flex";
-    }
-
-    function updatePagination() {
-        const totalPages = Math.ceil(filteredCards.length / perPage);
-        mobilePaginationButtons.innerHTML = "";
-
-        if (totalPages <= 1) {
-            mobilePaginationButtons.style.display = "none";
-            return;
-        }
-        mobilePaginationButtons.style.display = "flex";
-
-        const isDark = document.documentElement.classList.contains('dark');
-
-        // Button classes
-        const btnBaseClass = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
-        const btnNormalClass = isDark ?
-            "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
-            "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100";
-        const btnActiveClass = isDark ?
-            "bg-gray-100 text-gray-900 border-none" :
-            "bg-gray-900 text-white border-none";
-        const btnDisabledClass = "opacity-50 cursor-not-allowed";
-
-        // Previous button
-        const prevBtn = document.createElement("button");
-        prevBtn.innerHTML = "‹";
-        prevBtn.className = `${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? btnDisabledClass : ''}`;
-        prevBtn.disabled = currentPage === 1;
-        if (!prevBtn.disabled) {
-            prevBtn.addEventListener("click", () => changePage(currentPage - 1));
-        }
-        mobilePaginationButtons.appendChild(prevBtn);
-
-        // Page number buttons
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, startPage + 4);
-        
-        // Adjust if we're near the end
-        if (endPage - startPage < 4) {
-            startPage = Math.max(1, endPage - 4);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const pageBtn = document.createElement("button");
-            pageBtn.textContent = i;
-            pageBtn.className = `${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}`;
-            
-            if (i !== currentPage) {
-                pageBtn.addEventListener("click", () => changePage(i));
-            } else {
-                pageBtn.disabled = true;
+            function getAllCards() {
+                return Array.from(document.querySelectorAll(".ticket-card"));
             }
-            
-            mobilePaginationButtons.appendChild(pageBtn);
-        }
 
-        // Next button
-        const nextBtn = document.createElement("button");
-        nextBtn.innerHTML = "›";
-        nextBtn.className = `${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? btnDisabledClass : ''}`;
-        nextBtn.disabled = currentPage === totalPages;
-        if (!nextBtn.disabled) {
-            nextBtn.addEventListener("click", () => changePage(currentPage + 1));
-        }
-        mobilePaginationButtons.appendChild(nextBtn);
-    }
+            function filterCards() {
+                const searchTerm = mobileSearch.value.toLowerCase().trim();
+                const allCards = getAllCards();
 
-    function updateInfo(start, end, total) {
-        if (total === 0) {
-            mobileInfo.textContent = "No tickets found";
-        } else {
-            mobileInfo.textContent = `Showing ${start}-${end} of ${total} tickets`;
-        }
-    }
+                filteredCards = allCards.filter(card => {
+                    const searchText = [
+                        card.dataset.code || '',
+                        card.dataset.category || '',
+                        card.dataset.problem || '',
+                        card.dataset.status || '',
+                        card.dataset.support || '',
+                        card.dataset.feedback || ''
+                    ].join(" ").toLowerCase();
 
-    function changePage(page) {
-        currentPage = page;
-        displayCards();
-        
-        // Smooth scroll to top of mobile cards
-        if (mobileCardsContainer) {
-            mobileCardsContainer.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }
-    }
+                    return searchText.includes(searchTerm);
+                });
 
-    // Event listeners
-    if (mobileSearch) {
-        mobileSearch.addEventListener("input", filterCards);
-    }
+                // Sort by priority (highest first)
+                filteredCards.sort((a, b) => {
+                    const priorityA = parseInt(a.dataset.priority) || 0;
+                    const priorityB = parseInt(b.dataset.priority) || 0;
+                    return priorityB - priorityA;
+                });
 
-    if (mobilePerPage) {
-        mobilePerPage.addEventListener("change", () => {
-            perPage = mobilePerPage.value === "all" ? 999999 : parseInt(mobilePerPage.value);
-            currentPage = 1;
-            displayCards();
-        });
-    }
+                currentPage = 1;
+                displayCards();
+            }
 
-    // Initial load - only run if on mobile
-    if (window.innerWidth < 1024) {
-        filterCards();
-    }
+            function displayCards() {
+                const allCards = getAllCards();
 
-    // Handle window resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
+                // Hide all cards first
+                allCards.forEach(card => {
+                    card.style.display = "none";
+                });
+
+                // Check if "All" is selected
+                if (mobilePerPage.value === "all") {
+                    filteredCards.forEach(card => {
+                        card.style.display = "block";
+                    });
+                    mobilePagination.style.display = "none";
+                    return;
+                }
+
+                // Calculate pagination
+                const start = (currentPage - 1) * perPage;
+                const end = start + perPage;
+                const cardsToShow = filteredCards.slice(start, end);
+
+                // Show cards for current page
+                cardsToShow.forEach(card => {
+                    card.style.display = "block";
+                });
+
+                // Update pagination controls
+                updatePagination();
+                updateInfo(start + 1, Math.min(end, filteredCards.length), filteredCards.length);
+                mobilePagination.style.display = "flex";
+            }
+
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredCards.length / perPage);
+                mobilePaginationButtons.innerHTML = "";
+
+                if (totalPages <= 1) {
+                    mobilePaginationButtons.style.display = "none";
+                    return;
+                }
+                mobilePaginationButtons.style.display = "flex";
+
+                const isDark = document.documentElement.classList.contains('dark');
+
+                // Button classes
+                const btnBaseClass = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
+                const btnNormalClass = isDark ?
+                    "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
+                    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-100";
+                const btnActiveClass = isDark ?
+                    "bg-gray-100 text-gray-900 border-none" :
+                    "bg-gray-900 text-white border-none";
+                const btnDisabledClass = "opacity-50 cursor-not-allowed";
+
+                // Previous button
+                const prevBtn = document.createElement("button");
+                prevBtn.innerHTML = "‹";
+                prevBtn.className =
+                `${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? btnDisabledClass : ''}`;
+                prevBtn.disabled = currentPage === 1;
+                if (!prevBtn.disabled) {
+                    prevBtn.addEventListener("click", () => changePage(currentPage - 1));
+                }
+                mobilePaginationButtons.appendChild(prevBtn);
+
+                // Page number buttons
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+
+                // Adjust if we're near the end
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageBtn = document.createElement("button");
+                    pageBtn.textContent = i;
+                    pageBtn.className = `${btnBaseClass} ${i === currentPage ? btnActiveClass : btnNormalClass}`;
+
+                    if (i !== currentPage) {
+                        pageBtn.addEventListener("click", () => changePage(i));
+                    } else {
+                        pageBtn.disabled = true;
+                    }
+
+                    mobilePaginationButtons.appendChild(pageBtn);
+                }
+
+                // Next button
+                const nextBtn = document.createElement("button");
+                nextBtn.innerHTML = "›";
+                nextBtn.className =
+                    `${btnBaseClass} ${btnNormalClass} ${currentPage === totalPages ? btnDisabledClass : ''}`;
+                nextBtn.disabled = currentPage === totalPages;
+                if (!nextBtn.disabled) {
+                    nextBtn.addEventListener("click", () => changePage(currentPage + 1));
+                }
+                mobilePaginationButtons.appendChild(nextBtn);
+            }
+
+            function updateInfo(start, end, total) {
+                if (total === 0) {
+                    mobileInfo.textContent = "No tickets found";
+                } else {
+                    mobileInfo.textContent = `Showing ${start}-${end} of ${total} tickets`;
+                }
+            }
+
+            function changePage(page) {
+                currentPage = page;
+                displayCards();
+
+                // Smooth scroll to top of mobile cards
+                if (mobileCardsContainer) {
+                    mobileCardsContainer.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }
+            }
+
+            // Event listeners
+            if (mobileSearch) {
+                mobileSearch.addEventListener("input", filterCards);
+            }
+
+            if (mobilePerPage) {
+                mobilePerPage.addEventListener("change", () => {
+                    perPage = mobilePerPage.value === "all" ? 999999 : parseInt(mobilePerPage.value);
+                    currentPage = 1;
+                    displayCards();
+                });
+            }
+
+            // Initial load - only run if on mobile
             if (window.innerWidth < 1024) {
                 filterCards();
             }
-        }, 250);
-    });
-});
-</script>
+
+            // Handle window resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth < 1024) {
+                        filterCards();
+                    }
+                }, 250);
+            });
+        });
+    </script>
 
 
 </x-app-layout>

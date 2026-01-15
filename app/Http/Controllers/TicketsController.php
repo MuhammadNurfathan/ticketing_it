@@ -37,15 +37,15 @@ class TicketsController extends Controller
     {
         $userId = Auth::id();
         $myTicket = Ticket::where('user_id', auth()->id())
-    ->orderByRaw("
+            ->orderByRaw("
         CASE 
             WHEN status_id = 3 THEN 1       -- Done paling atas
             WHEN status_id IN (1,2) THEN 2 -- Waiting/In Progress berikutnya
             ELSE 3                         -- Sisanya
         END
     ")
-    ->orderByDesc('request_date')  // ticket terbaru di atas untuk yang sama priority
-    ->get();
+            ->orderByDesc('request_date')  // ticket terbaru di atas untuk yang sama priority
+            ->get();
 
 
         $data = Ticket::data();
@@ -60,7 +60,7 @@ class TicketsController extends Controller
             'hasDoneTicket',
             'users',
             'assets',
-            'categories',   
+            'categories',
         ));
 
         if ($hasDoneWithoutFeedback) {
@@ -86,6 +86,8 @@ class TicketsController extends Controller
 
         );
     }
+
+
 
     public function createUser()
     {
@@ -120,7 +122,7 @@ class TicketsController extends Controller
         ]);
     }
 
-    
+
     public function store(Request $request)
     {
         $isFromUser = $request->input('from') === 'user';
@@ -214,6 +216,35 @@ class TicketsController extends Controller
             );
         }
     }
+
+      public function editUser($id)
+    {
+        $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
+        $data = Ticket::data();
+
+        return view('tickets.EditUser', [
+            'ticket'      => $ticket,
+            'users'       => $data['users'],
+            'categories'  => $data['categories'],
+        ]);
+    }
+public function updateUser(Request $request, $id)
+{
+    $ticket = Ticket::findOrFail($id);
+
+    $validated = $request->validate([
+        'nama_pembuat' => 'sometimes|nullable|string',
+        'problem' => 'sometimes|nullable|string',
+        'problem_category_id' => 'sometimes|nullable|exists:problem_categories,id',
+    ]);
+
+    $ticket->update($validated);
+
+    return redirect()
+        ->route('DashboardTicketsUser.indexUser')
+        ->with('success', '✅ Ticket berhasil diupdate!');
+}
+
 
     public function update(Request $request, $id)
     {
@@ -312,7 +343,7 @@ class TicketsController extends Controller
             ->with('success', 'Status tiket berhasil diperbarui.');
     }
 
-   public function updateStatusDone(Request $request, Ticket $ticket)
+    public function updateStatusDone(Request $request, Ticket $ticket)
     {
         // Validasi input
         $validated = $request->validate([
@@ -321,28 +352,27 @@ class TicketsController extends Controller
             'solution'   => 'required|string',
             'notes'      => 'nullable|string',
         ]);
-    
+
         // Hitung time_spent
         $timeSpent = $validated['time_spent'] ?? $ticket->time_spent ?? 0;
         $validated['time_spent'] = $timeSpent;
-    
+
         // Tandai apakah terlambat (lebih dari 480 menit / 8 jam)
         $validated['is_late'] = $timeSpent > 480;
-    
+
         // Jika status Done (3), set end_date sekarang
         if ($validated['status_id'] == 3) {
             $validated['end_date'] = now();
         }
-    
+
         // Update ticket dengan data validasi
         $ticket->update($validated);
-    
+
         // Kirim notifikasi Done
         if ($validated['status_id'] == 3) {
             $this->sendDoneNotification($ticket);
         }
-    
+
         return back()->with('success', 'Ticket updated successfully.');
     }
-
 }
