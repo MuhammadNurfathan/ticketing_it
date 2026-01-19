@@ -1,453 +1,650 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-900 dark:text-white">
-            {{ __('Executive Ticket Insight') }}
-        </h2>
+        <div>
+            <h2 class="font-semibold text-xl text-light-text dark:text-dark-text">
+                {{ __('Executive Ticket Insight') }}
+            </h2>
+            <p class="text-xs mt-1 text-light-text-secondary dark:text-dark-text-secondary">
+                Download data + insight per developer & support
+            </p>
+        </div>
     </x-slot>
 
-    <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
-        <div class="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    @php
+        $page = 'min-h-screen bg-light-bg dark:bg-dark-bg';
+        $wrap = 'w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6';
 
-                    {{-- DOWNLOAD DATA SECTION --}}
-                    <div
-                        class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                        <div class="p-4 sm:p-6">
-                            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Download Data Tickets</h2>
+        $card = "rounded-2xl border shadow-sm overflow-hidden
+                 bg-light-eval-1 dark:bg-dark-eval-1
+                 border-light-eval-3 dark:border-dark-eval-2";
 
-                            <form id="exportForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div>
-                                    <label for="start_date"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Mulai
-                                    </label>
-                                    <input type="date" id="start_date" name="start_date"
-                                        class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                                </div>
+        $head = "p-4 sm:p-6 border-b
+                 border-light-eval-3 dark:border-dark-eval-2";
 
-                                <div>
-                                    <label for="end_date"
-                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Tanggal Akhir
-                                    </label>
-                                    <input type="date" id="end_date" name="end_date"
-                                        class="date-input block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                                </div>
+        $title = 'text-lg font-semibold text-light-text dark:text-dark-text';
+        $sub = 'text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1';
 
-                                <div class="flex items-end">
-                                    <button type="button" id="previewBtn"
-                                        class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg shadow font-medium text-sm transition-colors">
-                                        Preview
-                                    </button>
-                                </div>
-                            </form>
+        $label = 'block text-sm font-medium mb-1 text-light-text-secondary dark:text-dark-text-secondary';
+
+        $input = "w-full rounded-lg border px-3 py-2 text-sm
+                  bg-light-bg dark:bg-dark-eval-2
+                  text-light-text dark:text-dark-text
+                  border-light-eval-3 dark:border-dark-eval-2
+                  focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500/40";
+
+        $btn = "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+                bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm";
+
+        $btnGhost = "inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+                     bg-light-eval-2 dark:bg-dark-eval-2
+                     text-light-text-secondary dark:text-dark-text-secondary
+                     hover:bg-light-eval-3 dark:hover:bg-dark-eval-3 transition-colors";
+
+        $tableHead = "bg-light-eval-2 dark:bg-dark-eval-2 border-b
+                      border-light-eval-3 dark:border-dark-eval-2";
+
+        $th =
+            'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-light-text-secondary dark:text-dark-text-secondary';
+        $td = 'px-4 py-3 text-sm text-light-text dark:text-dark-text';
+    @endphp
+
+    <div class="{{ $page }}">
+        <div class="{{ $wrap }}">
+
+            {{-- ================= DOWNLOAD DATA ================= --}}
+            <div class="{{ $card }}">
+                <div class="{{ $head }}">
+                    <h2 class="{{ $title }}">Download Data Tickets</h2>
+                    <p class="{{ $sub }}">Preview dulu biar yakin, lalu download CSV</p>
+                </div>
+
+                <div class="p-4 sm:p-6">
+
+                    <form id="exportForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label for="start_date" class="{{ $label }}">Tanggal Mulai</label>
+                            <input type="date" id="start_date" name="start_date"
+                                class="{{ $input }} date-input">
                         </div>
-                    </div>
 
-                    {{-- MODAL PREVIEW --}}
-                    <div id="previewModal"
-                        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                        <div
-                            class="bg-white dark:bg-dark-eval-1 rounded-2xl shadow-2xl w-11/12 max-w-6xl p-6 transform scale-95 transition-all">
-                            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Preview Data Tickets</h3>
+                        <div>
+                            <label for="end_date" class="{{ $label }}">Tanggal Akhir</label>
+                            <input type="date" id="end_date" name="end_date"
+                                class="{{ $input }} date-input">
+                        </div>
 
-                            <div class="overflow-x-auto max-h-[60vh] border border-gray-200 dark:border-gray-700 rounded-lg">
-                                <table class="min-w-full text-sm">
-                                    <thead class="bg-gray-50 dark:bg-dark-eval-2 sticky top-0">
-                                        <tr>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Ticket Code</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Requestor</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Support</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Problem</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Status</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Start</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                End</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Time (min)</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Late</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">
-                                                Created</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="previewTableBody"
-                                        class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-dark-eval-1">
-                                    </tbody>
-                                </table>
+                        <div>
+                            <label for="datePreset" class="{{ $label }}">Preset</label>
+                            <select id="datePreset" class="{{ $input }}">
+                                <option value="today" selected>Today</option>
+                                <option value="this_month" selected>This Month</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="last_month">Last Month</option>
+                                <option value="this_year">This Year</option>
+                                <option value="last_year">Last Year</option>
+                                <option value="">Custom</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <button type="button" id="previewBtn" class="{{ $btn }} w-full">
+                                Preview
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {{-- ================= MODAL PREVIEW ================= --}}
+            <div id="previewModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+                <div class="min-h-full flex items-center justify-center p-4">
+                    <div id="previewModalPanel"
+                        class="{{ $card }} w-full max-w-6xl transform scale-95 opacity-0 transition duration-200">
+                        <div class="{{ $head }} flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-lg font-semibold text-light-text dark:text-dark-text">Preview Data
+                                    Tickets</h3>
+                                <p id="previewRangeText"
+                                    class="text-xs mt-1 text-light-text-secondary dark:text-dark-text-secondary">
+                                    -
+                                </p>
                             </div>
 
-                            <div class="mt-6 flex justify-end gap-3">
-                                <button id="closePreview"
-                                    class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors text-sm font-medium">
+                            <button id="closePreviewX"
+                                class="h-10 w-10 rounded-lg grid place-items-center
+                                       bg-light-eval-2 dark:bg-dark-eval-2
+                                       hover:bg-light-eval-3 dark:hover:bg-dark-eval-3
+                                       text-light-text dark:text-dark-text transition-colors">
+                                ✕
+                            </button>
+                        </div>
+
+                        <div class="p-4 sm:p-6">
+                            <div class="relative">
+                                <div id="previewLoading"
+                                    class="hidden absolute inset-0 z-10 rounded-xl
+                                           bg-light-eval-1/80 dark:bg-dark-eval-1/80 backdrop-blur-sm
+                                           flex items-center justify-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600">
+                                        </div>
+                                        <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                                            Loading...</p>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="overflow-x-auto max-h-[60vh] rounded-xl border border-light-eval-3 dark:border-dark-eval-2">
+                                    <table class="min-w-full text-sm">
+                                        <thead class="{{ $tableHead }} sticky top-0 z-10">
+                                            <tr>
+                                                <th class="{{ $th }}">Ticket Code</th>
+                                                <th class="{{ $th }}">Requestor</th>
+                                                <th class="{{ $th }}">Support</th>
+                                                <th class="{{ $th }}">Problem</th>
+                                                <th class="{{ $th }}">Status</th>
+                                                <th class="{{ $th }}">Start</th>
+                                                <th class="{{ $th }}">End</th>
+                                                <th class="{{ $th }}">Time (min)</th>
+                                                <th class="{{ $th }}">Late</th>
+                                                <th class="{{ $th }}">Created</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="previewTableBody"
+                                            class="divide-y divide-light-eval-3 dark:divide-dark-eval-2
+                                                   bg-light-eval-1 dark:bg-dark-eval-1">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+                                <button id="closePreview" class="{{ $btnGhost }}">
                                     Tutup
                                 </button>
-                                <button id="confirmDownload"
-                                    class="px-4 py-2 bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg transition-colors text-sm font-medium">
+                                <button id="confirmDownload" class="{{ $btn }}">
                                     💾 Download CSV
                                 </button>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-            {{-- BAR CHART - Tickets per Developer --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        👨‍💻 Jumlah Ticket Selesai per Developer
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            {{-- ================= BAR CHART: TICKETS / DEV ================= --}}
+            <div class="{{ $card }}">
+                <div class="{{ $head }}">
+                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Pilih Tahun
-                            </label>
-                            <select id="bar_year"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                            </select>
+                            <h3 class="{{ $title }}">👨‍💻 Ticket Done per Developer</h3>
+                            <p class="{{ $sub }}">Jumlah ticket selesai per developer (per tahun)</p>
                         </div>
-                        <div class="flex items-end">
-                            <button id="filterBarBtn"
-                                class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                Filter
-                            </button>
-                        </div>
-                        <div class="flex items-end">
-                            <button id="resetBarBtn"
-                                class="w-full bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                Reset
-                            </button>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:items-end">
+                            <div>
+                                <label class="{{ $label }}">Pilih Tahun</label>
+                                <select id="bar_year" class="{{ $input }}"></select>
+                            </div>
+                            <button id="filterBarBtn" class="{{ $btn }}">Filter</button>
+                            <button id="resetBarBtn" class="{{ $btnGhost }}">Reset</button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="relative flex justify-center items-center min-h-[400px]">
+                <div class="p-4 sm:p-6">
+                    <div class="relative min-h-[380px]">
                         <div id="barLoadingIndicator"
-                            class="absolute inset-0 flex flex-col justify-center items-center bg-white/90 dark:bg-dark-eval-1/90 rounded-lg hidden z-10">
-                            <div
-                                class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
+                            class="absolute inset-0 hidden items-center justify-center bg-light-eval-1/80 dark:bg-dark-eval-1/80 backdrop-blur-sm z-10">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                                <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">Load Data...
+                                </p>
                             </div>
-                            <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                         </div>
-                        <div id="barNoDataMessage"
-                            class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden z-10">
-                            No Data Available
+
+                        <div id="barNoDataMessage" class="absolute inset-0 hidden items-center justify-center z-10">
+                            <p class="text-sm italic text-light-text-muted dark:text-dark-text-secondary">No Data
+                                Available</p>
                         </div>
-                        <div id="barChartContainer" class="w-full p-4">
+
+                        <div id="barChartContainer" class="w-full">
                             <canvas id="myBarChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- BAR CHART - Time Spent per Developer --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        ⏱️ Total Time Spent per Developer
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            {{-- ================= BAR CHART: TIME / DEV ================= --}}
+            <div class="{{ $card }}">
+                <div class="{{ $head }}">
+                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Pilih Tahun
-                            </label>
-                            <select id="time_year"
-                                class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2">
-                            </select>
+                            <h3 class="{{ $title }}">⏱️ Total Time Spent per Developer</h3>
+                            <p class="{{ $sub }}">Akumulasi menit pengerjaan (per tahun)</p>
                         </div>
-                        <div class="flex items-end">
-                            <button id="filterTimeBtn"
-                                class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                Filter
-                            </button>
-                        </div>
-                        <div class="flex items-end">
-                            <button id="resetTimeBtn"
-                                class="w-full bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm transition-colors">
-                                Reset
-                            </button>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:items-end">
+                            <div>
+                                <label class="{{ $label }}">Pilih Tahun</label>
+                                <select id="time_year" class="{{ $input }}"></select>
+                            </div>
+                            <button id="filterTimeBtn" class="{{ $btn }}">Filter</button>
+                            <button id="resetTimeBtn" class="{{ $btnGhost }}">Reset</button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="relative flex justify-center items-center min-h-[400px]">
+                <div class="p-4 sm:p-6">
+                    <div class="relative min-h-[380px]">
                         <div id="timeLoadingIndicator"
-                            class="absolute inset-0 flex flex-col justify-center items-center bg-white/90 dark:bg-dark-eval-1/90 rounded-lg hidden z-10">
-                            <div
-                                class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100">
+                            class="absolute inset-0 hidden items-center justify-center bg-light-eval-1/80 dark:bg-dark-eval-1/80 backdrop-blur-sm z-10">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                                <p class="text-sm text-light-text-secondary dark:text-dark-text-secondary">Load Data...
+                                </p>
                             </div>
-                            <p class="mt-4 text-gray-600 dark:text-gray-400">Load Data...</p>
                         </div>
-                        <div id="timeNoDataMessage"
-                            class="absolute inset-0 flex justify-center items-center text-gray-500 dark:text-gray-400 hidden z-10">
-                            No Data Available
+
+                        <div id="timeNoDataMessage" class="absolute inset-0 hidden items-center justify-center z-10">
+                            <p class="text-sm italic text-light-text-muted dark:text-dark-text-secondary">No Data
+                                Available</p>
                         </div>
-                        <div id="timeChartContainer" class="w-full p-4">
+
+                        <div id="timeChartContainer" class="w-full">
                             <canvas id="timeSpentChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- TICKETS BY SUPPORT --}}
-            <div
-                class="bg-white dark:bg-dark-eval-1 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {{-- ================= TICKETS BY SUPPORT ================= --}}
+            <div class="{{ $card }}">
+                <div class="{{ $head }}">
+                    <h2 class="{{ $title }}">Tickets by Support (Per Hari)</h2>
+                    <p class="{{ $sub }}">Ringkasan ticket per support, per tanggal</p>
+                </div>
+
                 <div class="p-4 sm:p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                        Tickets by Support (Per Hari)
-                    </h2>
                     <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                        <input type="date" id="date"
-                            class="flex-1 rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 text-sm px-3 py-2 date-input">
-                        <button id="filterBtn"
-                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-gray-100 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-lg font-medium text-sm transition-colors">
-                            Filter
-                        </button>
+                        <input type="date" id="date" class="{{ $input }} date-input flex-1">
+                        <button id="filterBtn" class="{{ $btn }}">Filter</button>
                     </div>
-                    <div id="ticketsContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6"></div>
+
+                    <div id="ticketsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"></div>
                 </div>
             </div>
 
         </div>
     </div>
 
+    {{-- ================= STYLE ================= --}}
     <style>
-        /* Styling untuk date input di light mode */
         .date-input::-webkit-calendar-picker-indicator {
             filter: invert(0);
             cursor: pointer;
+            opacity: .85;
         }
 
-        /* Styling untuk date input di dark mode */
         .dark .date-input::-webkit-calendar-picker-indicator {
             filter: invert(1);
-            cursor: pointer;
+            opacity: .85;
         }
 
-        /* Opsional: ubah opacity saat hover */
         .date-input::-webkit-calendar-picker-indicator:hover {
-            opacity: 0.7;
+            opacity: 1;
+        }
+
+        canvas {
+            max-height: 420px;
         }
     </style>
 
-    {{-- Preview Modal Script --}}
+    {{-- ================= JS (FASTER) ================= --}}
     <script>
-        document.getElementById('previewBtn').addEventListener('click', async () => {
-            const start = document.getElementById('start_date').value;
-            const end = document.getElementById('end_date').value;
+        const $ = (id) => document.getElementById(id);
+        const show = (id) => $(id).classList.remove('hidden');
+        const hide = (id) => $(id).classList.add('hidden');
+        const flexShow = (id) => {
+            $(id).classList.remove('hidden');
+            $(id).classList.add('flex');
+        };
+        const flexHide = (id) => {
+            $(id).classList.add('hidden');
+            $(id).classList.remove('flex');
+        };
+
+        // ====== Modal helpers ======
+        function openPreviewModal() {
+            const modal = $('previewModal');
+            const panel = $('previewModalPanel');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                panel.classList.remove('opacity-0');
+                panel.classList.remove('scale-95');
+                panel.classList.add('opacity-100');
+                panel.classList.add('scale-100');
+            });
+        }
+
+        function closePreviewModal() {
+            const modal = $('previewModal');
+            const panel = $('previewModalPanel');
+            panel.classList.remove('opacity-100');
+            panel.classList.remove('scale-100');
+            panel.classList.add('opacity-0');
+            panel.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 180);
+        }
+
+
+        // ====== Preview (FAST render) ======
+        $('previewBtn').addEventListener('click', async () => {
+            const start = $('start_date').value;
+            const end = $('end_date').value;
 
             if (!start || !end) {
                 alert('Isi tanggal mulai dan tanggal akhir terlebih dahulu.');
                 return;
             }
+            if (start > end) {
+                alert('Tanggal mulai tidak boleh lebih besar dari tanggal akhir.');
+                return;
+            }
+
+            $('previewRangeText').textContent = `${start} → ${end}`;
+
+            // UI state
+            show('previewLoading');
+            $('previewTableBody').innerHTML = '';
+            openPreviewModal();
 
             try {
                 const res = await fetch(`/api/tickets/preview?start_date=${start}&end_date=${end}`);
                 const result = await res.json();
 
-                if (!result.data || result.data.length === 0) {
-                    alert('There is no data in that date range.');
+                hide('previewLoading');
+
+                const data = result.data || [];
+                if (!data.length) {
+                    $('previewTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="10" class="px-4 py-10 text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">
+                                Tidak ada data di range ini
+                            </td>
+                        </tr>`;
                     return;
                 }
 
-                const tbody = document.getElementById('previewTableBody');
-                tbody.innerHTML = '';
-
-                result.data.forEach(t => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50 dark:hover:bg-dark-eval-2 transition-colors';
-                    row.innerHTML = `
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.ticket_code}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.requestor_name}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.support_name}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.problem}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.status_name}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.start_date}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.end_date}</td>
-                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.time_spent}</td>
-                    <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">${t.is_late}</td>
-                    <td class="px-4 py-3 text-gray-700 dark:text-gray-300">${t.created_at}</td>
-                `;
-                    tbody.appendChild(row);
+                const frag = document.createDocumentFragment();
+                data.forEach(t => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2';
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.ticket_code ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.requestor_name ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.support_name ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.problem ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.status_name ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.start_date ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.end_date ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-center text-light-text dark:text-dark-text">${t.time_spent ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-center text-light-text dark:text-dark-text">${t.is_late ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.created_at ?? '-'}</td>
+                    `;
+                    frag.appendChild(tr);
                 });
-
-                const modal = document.getElementById('previewModal');
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
+                $('previewTableBody').appendChild(frag);
 
             } catch (err) {
                 console.error(err);
-                alert('Gagal memuat preview.');
+                hide('previewLoading');
+                $('previewTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="10" class="px-4 py-10 text-center text-sm text-red-500">
+                            Gagal memuat preview
+                        </td>
+                    </tr>`;
             }
         });
 
-        document.getElementById('closePreview').addEventListener('click', () => {
-            const modal = document.getElementById('previewModal');
-            modal.querySelector('div').classList.replace('scale-100', 'scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 200);
+        $('closePreview').addEventListener('click', closePreviewModal);
+        $('closePreviewX').addEventListener('click', closePreviewModal);
+        $('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') closePreviewModal();
         });
 
-        document.getElementById('confirmDownload').addEventListener('click', () => {
-            const start = document.getElementById('start_date').value;
-            const end = document.getElementById('end_date').value;
+        $('confirmDownload').addEventListener('click', () => {
+            const start = $('start_date').value;
+            const end = $('end_date').value;
+            if (!start || !end) return;
             window.location.href = `/api/tickets/export?start_date=${start}&end_date=${end}`;
-            document.getElementById('previewModal').classList.add('hidden');
+            closePreviewModal();
         });
     </script>
 
-    {{-- Tickets by Support Script --}}
-    {{-- <script>
-        async function loadTickets() {
-            const date = document.getElementById('date').value;
-            const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+    <script>
+        (() => {
+            const startInp = document.getElementById('start_date');
+            const endInp = document.getElementById('end_date');
+            const preset = document.getElementById('datePreset');
 
-            try {
-                const res = await fetch(url);
-                const json = await res.json();
-                const data = json.data || {};
+            if (!startInp || !endInp || !preset) return;
 
-                const supports = {
-                    ticketsAzi: 'Azi',
-                    ticketsApri: 'Apri',
-                    ticketsBayu: 'Bayu',
-                    ticketsFatih: 'Fatih'
-                };
+            const pad2 = (n) => String(n).padStart(2, '0');
+            const formatDate = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
-                const container = document.getElementById('ticketsContainer');
-                let html = '';
+            const startOfWeekMonday = (date) => {
+                const d = new Date(date);
+                const day = d.getDay(); // 0=Sun..6=Sat
+                const diff = (day === 0 ? -6 : 1 - day);
+                d.setDate(d.getDate() + diff);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            };
 
-                for (const key in supports) {
-                    const tickets = data[key] || [];
-                    html += `
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
-                        <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">${supports[key]}</h3>
-                        <div class="space-y-2">
-                            ${
-                                tickets.length
-                                    ? tickets.map(t => `
-                                                <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Kode:</b> ${t.ticket_code}</p>
-                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Problem:</b> ${t.problem ?? '-'}</p>
-                                                    <p class="text-sm text-gray-700 dark:text-gray-300"><b>Solution:</b> ${t.solution ?? '-'}</p>
-                                                </div>
-                                            `).join('')
-                                    : '<p class="text-center text-gray-400 dark:text-gray-500 italic">No Data Available</p>'
-                            }
-                        </div>
-                    </div>
-                `;
+            const endOfWeekSunday = (date) => {
+                const s = startOfWeekMonday(date);
+                const e = new Date(s);
+                e.setDate(s.getDate() + 6);
+                e.setHours(0, 0, 0, 0);
+                return e;
+            };
+
+            function applyPreset(type) {
+                const today = new Date();
+                let start, end;
+
+                switch (type) {
+                    case 'today': {
+                        start = new Date(today);
+                        end = new Date(today);
+                        break;
+                    }
+
+                    case 'last_week': {
+                        const lastWeekRef = new Date(today);
+                        lastWeekRef.setDate(today.getDate() - 7);
+                        start = startOfWeekMonday(lastWeekRef);
+                        end = endOfWeekSunday(lastWeekRef);
+                        break;
+                    }
+
+                    case 'this_month': {
+                        start = new Date(today.getFullYear(), today.getMonth(), 1);
+                        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                        break;
+                    }
+
+                    case 'last_month': {
+                        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        end = new Date(today.getFullYear(), today.getMonth(), 0);
+                        break;
+                    }
+
+                    case 'this_year': {
+                        start = new Date(today.getFullYear(), 0, 1);
+                        end = new Date(today.getFullYear(), 11, 31);
+                        break;
+                    }
+
+                    case 'last_year': {
+                        start = new Date(today.getFullYear() - 1, 0, 1);
+                        end = new Date(today.getFullYear() - 1, 11, 31);
+                        break;
+                    }
+
+                    default:
+                        return; // Custom
                 }
 
-                container.innerHTML = html;
-
-            } catch (err) {
-                console.error('Error loading tickets:', err);
-                document.getElementById('ticketsContainer').innerHTML =
-                    '<p class="text-center text-red-500">Gagal memuat tiket</p>';
+                startInp.value = formatDate(start);
+                endInp.value = formatDate(end);
             }
-        }
 
-        document.getElementById('filterBtn').addEventListener('click', loadTickets);
-        loadTickets();
-    </script> --}}
+            preset.addEventListener('change', () => {
+                if (preset.value) applyPreset(preset.value);
+            });
+
+            [startInp, endInp].forEach(inp => {
+                inp.addEventListener('change', () => {
+                    preset.value = '';
+                });
+            });
+        })();
+    </script>
+
+
+
+
+    {{-- ================= Tickets by Support (FAST) ================= --}}
     <script>
         async function loadTickets() {
-            const date = document.getElementById('date').value;
+            const date = $('date').value;
             const url = date ? `/api/tickets-by-support?date=${date}` : `/api/tickets-by-support`;
+
+            const container = $('ticketsContainer');
+            container.innerHTML = `
+                <div class="col-span-full text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary py-8">
+                    Loading...
+                </div>
+            `;
 
             try {
                 const res = await fetch(url);
                 const json = await res.json();
                 const supports = json.data || [];
 
-                const container = document.getElementById('ticketsContainer');
-                let html = '';
+                if (!supports.length) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary py-8">
+                            Tidak ada data support
+                        </div>`;
+                    return;
+                }
+
+                const frag = document.createDocumentFragment();
 
                 supports.forEach(support => {
-                    html += `
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-dark-eval-2">
-                <h3 class="font-bold text-center text-gray-900 dark:text-white mb-3">
-                    ${support.support_name}
-                </h3>
+                    const card = document.createElement('div');
+                    card.className = `
+                        rounded-2xl border p-4 shadow-sm
+                        bg-light-eval-2 dark:bg-dark-eval-2
+                        border-light-eval-3 dark:border-dark-eval-2
+                    `;
 
-                <div class="space-y-2">
-                    ${
-                        support.tickets.length
-                            ? support.tickets.map(t => `
-                                    <div class="bg-white dark:bg-dark-eval-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                                        <p class="text-sm text-gray-700 dark:text-gray-300">
-                                            <b>Kode:</b> ${t.ticket_code}
-                                        </p>
-                                        <p class="text-sm text-gray-700 dark:text-gray-300">
-                                            <b>Problem:</b> ${t.problem ?? '-'}
-                                        </p>
-                                        <p class="text-sm text-gray-700 dark:text-gray-300">
-                                            <b>Solution:</b> ${t.solution ?? '-'}
-                                        </p>
-                                    </div>
-                                `).join('')
-                            : `<p class="text-center text-gray-400 dark:text-gray-500 italic">
-                                    No Data Available
-                                   </p>`
-                    }
-                </div>
-            </div>
-            `;
+                    const tickets = support.tickets || [];
+                    const ticketHtml = tickets.length ?
+                        tickets.map(t => `
+                            <div class="rounded-xl border p-3
+                                        bg-light-eval-1 dark:bg-dark-eval-1
+                                        border-light-eval-3 dark:border-dark-eval-2">
+                                <div class="text-sm text-light-text dark:text-dark-text">
+                                    <span class="font-semibold">Kode:</span> ${t.ticket_code ?? '-'}
+                                </div>
+                                <div class="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
+                                    <span class="font-semibold">Problem:</span> ${t.problem ?? '-'}
+                                </div>
+                                <div class="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
+                                    <span class="font-semibold">Solution:</span> ${t.solution ?? '-'}
+                                </div>
+                            </div>
+                        `).join('') :
+                        `<p class="text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">No Data Available</p>`;
+
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="font-bold text-light-text dark:text-dark-text">${support.support_name ?? '-'}</div>
+                            <span class="text-xs px-2 py-1 rounded-lg bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300">
+                                ${tickets.length} ticket
+                            </span>
+                        </div>
+                        <div class="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                            ${ticketHtml}
+                        </div>
+                    `;
+                    frag.appendChild(card);
                 });
 
-                container.innerHTML = html || `
-            <p class="text-center col-span-full text-gray-400 italic">
-                Tidak ada data support
-            </p>
-        `;
+                container.innerHTML = '';
+                container.appendChild(frag);
 
             } catch (err) {
                 console.error(err);
-                document.getElementById('ticketsContainer').innerHTML =
-                    '<p class="text-center text-red-500">Gagal memuat tiket</p>';
+                container.innerHTML = `
+                    <div class="col-span-full text-center text-red-500 py-8">
+                        Gagal memuat tiket
+                    </div>`;
             }
         }
 
-        document.getElementById('filterBtn').addEventListener('click', loadTickets);
+        $('filterBtn').addEventListener('click', loadTickets);
         loadTickets();
     </script>
 
-    {{-- Bar & Time Charts Script --}}
+    {{-- ================= Charts (Bar + Time) - faster + no refetch on dark toggle ================= --}}
     <script type="module">
-        const NEUTRAL_COLOR = '#6B7280';
-        const BAR_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+        const $ = (id) => document.getElementById(id);
+        const show = (id) => $(id).classList.remove('hidden');
+        const hide = (id) => $(id).classList.add('hidden');
+        const flexShow = (id) => {
+            $(id).classList.remove('hidden');
+            $(id).classList.add('flex');
+        };
+        const flexHide = (id) => {
+            $(id).classList.add('hidden');
+            $(id).classList.remove('flex');
+        };
+
+        const NEUTRAL = '#6B7280';
+        const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316',
+            '#6366f1'
+        ];
 
         let barChart = null;
         let timeChart = null;
 
-        // Utility functions
-        const isDarkMode = () => document.documentElement.classList.contains('dark');
-        const getTextColor = () => '#6B7280';
-        const getGridColor = () => NEUTRAL_COLOR;
+        function fillYears(selectId) {
+            const now = new Date().getFullYear();
+            const s = $(selectId);
+            s.innerHTML = '';
+            for (let y = now; y >= now - 5; y--) {
+                const o = document.createElement('option');
+                o.value = y;
+                o.textContent = y;
+                if (y === now) o.selected = true;
+                s.appendChild(o);
+            }
+            return now;
+        }
 
-        // Base chart options
-        function getBaseChartOptions(extraOptions = {}) {
+        function baseOptions(extra = {}) {
             return {
                 responsive: true,
-                maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        display: true,
                         position: 'top',
                         labels: {
-                            color: NEUTRAL_COLOR,
+                            color: NEUTRAL,
                             font: {
                                 size: 12
                             },
@@ -455,24 +652,17 @@
                         }
                     },
                     tooltip: {
-                        backgroundColor: isDarkMode() ? '#374151' : '#fff',
-                        titleColor: getTextColor(),
-                        bodyColor: getTextColor(),
-                        borderColor: getGridColor(),
+                        borderColor: NEUTRAL,
                         borderWidth: 1
                     }
                 },
                 scales: {
                     x: {
-                        border: {
-                            display: false
-                        },
                         grid: {
-                            color: NEUTRAL_COLOR,
-                            drawBorder: false
+                            color: NEUTRAL
                         },
                         ticks: {
-                            color: NEUTRAL_COLOR,
+                            color: NEUTRAL,
                             font: {
                                 size: 11
                             }
@@ -480,142 +670,122 @@
                     },
                     y: {
                         beginAtZero: true,
-                        border: {
-                            display: false
-                        },
                         grid: {
-                            color: NEUTRAL_COLOR,
-                            drawBorder: false
+                            color: NEUTRAL
                         },
                         ticks: {
-                            color: NEUTRAL_COLOR,
+                            color: NEUTRAL,
                             font: {
                                 size: 11
-                            },
-                            stepSize: 1
+                            }
                         }
                     }
                 },
-                ...extraOptions
+                ...extra
             };
         }
 
-        // Chart loader universal FIXED
-        async function loadChart(config) {
-            const {
-                url,
-                canvas,
-                container,
-                loading,
-                noData,
-                instance,
-                extraOptions = {},
-                useNeutralForTotal = false
-            } = config;
-
-            loading.classList.remove('hidden');
-            container.classList.add('hidden');
-            noData.classList.add('hidden');
+        async function loadChart({
+            url,
+            canvasId,
+            containerId,
+            loadingId,
+            noDataId,
+            instance,
+            buildDatasets,
+            options
+        }) {
+            flexShow(loadingId);
+            hide(containerId);
+            flexHide(noDataId);
 
             if (instance) instance.destroy();
 
             try {
                 const res = await fetch(url);
-                const data = await res.json();
+                const json = await res.json();
 
-                loading.classList.add('hidden');
+                flexHide(loadingId);
 
-                // ❗ FIX: CEK KALO DATASET KOSONG ATAU SEMUA NILAI = 0
-                if (
-                    !data.success ||
-                    !data.data ||
-                    !data.data.datasets ||
-                    data.data.datasets.length === 0 ||
-                    data.data.datasets.every(ds => ds.data.every(v => v === 0))
-                ) {
-                    noData.classList.remove('hidden');
+                const raw = json?.data;
+                if (!json?.success || !raw?.labels || !raw?.datasets?.length) {
+                    flexShow(noDataId);
                     return null;
                 }
 
-                container.classList.remove('hidden');
+                // if all zero
+                const allZero = raw.datasets.every(ds => (ds.data || []).every(v => (v || 0) === 0));
+                if (allZero) {
+                    flexShow(noDataId);
+                    return null;
+                }
 
-                // Build datasets
-                const datasets = data.data.datasets.map((ds, i) => {
-                    let color = BAR_COLORS[i % BAR_COLORS.length];
+                show(containerId);
 
-                    if (useNeutralForTotal && ds.label === 'Total Time Spent') {
-                        color = NEUTRAL_COLOR;
-                    }
+                const datasets = buildDatasets(raw.datasets);
 
+                return new Chart($(canvasId), {
+                    type: 'bar',
+                    data: {
+                        labels: raw.labels,
+                        datasets
+                    },
+                    options: options
+                });
+
+            } catch (e) {
+                console.error(e);
+                flexHide(loadingId);
+                flexShow(noDataId);
+                return null;
+            }
+        }
+
+        async function loadBar(year) {
+            barChart = await loadChart({
+                url: `/api/chart-tickets-by-dev?year=${year}`,
+                canvasId: 'myBarChart',
+                containerId: 'barChartContainer',
+                loadingId: 'barLoadingIndicator',
+                noDataId: 'barNoDataMessage',
+                instance: barChart,
+                buildDatasets: (datasets) => datasets.map((ds, i) => ({
+                    ...ds,
+                    backgroundColor: COLORS[i % COLORS.length],
+                    borderColor: COLORS[i % COLORS.length],
+                    borderWidth: 2
+                })),
+                options: baseOptions()
+            });
+        }
+
+        async function loadTime(year) {
+            timeChart = await loadChart({
+                url: `/api/chart-time-spent-by-dev?year=${year}`,
+                canvasId: 'timeSpentChart',
+                containerId: 'timeChartContainer',
+                loadingId: 'timeLoadingIndicator',
+                noDataId: 'timeNoDataMessage',
+                instance: timeChart,
+                buildDatasets: (datasets) => datasets.map((ds, i) => {
+                    const color = (ds.label === 'Total Time Spent') ? NEUTRAL : COLORS[i % COLORS
+                        .length];
                     return {
                         ...ds,
                         backgroundColor: color,
                         borderColor: color,
                         borderWidth: 2
                     };
-                });
-
-                return new Chart(canvas, {
-                    type: 'bar',
-                    data: {
-                        labels: data.data.labels,
-                        datasets: datasets
-                    },
-                    options: getBaseChartOptions(extraOptions)
-                });
-
-            } catch (e) {
-                console.error('Chart loading error:', e);
-                loading.classList.add('hidden');
-                noData.classList.remove('hidden');
-                return null;
-            }
-        }
-
-
-        // Load Bar Chart (all datasets colorful)
-        async function loadBarChart(year) {
-            barChart = await loadChart({
-                url: `/api/chart-tickets-by-dev?year=${year}`,
-                canvas: document.getElementById('myBarChart'),
-                container: document.getElementById('barChartContainer'),
-                loading: document.getElementById('barLoadingIndicator'),
-                noData: document.getElementById('barNoDataMessage'),
-                instance: barChart,
-                useNeutralForTotal: false
-            });
-        }
-
-        // Load Time Chart (Total Time Spent uses neutral color)
-        async function loadTimeChart(year) {
-            timeChart = await loadChart({
-                url: `/api/chart-time-spent-by-dev?year=${year}`,
-                canvas: document.getElementById('timeSpentChart'),
-                container: document.getElementById('timeChartContainer'),
-                loading: document.getElementById('timeLoadingIndicator'),
-                noData: document.getElementById('timeNoDataMessage'),
-                instance: timeChart,
-                useNeutralForTotal: true,
-                extraOptions: {
+                }),
+                options: baseOptions({
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                color: NEUTRAL_COLOR,
-                                font: {
-                                    size: 12
-                                },
-                                padding: 15
-                            }
-                        },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
-                                    const minutes = context.raw;
-                                    const hours = Math.floor(minutes / 60);
-                                    const mins = minutes % 60;
-                                    return `${context.dataset.label}: ${hours} jam ${mins} menit`;
+                                label: (ctx) => {
+                                    const m = ctx.raw || 0;
+                                    const h = Math.floor(m / 60);
+                                    const mm = m % 60;
+                                    return `${ctx.dataset.label}: ${h} jam ${mm} menit`;
                                 }
                             }
                         }
@@ -623,77 +793,57 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            border: {
-                                display: false
-                            },
                             grid: {
-                                color: NEUTRAL_COLOR,
-                                drawBorder: false
+                                color: NEUTRAL
                             },
                             ticks: {
-                                color: NEUTRAL_COLOR,
-                                font: {
-                                    size: 11
-                                },
-                                callback: function(value) {
-                                    const hours = Math.floor(value / 60);
-                                    const mins = value % 60;
-                                    return `${hours}j ${mins}m`;
+                                color: NEUTRAL,
+                                callback: (v) => {
+                                    const h = Math.floor(v / 60);
+                                    const mm = v % 60;
+                                    return `${h}j ${mm}m`;
                                 }
                             }
                         },
                         x: {
-                            border: {
-                                display: false
-                            },
                             grid: {
-                                color: NEUTRAL_COLOR,
-                                drawBorder: false
+                                color: NEUTRAL
                             },
                             ticks: {
-                                color: NEUTRAL_COLOR,
-                                font: {
-                                    size: 11
-                                }
+                                color: NEUTRAL
                             }
                         }
                     }
-                }
+                })
             });
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            const currentYear = new Date().getFullYear();
-            const barYear = document.getElementById('bar_year');
-            const timeYear = document.getElementById('time_year');
+            const currentYear = fillYears('bar_year');
+            fillYears('time_year');
 
-            // Populate year options
-            for (let y = currentYear; y >= currentYear - 5; y--) {
-                barYear.innerHTML += `<option value="${y}">${y}</option>`;
-                timeYear.innerHTML += `<option value="${y}">${y}</option>`;
-            }
+            const barYear = $('bar_year');
+            const timeYear = $('time_year');
 
-            // Event listeners
-            document.getElementById('filterBarBtn').addEventListener('click', () => loadBarChart(barYear.value));
-            document.getElementById('resetBarBtn').addEventListener('click', () => {
+            $('filterBarBtn').addEventListener('click', () => loadBar(barYear.value));
+            $('resetBarBtn').addEventListener('click', () => {
                 barYear.value = currentYear;
-                loadBarChart(currentYear);
+                loadBar(currentYear);
             });
-            document.getElementById('filterTimeBtn').addEventListener('click', () => loadTimeChart(timeYear.value));
-            document.getElementById('resetTimeBtn').addEventListener('click', () => {
+
+            $('filterTimeBtn').addEventListener('click', () => loadTime(timeYear.value));
+            $('resetTimeBtn').addEventListener('click', () => {
                 timeYear.value = currentYear;
-                loadTimeChart(currentYear);
+                loadTime(currentYear);
             });
 
-            // Initial load
-            loadBarChart(currentYear);
-            loadTimeChart(currentYear);
+            loadBar(currentYear);
+            loadTime(currentYear);
 
-            // Dark mode observer
+            // dark toggle: update only (no refetch)
             new MutationObserver(() => {
-                if (barChart) loadBarChart(barYear.value);
-                if (timeChart) loadTimeChart(timeYear.value);
+                if (barChart) barChart.update();
+                if (timeChart) timeChart.update();
             }).observe(document.documentElement, {
                 attributes: true,
                 attributeFilter: ['class']

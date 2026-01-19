@@ -1,79 +1,116 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-dark-bg leading-tight dark:text-white">
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl leading-tight text-light-text dark:text-dark-text">
                 {{ __('List Feedback') }}
             </h2>
         </div>
     </x-slot>
 
-    <div class="p-6 space-y-6">
+    @php
+        $card = "rounded-2xl border shadow-sm
+                 bg-light-eval-1 dark:bg-dark-eval-1
+                 border-light-eval-3 dark:border-dark-eval-2";
+
+        $muted = "text-light-text-secondary dark:text-dark-text-secondary";
+        $muted2 = "text-light-text-muted dark:text-dark-text-secondary";
+
+        $thead = "bg-light-eval-2 dark:bg-dark-eval-2 border-b
+                  border-light-eval-3 dark:border-dark-eval-2";
+
+        $th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider $muted";
+        $td = "px-4 py-3 text-sm $muted";
+    @endphp
+
+    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         {{-- Alert Success --}}
         @if (session('success'))
-            <div class="bg-green-800 border border-green-700 text-green-200 px-4 py-3 rounded relative mb-4"
-                role="alert">
-                <span class="block sm:inline">{{ session('success') }}</span>
+            <div class="rounded-xl border px-4 py-3 {{ $card }} border-green-600/25">
+                <div class="text-sm font-medium text-green-700 dark:text-green-300">
+                    {{ session('success') }}
+                </div>
             </div>
         @endif
 
         {{-- Alert Error --}}
         @if (session('error'))
-            <div class="bg-red-800 border border-red-700 text-red-200 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
+            <div class="rounded-xl border px-4 py-3 {{ $card }} border-red-600/25">
+                <div class="text-sm font-medium text-red-700 dark:text-red-300">
+                    {{ session('error') }}
+                </div>
             </div>
         @endif
 
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <div class="overflow-x-auto">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <div class="flex gap-4 text-sm mb-4 text-gray-600 dark:text-gray-400">
-                        <div>Total: {{ $feedback->count() }} | Average Rate: {{ $Rate }} ⭐</div>
+        {{-- Table Card --}}
+        <div class="{{ $card }} p-4 sm:p-5">
+            {{-- Top bar --}}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div>
+                    <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                        Summary
                     </div>
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
+                    <div class="text-xs mt-0.5 {{ $muted2 }}">
+                        Total feedback & rating average
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+                                 bg-light-eval-2 dark:bg-dark-eval-2
+                                 text-light-text dark:text-dark-text
+                                 border border-light-eval-3 dark:border-dark-eval-2">
+                        Total: {{ $feedback->count() }}
+                    </span>
+
+                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+                                 bg-blue-600/10 dark:bg-blue-400/10
+                                 text-blue-700 dark:text-blue-300">
+                        Average: {{ $Rate }} ⭐
+                    </span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="datatable w-full text-light-text dark:text-dark-text">
+                    <thead class="{{ $thead }}">
                         <tr>
-
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Ticket</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                IT Support</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Deskripsi</th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Rating</th>
-
+                            <th class="{{ $th }}">Ticket</th>
+                            <th class="{{ $th }}">Requestor</th>
+                            <th class="{{ $th }}">IT Support</th>
+                            <th class="{{ $th }}">Deskripsi</th>
+                            <th class="{{ $th }}">Rating</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($feedback as $index => $f)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $f->ticket->ticket_code ?? '-' }}
+
+                    <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                        @foreach ($feedback as $f)
+                            <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                <td class="px-4 py-3">
+                                    <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                        {{ $f->ticket->ticket_code ?? '-' }}
+                                    </div>
                                 </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+
+                                <td class="{{ $td }}">
                                     {{ $f->ticket->nama_pembuat ?? '-' }}
                                 </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+
+                                <td class="{{ $td }}">
                                     {{ $f->ticket->support->name ?? '-' }}
                                 </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
+
+                                <td class="px-4 py-3 text-sm {{ $muted }} max-w-xl break-words whitespace-normal">
                                     {{ $f->description ?? '-' }}
                                 </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $f->rating ?? '-' }}/5
+
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold
+                                                 bg-light-eval-2 dark:bg-dark-eval-2
+                                                 text-light-text dark:text-dark-text
+                                                 border border-light-eval-3 dark:border-dark-eval-2">
+                                        {{ $f->rating ?? '-' }}/5
+                                    </span>
                                 </td>
                             </tr>
                         @endforeach
@@ -84,19 +121,18 @@
 
     </div>
 
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    new DataTable(".datatable", {
-        responsive: false,
-        pageLength: 10,
-        layout: {
-            topStart: "pageLength",   // ✔️ fitur resmi v2
-            topEnd: "search",
-            bottomStart: "info",
-            bottomEnd: "paging"
-        }
-    });
-});
-</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            new DataTable(".datatable", {
+                responsive: false,
+                pageLength: 10,
+                layout: {
+                    topStart: "pageLength",
+                    topEnd: "search",
+                    bottomStart: "info",
+                    bottomEnd: "paging"
+                }
+            });
+        });
+    </script>
 </x-app-layout>

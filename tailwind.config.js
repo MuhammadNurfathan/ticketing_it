@@ -26,7 +26,7 @@ module.exports = {
                 },
                 light: {
                     bg: "#FFFFFF", // ✅ FIX
-                    "eval-1": "#F7F8FA",
+                    "eval-1": "#FFFFFF",
                     "eval-2": "#F0F2F5",
                     "eval-3": "#E8EAED",
                     "eval-4": "#F4F4F4",

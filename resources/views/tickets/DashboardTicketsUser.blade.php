@@ -1,9 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
+    <x-slot name="header"></x-slot>
 
-    </x-slot>
-
-    <div class="min-h-screen bg-light-bg dark:bg-dark-bg">
+    <div class="min-h-screen bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
         <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
 
             {{-- Alert Error --}}
@@ -28,16 +26,53 @@
                 </script>
             @endif
 
+            @php
+                // ===== Base Styles (biar konsisten & pendek) =====
+                $cardBase = "rounded-xl border shadow-sm
+                             bg-light-eval-1 dark:bg-dark-eval-1
+                             border-light-eval-3 dark:border-dark-eval-2";
+
+                $muted = 'text-light-text-secondary dark:text-dark-text-secondary';
+                $muted2 = 'text-light-text-muted dark:text-dark-text-secondary';
+
+                $tableWrap = "rounded-xl p-4 border shadow-sm
+                              bg-light-bg dark:bg-dark-eval-1
+                              border-light-eval-3 dark:border-dark-eval-2";
+
+                $theadBase = "bg-light-eval-2 dark:bg-dark-eval-2 border-b
+                              border-light-eval-3 dark:border-dark-eval-2";
+
+                $thBase = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider $muted";
+
+                $tdBase = "px-4 py-4 text-sm $muted";
+
+                // Status badge classes
+                $statusClasses = [
+                    1 => 'bg-light-eval-3 text-light-text dark:bg-dark-eval-2 dark:text-dark-text',
+                    2 => 'bg-yellow-500/90 text-gray-900 dark:bg-yellow-600 dark:text-white',
+                    3 => 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white',
+                    4 => 'bg-red-600 text-white dark:bg-red-700 dark:text-white',
+                    5 => 'bg-green-600 text-white dark:bg-green-700 dark:text-white',
+                ];
+            @endphp
+
             {{-- Header Section --}}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Ticket Management</h1>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Track and manage your support requests</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-light-text dark:text-dark-text">
+                        Ticket Management
+                    </h1>
+                    <p class="text-sm mt-1 {{ $muted }}">
+                        Track and manage your support requests
+                    </p>
                 </div>
 
                 @if (!$hasDoneTicket)
                     <a href="{{ route('DashboardTicketsUser.createUser') }}"
-                        class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-500 dark:bg-blue-500 text-white dark:text-white rounded-lg hover:bg-blue-800 dark:hover:bg-blue-800 transition-colors font-medium text-sm shadow-sm">
+                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                              bg-blue-600 text-white hover:bg-blue-700
+                              dark:bg-blue-600 dark:hover:bg-blue-700
+                              transition-colors shadow-sm">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -48,128 +83,111 @@
 
             {{-- Stats Cards --}}
             <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
-                <div
-                    class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
-                    <div
-                        class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">
-                        Done</div>
-                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                <div class="{{ $cardBase }} p-3 sm:p-6">
+                    <div class="text-xs font-medium uppercase tracking-wide mb-1 sm:mb-2 {{ $muted2 }}">Done</div>
+                    <div class="text-xl sm:text-3xl font-bold text-light-text dark:text-dark-text">
                         {{ $myTicket->whereIn('status_id', [3, 5])->count() }}
                     </div>
                 </div>
-                <div
-                    class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
-                    <div
-                        class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">
-                        Feedback</div>
-                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+
+                <div class="{{ $cardBase }} p-3 sm:p-6">
+                    <div class="text-xs font-medium uppercase tracking-wide mb-1 sm:mb-2 {{ $muted2 }}">Feedback
+                    </div>
+                    <div class="text-xl sm:text-3xl font-bold text-light-text dark:text-dark-text">
                         {{ $myTicket->where('status_id', 5)->count() }}
                     </div>
                 </div>
-                <div
-                    class="bg-white dark:bg-dark-eval-1 rounded-xl p-3 sm:p-6 border border-gray-200 dark:border-gray-700">
-                    <div
-                        class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 sm:mb-2">
-                        Total</div>
-                    <div class="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+
+                <div class="{{ $cardBase }} p-3 sm:p-6">
+                    <div class="text-xs font-medium uppercase tracking-wide mb-1 sm:mb-2 {{ $muted2 }}">Total
+                    </div>
+                    <div class="text-xl sm:text-3xl font-bold text-light-text dark:text-dark-text">
                         {{ $myTicket->count() }}
                     </div>
                 </div>
             </div>
 
             {{-- Tickets Table/List --}}
-
-            <div
-                class="bg-white rounded-lg dark:bg-dark-eval-1 shadow-md p-4 border border-gray-200 dark:border-gray-700">
+            <div class="{{ $tableWrap }}">
+                {{-- Desktop --}}
                 <div class="overflow-x-auto py-4" id="desktop-wrapper">
-                    <table class="datatable w-full text-gray-900 dark:text-gray-100">
-                        <thead class="bg-gray-50 dark:bg-dark-eval-2 border-b border-gray-200 dark:border-gray-700">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $theadBase }}">
                             <tr>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Ticket</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Category</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Problem</th>
-
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Date</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Solution</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Feedback</th>
-                                <th
-                                    class="px-4 py-3 text-center text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Action</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    IT Support</th>
-                                <th
-                                    class="px-4 py-3 text-left text-gray-700 dark:text-gray-300 text-xs font-semibold uppercase tracking-wider">
-                                    Status</th>
+                                <th class="{{ $thBase }}">Ticket</th>
+                                <th class="{{ $thBase }}">Category</th>
+                                <th class="{{ $thBase }}">Problem</th>
+                                <th class="{{ $thBase }}">Date</th>
+                                <th class="{{ $thBase }}">Solution</th>
+                                <th class="{{ $thBase }}">Feedback</th>
+                                <th class="{{ $thBase }} text-center">Action</th>
+                                <th class="{{ $thBase }}">IT Support</th>
+                                <th class="{{ $thBase }}">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
                             @foreach ($myTicket as $ticket)
                                 <tr
-                                    class="transition-colors hover:bg-gray-100 dark:hover:bg-dark-eval-2 {{ $ticket->status_id == 3 ? 'bg-gray-50 dark:bg-dark-eval-2/50' : '' }}">
+                                    class="transition-colors
+                                           hover:bg-light-eval-1 dark:hover:bg-dark-eval-2
+                                           {{ $ticket->status_id == 3 ? 'bg-light-eval-2 dark:bg-dark-eval-2/60' : '' }}">
                                     <td class="px-4 py-4">
-                                        <div class="font-medium text-gray-900 dark:text-white">
-                                            {{ $ticket->ticket_code }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                            {{ $ticket->user->name ?? '-' }}</div>
+                                        <div class="font-medium text-light-text dark:text-dark-text">
+                                            {{ $ticket->ticket_code }}
+                                        </div>
+                                        <div class="text-xs mt-0.5 {{ $muted2 }}">
+                                            {{ $ticket->nama_pembuat ?? '-' }}
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
+
+                                    <td class="{{ $tdBase }}">
                                         {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
                                     </td>
+
                                     <td
-                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs whitespace-normal break-words">
+                                        class="px-4 py-4 text-sm {{ $muted }} max-w-xs whitespace-normal break-words">
                                         {{ $ticket->problem }}
                                     </td>
 
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                    <td class="{{ $tdBase }}">
                                         {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
                                     </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
+
+                                    <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs break-words">
                                         {{ $ticket->solution ?? '-' }}
                                     </td>
-                                    <td
-                                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs  break-words">
+
+                                    <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs break-words">
                                         {{ $ticket->feedback->description ?? '-' }}
                                     </td>
+
                                     <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
-                                                class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium
+                                                      bg-red-600 hover:bg-red-700 text-white transition-colors">
                                                 Berikan Feedback
                                             </a>
                                         @elseif ($ticket->status_id == 1)
                                             <a href="{{ route('DashboardTicketsUser.edit', $ticket->id) }}"
-                                                class="inline-flex items-center px-3 py-1.5 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors">
+                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium
+                                                      bg-blue-600 hover:bg-blue-700 text-white transition-colors">
                                                 Edit
                                             </a>
                                         @else
-                                            <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
+                                            <span class="text-xs {{ $muted2 }}">-</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate">
+
+                                    <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs truncate">
                                         {{ $ticket->support->name ?? '-' }}
                                     </td>
+
                                     <td class="px-4 py-4">
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium
-                                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 4 ? 'bg-red-500 text-white dark:bg-red-600 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
-                                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                                                     {{ $statusClasses[$ticket->status_id] ?? 'bg-light-eval-3 text-light-text dark:bg-dark-eval-2 dark:text-dark-text' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
                                     </td>
@@ -180,60 +198,53 @@
                     </table>
                 </div>
 
+                {{-- Mobile --}}
                 <div class="lg:hidden" id="mobile-wrapper">
                     <div class="p-4 space-y-4">
 
-                        {{-- Search & Filter --}}
-
-
+                        {{-- Search & PerPage --}}
                         <div class="flex items-center gap-2 w-full">
-
-                            <!-- SEARCH FLEX -->
                             <input type="text" id="mobileSearch" placeholder="Search..."
-                                class="flex-1 min-w-0 px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md
-                           bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
-                           placeholder-gray-500 dark:placeholder-gray-400
-                           focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 focus:border-transparent" />
+                                class="flex-1 min-w-0 px-3 py-2 text-xs rounded-lg border
+                                          bg-light-bg dark:bg-dark-eval-2
+                                          text-light-text dark:text-dark-text
+                                          placeholder:text-light-text-muted dark:placeholder:text-dark-text-secondary
+                                          border-light-eval-3 dark:border-dark-eval-2
+                                          focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40" />
 
-                            <!-- SELECT FLEX -->
                             <select id="mobilePerPage"
-                                class="px-2 pr-6 py-1.5 text-xs min-w-[55px] border border-gray-300 dark:border-gray-600 rounded-md
-           bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-white
-           focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 appearance-none">
+                                class="px-3 pr-7 py-2 text-xs min-w-[70px] rounded-lg border appearance-none
+                                           bg-light-bg dark:bg-dark-eval-2
+                                           text-light-text dark:text-dark-text
+                                           border-light-eval-3 dark:border-dark-eval-2
+                                           focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40">
                                 <option value="3" selected>3</option>
                                 <option value="5">5</option>
                                 <option value="10">10</option>
                                 <option value="25">25</option>
                                 <option value="all">All</option>
                             </select>
-
                         </div>
-
 
                         {{-- Cards Container --}}
                         <div id="mobileCards" class="space-y-4">
-
-
                             @php
                                 $sortedMobile = $myTicket->sort(function ($a, $b) {
-                                    // Priority berdasarkan status (semakin kecil = semakin tinggi prioritas)
                                     $priorityA = $a->status_id == 3 ? 1 : (in_array($a->status_id, [1, 2]) ? 2 : 3);
                                     $priorityB = $b->status_id == 3 ? 1 : (in_array($b->status_id, [1, 2]) ? 2 : 3);
 
-                                    // Jika priority berbeda, urutkan berdasarkan priority
                                     if ($priorityA != $priorityB) {
                                         return $priorityA - $priorityB;
                                     }
-
-                                    // Jika priority sama, urutkan berdasarkan request_date (terbaru dulu)
                                     return $b->request_date <=> $a->request_date;
                                 });
                             @endphp
 
                             @foreach ($sortedMobile as $ticket)
-                                <div class="ticket-card bg-gray-50 dark:bg-dark-eval-2 rounded-xl p-4
-                            border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden
-                            {{ $ticket->status_id == 3 ? 'ring-2 ring-red-500 dark:ring-red-600' : '' }}"
+                                <div class="ticket-card rounded-xl p-4 border shadow-sm overflow-hidden
+                                            bg-light-eval-1 dark:bg-dark-eval-2
+                                            border-light-eval-3 dark:border-dark-eval-2
+                                            {{ $ticket->status_id == 3 ? 'ring-2 ring-blue-500/40 dark:ring-blue-400/35' : '' }}"
                                     data-code="{{ strtolower($ticket->ticket_code) }}"
                                     data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
                                     data-problem="{{ strtolower($ticket->problem) }}"
@@ -251,142 +262,118 @@
                                     {{-- Header --}}
                                     <div class="flex justify-between items-start mb-3">
                                         <div>
-                                            <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                            <div class="text-sm font-semibold text-light-text dark:text-dark-text">
                                                 {{ $ticket->ticket_code }}
                                             </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            <div class="text-xs mt-0.5 {{ $muted2 }}">
                                                 {{ $ticket->user->name ?? '-' }}
                                             </div>
                                         </div>
 
                                         {{-- Status Badge --}}
                                         <span
-                                            class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
-                            {{ $ticket->status_id == 1 ? 'bg-gray-400 text-gray-900 dark:bg-gray-600 dark:text-white' : '' }}
-                            {{ $ticket->status_id == 2 ? 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-white' : '' }}
-                            {{ $ticket->status_id == 4 ? 'bg-red-500 text-gray-900 dark:bg-red-600 dark:text-white' : '' }}
-                            {{ $ticket->status_id == 3 ? 'bg-blue-600 text-white dark:bg-blue-700 dark:text-white' : '' }}
-                            {{ $ticket->status_id == 5 ? 'bg-green-500 text-white dark:bg-green-600 dark:text-white' : '' }}">
+                                            class="shrink-0 inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
+             {{ $statusClasses[$ticket->status_id] ?? 'bg-light-eval-3 text-light-text dark:bg-dark-eval-2 dark:text-dark-text' }}">
                                             {{ $ticket->status->status_name }}
                                         </span>
+
                                     </div>
 
                                     {{-- Content --}}
                                     <div class="space-y-2 text-sm">
-
-                                        {{-- Category --}}
-                                        <div class="flex items-start">
-                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                Category:
-                                            </span>
+                                        <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
                                             <span
-                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Category:</span>
+                                            <span
+                                                class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                 {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
                                             </span>
                                         </div>
 
-                                        {{-- Problem --}}
-                                        <div class="flex items-start">
-                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                Problem:
-                                            </span>
+
+                                        <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                                            <span class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Problem:</span>
                                             <span
-                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                 {{ $ticket->problem }}
                                             </span>
                                         </div>
 
-                                        {{-- Date --}}
-                                        <div class="flex items-start">
-                                            <span class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                Date:
-                                            </span>
+
+                                        <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                                            <span class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Date:</span>
                                             <span
-                                                class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                 {{ $ticket->request_date ? $ticket->request_date->format('d M Y') : '-' }}
                                             </span>
                                         </div>
 
-                                        {{-- Solution --}}
                                         @if ($ticket->solution)
-                                            <div class="flex items-start">
+                                            <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                    Solution:
-                                                </span>
+                                                    class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Solution:</span>
                                                 <span
-                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                    class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                     {{ $ticket->solution }}
                                                 </span>
                                             </div>
                                         @endif
 
-                                        {{-- Feedback --}}
                                         @if ($ticket->feedback)
-                                            <div class="flex items-start">
+                                            <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                    Feedback:
-                                                </span>
+                                                    class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Feedback:</span>
                                                 <span
-                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal overflow-hidden">
+                                                    class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                     {{ $ticket->feedback->description }}
                                                 </span>
                                             </div>
                                         @endif
 
-                                        {{-- Support --}}
                                         @if ($ticket->support)
-                                            <div class="flex items-start">
+                                            <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
                                                 <span
-                                                    class="text-gray-500 dark:text-gray-400 min-w-[65px] shrink text-xs">
-                                                    Support:
-                                                </span>
+                                                    class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Support:</span>
                                                 <span
-                                                    class="text-gray-900 dark:text-white text-xs flex-1 break-words whitespace-normal font-medium overflow-hidden">
+                                                    class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
                                                     {{ $ticket->support->name }}
                                                 </span>
                                             </div>
                                         @endif
                                     </div>
 
-                                    {{-- Give Feedback Button --}}
+                                    {{-- Action --}}
                                     @if ($ticket->status_id == 3)
-                                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                        <div class="mt-3 pt-3 border-t border-light-eval-3 dark:border-dark-eval-2">
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
-                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
-            dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
-            text-sm font-medium transition-colors shadow-sm">
+                                                class="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium
+                                                      bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
                                                 Berikan Feedback
                                             </a>
                                         </div>
-                                        @elseif ($ticket->status_id == 1)
-                                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    @elseif ($ticket->status_id == 1)
+                                        <div class="mt-3 pt-3 border-t border-light-eval-3 dark:border-dark-eval-2">
                                             <a href="{{ route('DashboardTicketsUser.edit', $ticket->id) }}"
-                                                class="block w-full text-center px-4 py-2 bg-blue-500 hover:bg-blue-600
-            dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
-            text-sm font-medium transition-colors shadow-sm">
+                                                class="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium
+                                                      bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                                                 Edit
                                             </a>
                                         </div>
                                     @endif
-
                                 </div>
                             @endforeach
-
                         </div>
 
                         {{-- Pagination --}}
                         <div id="mobilePagination"
-                            class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            <div id="mobileInfo" class="text-xs text-gray-600 dark:text-gray-400 font-medium"></div>
+                            class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-3
+                                    border-t border-light-eval-3 dark:border-dark-eval-2">
+                            <div id="mobileInfo" class="text-xs {{ $muted }} font-medium"></div>
                             <div id="mobilePaginationButtons" class="flex gap-1 flex-wrap justify-center"></div>
                         </div>
 
                     </div>
                 </div>
-
-
             </div>
 
         </div>
@@ -401,18 +388,25 @@
             <input type="hidden" name="status_id" value="1">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User</label>
+                <label class="block text-sm font-medium mb-1 {{ $muted }}">User</label>
                 <input type="text" value="{{ Auth::user()->name }}" readonly
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm">
+                    class="w-full px-3 py-2 rounded-lg border
+                              bg-light-eval-1 dark:bg-dark-eval-2
+                              text-light-text dark:text-dark-text text-sm
+                              border-light-eval-3 dark:border-dark-eval-2">
                 <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-sm font-medium mb-1 {{ $muted }}">
                     Category <span class="text-red-500">*</span>
                 </label>
                 <select name="problem_category_id" required
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500">
+                    class="w-full px-3 py-2 rounded-lg border
+                               bg-light-bg dark:bg-dark-eval-2
+                               text-light-text dark:text-dark-text text-sm
+                               border-light-eval-3 dark:border-dark-eval-2
+                               focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40">
                     <option value="">-- Select Category --</option>
                     @foreach ($categories as $cat)
                         <option value="{{ $cat->id }}">{{ $cat->problem_category_name }}</option>
@@ -421,33 +415,44 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-sm font-medium mb-1 {{ $muted }}">
                     Problem Description <span class="text-red-500">*</span>
                 </label>
                 <textarea name="problem" rows="3" required placeholder="Describe your issue..."
-                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-dark-eval-2 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500"></textarea>
+                    class="w-full px-3 py-2 rounded-lg border
+                                 bg-light-bg dark:bg-dark-eval-2
+                                 text-light-text dark:text-dark-text text-sm
+                                 border-light-eval-3 dark:border-dark-eval-2
+                                 placeholder:text-light-text-muted dark:placeholder:text-dark-text-secondary
+                                 focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40"></textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label class="block text-sm font-medium mb-1 {{ $muted }}">
                     Attachment (Image/Video, Max 10MB)
                 </label>
                 <input type="file" name="image" accept=".jpg,.jpeg,.png,.mp4"
-                    class="block w-full text-sm text-gray-900 dark:text-gray-100
-                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
-                    file:text-sm file:font-medium file:bg-gray-900 dark:file:bg-gray-100
-                    file:text-white dark:file:text-gray-900 hover:file:bg-gray-800 dark:hover:file:bg-gray-200
-                    file:cursor-pointer cursor-pointer">
+                    class="block w-full text-sm text-light-text dark:text-dark-text
+                              file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                              file:text-sm file:font-medium
+                              file:bg-light-eval-2 dark:file:bg-dark-eval-2
+                              file:text-light-text dark:file:text-dark-text
+                              hover:file:bg-light-eval-3 dark:hover:file:bg-dark-eval-3
+                              file:cursor-pointer cursor-pointer">
             </div>
 
             <div class="flex justify-end gap-3 pt-2">
                 <button type="button" onclick="closeModal('ticketModal')"
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-eval-2 text-sm font-medium transition-colors">
+                    class="px-4 py-2 rounded-lg text-sm font-medium border
+                               border-light-eval-3 dark:border-dark-eval-2
+                               text-light-text-secondary dark:text-dark-text-secondary
+                               hover:bg-light-eval-1 dark:hover:bg-dark-eval-2 transition-colors">
                     Cancel
                 </button>
 
                 <button type="submit"
-                    class="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 text-sm font-medium transition-colors">
+                    class="px-4 py-2 rounded-lg text-sm font-medium
+                               bg-blue-600 hover:bg-blue-700 text-white transition-colors">
                     Create Ticket
                 </button>
             </div>
@@ -593,7 +598,7 @@
 
                 const isDark = document.documentElement.classList.contains('dark');
 
-                // Button classes
+                // Button classes (dibiarin JS-based biar tidak ubah logic kamu)
                 const btnBaseClass = "px-3 py-1.5 text-xs rounded-lg font-medium transition-colors";
                 const btnNormalClass = isDark ?
                     "border border-gray-600 bg-dark-eval-2 text-gray-300 hover:bg-dark-eval-3" :
@@ -607,7 +612,7 @@
                 const prevBtn = document.createElement("button");
                 prevBtn.innerHTML = "‹";
                 prevBtn.className =
-                `${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? btnDisabledClass : ''}`;
+                    `${btnBaseClass} ${btnNormalClass} ${currentPage === 1 ? btnDisabledClass : ''}`;
                 prevBtn.disabled = currentPage === 1;
                 if (!prevBtn.disabled) {
                     prevBtn.addEventListener("click", () => changePage(currentPage - 1));
@@ -618,7 +623,6 @@
                 let startPage = Math.max(1, currentPage - 2);
                 let endPage = Math.min(totalPages, startPage + 4);
 
-                // Adjust if we're near the end
                 if (endPage - startPage < 4) {
                     startPage = Math.max(1, endPage - 4);
                 }
@@ -661,7 +665,6 @@
                 currentPage = page;
                 displayCards();
 
-                // Smooth scroll to top of mobile cards
                 if (mobileCardsContainer) {
                     mobileCardsContainer.scrollIntoView({
                         behavior: "smooth",
@@ -671,9 +674,7 @@
             }
 
             // Event listeners
-            if (mobileSearch) {
-                mobileSearch.addEventListener("input", filterCards);
-            }
+            if (mobileSearch) mobileSearch.addEventListener("input", filterCards);
 
             if (mobilePerPage) {
                 mobilePerPage.addEventListener("change", () => {
@@ -683,23 +684,15 @@
                 });
             }
 
-            // Initial load - only run if on mobile
-            if (window.innerWidth < 1024) {
-                filterCards();
-            }
+            if (window.innerWidth < 1024) filterCards();
 
-            // Handle window resize
             let resizeTimer;
             window.addEventListener('resize', () => {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(() => {
-                    if (window.innerWidth < 1024) {
-                        filterCards();
-                    }
+                    if (window.innerWidth < 1024) filterCards();
                 }, 250);
             });
         });
     </script>
-
-
 </x-app-layout>

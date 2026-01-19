@@ -16,46 +16,47 @@
     <!-- Styles -->
     <style>
         [x-cloak] {
-            display: none;
+            display: none !important;
         }
     </style>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text">
     <div x-data="mainState" :class="{ dark: isDarkMode }" @resize.window="handleWindowResize" x-cloak>
-        <div class="min-h-screen text-gray-900 bg-gray-100 dark:bg-dark-bg dark:text-gray-200">
-            
+        <div class="min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text">
+
             <!-- Sidebar -->
             <x-sidebar.sidebar />
-            
+
             <!-- Page Wrapper -->
-            <div class="flex flex-col min-h-screen"
+            <div class="flex min-h-screen flex-col transition-[margin] duration-200 ease-out"
                 :class="{
                     'lg:ml-64': isSidebarOpen,
                     'md:ml-16': !isSidebarOpen
-                }"
-                style="transition-property: margin; transition-duration: 150ms;">
+                }">
 
-                <!-- Navbar (Responsive - Mobile & Desktop) -->
+                <!-- Navbar -->
                 <x-navbar />
 
                 <!-- Page Heading -->
-                <header>
-                    <div class="p-4 sm:p-6">
-                        {{ $header }}
-                    </div>
+                <header class="px-4 sm:px-6 lg:px-8 py-2 sm:py-3">
+                    {{ $header }}
                 </header>
 
+
+
                 <!-- Page Content -->
-                <main class="px-4 sm:px-6 flex-1">
-                    {{ $slot }}
+                <main class="flex-1" >
+                    {{-- Content container full-width, tapi tetap rapi --}}
+                    <div class="w-full">
+                        {{ $slot }}
+                    </div>
                 </main>
 
-                <!-- Page Footer -->
+                <!-- Footer -->
                 <x-footer />
             </div>
         </div>

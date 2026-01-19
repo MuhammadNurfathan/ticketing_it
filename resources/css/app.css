@@ -10,3 +10,49 @@
 .dark .ps__rail-x {
     background-color: transparent !important;
 }
+/* ===== DATATABLE LAYOUT FIX ===== */
+.dataTables_wrapper .dt-layout-row {
+  padding: 12px 16px;
+}
+
+.dataTables_wrapper .dt-layout-row:first-child {
+  margin-bottom: 12px;
+}
+
+.dataTables_wrapper .dt-layout-row:last-child {
+  margin-top: 12px;
+}
+
+/* Entries + Search gak nempel border */
+.dataTables_wrapper .dt-length,
+.dataTables_wrapper .dt-search {
+  padding: 8px 0;
+}
+
+/* Input style */
+.dataTables_wrapper .dt-input,
+.dataTables_wrapper .dt-search input,
+.dataTables_wrapper .dt-length select {
+  border-radius: 12px;
+  padding: 8px 12px;
+  border: 1px solid #E5E7EB;
+}
+
+.dark .dataTables_wrapper .dt-input,
+.dark .dataTables_wrapper .dt-search input,
+.dark .dataTables_wrapper .dt-length select {
+  background-color: #1F2937;
+  border-color: #374151;
+  color: #E5E7EB;
+}
+
+/* Header table lebih lega */
+table.dataTable thead th {
+  padding: 14px 16px !important;
+}
+
+/* Body table */
+table.dataTable tbody td {
+  padding: 12px 16px !important;
+}
+

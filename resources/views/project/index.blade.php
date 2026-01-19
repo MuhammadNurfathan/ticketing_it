@@ -3,10 +3,15 @@
     <x-slot name="header">
         @auth
             @if (Auth::user()->role_id != 3)
-                <div class="flex justify-between items-center">
-                    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Project</h2>
+                <div class="flex items-center justify-between gap-4">
+                    <h2 class="m-0 font-semibold text-xl leading-tight text-light-text dark:text-dark-text">
+                        Project
+                    </h2>
+
+
                     <button onclick="openModal('projectModal')"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                               bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                         Create Project
                     </button>
                 </div>
@@ -14,670 +19,547 @@
         @endauth
     </x-slot>
 
-    <div class="p-6 space-y-6">
+    @php
+        $card = "rounded-2xl border shadow-sm
+                 bg-light-eval-1 dark:bg-dark-eval-1
+                 border-light-eval-3 dark:border-dark-eval-2";
+
+        $muted = 'text-light-text-secondary dark:text-dark-text-secondary';
+        $muted2 = 'text-light-text-muted dark:text-dark-text-secondary';
+
+        $input = "w-full px-3 py-2 rounded-lg border
+                  bg-light-bg dark:bg-dark-eval-2
+                  text-light-text dark:text-dark-text
+                  border-light-eval-3 dark:border-dark-eval-2
+                  focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500/40";
+
+        $btnPrimary = "inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm";
+
+        $btnGhost = "px-3 py-2 rounded-lg text-sm font-medium border transition-colors
+                     border-light-eval-3 dark:border-dark-eval-2
+                     text-light-text-secondary dark:text-dark-text-secondary
+                     hover:bg-light-eval-2 dark:hover:bg-dark-eval-2";
+
+        $thead = "bg-light-eval-2 dark:bg-dark-eval-2 border-b
+                  border-light-eval-3 dark:border-dark-eval-2";
+
+        $th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider $muted";
+        $td = "px-4 py-3 text-sm $muted";
+
+        $badgeBase = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold';
+
+        // ===== Stats tabs (format sesuai request lu) =====
+        $tabs = [
+            'waiting' => [
+                'label' => 'Waiting',
+                'count' => $stats['waiting'] ?? 0,
+                'badge' => 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300',
+                'accent' => 'bg-yellow-500',
+                'subtitle' => 'Project yang menunggu dieksekusi',
+            ],
+            'in_progress' => [
+                'label' => 'In Progress',
+                'count' => $stats['in_progress'] ?? 0,
+                'badge' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
+                'accent' => 'bg-blue-600',
+                'subtitle' => 'Project yang sedang berjalan',
+            ],
+            'done' => [
+                'label' => 'Done',
+                'count' => $stats['done'] ?? 0,
+                'badge' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
+                'accent' => 'bg-green-600',
+                'subtitle' => 'Project yang sudah selesai',
+            ],
+            'void' => [
+                'label' => 'Void',
+                'count' => $stats['void'] ?? 0,
+                'badge' => 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300',
+                'accent' => 'bg-red-600',
+                'subtitle' => 'Project yang dibatalkan',
+            ],
+            'pending' => [
+                'label' => 'Pending',
+                'count' => $stats['pending'] ?? 0,
+                'badge' => 'bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
+                'accent' => 'bg-orange-600',
+                'subtitle' => 'Project yang sedang pending',
+            ],
+        ];
+    @endphp
+
+    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6" x-data="{
+        tab: 'waiting',
+        dt: null,
+        initDT() {
+            // init sekali (DataTables v2)
+            this.dt = new DataTable('.datatable', {
+                responsive: false,
+                pageLength: 3,
+                lengthMenu: [
+                    [3, 5, 10, 25, 50, -1],
+                    [3, 5, 10, 25, 50, 'All']
+                ],
+                order: [
+                    [0, 'desc']
+                ],
+                layout: {
+                    topStart: 'pageLength',
+                    topEnd: 'search',
+                    bottomStart: 'info',
+                    bottomEnd: 'paging'
+                }
+            });
+        },
+        onTab() {
+            // biar width table aman saat tab hidden
+            setTimeout(() => {
+                try {
+                    document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
+                    window.dispatchEvent(new Event('resize'));
+                } catch (e) {}
+            }, 60);
+        }
+    }" x-init="initDT()">
+
         {{-- ========================================================= FILTER DATE ========================================================= --}}
-        <form method="GET" action="{{ route('project.index') }}"
-            class="flex flex-wrap items-end gap-4 bg-light-eval-1 dark:bg-dark-eval-1 p-4 rounded shadow">
-            <div>
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Start Date
-                </label>
-                <input type="date" name="start_date" value="{{ $start }}"
-                    class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
-            </div>
+        <form method="GET" action="{{ route('project.index') }}" class="{{ $card }} p-4 sm:p-5">
+            <div class="flex flex-col lg:flex-row lg:items-end gap-4">
+                <div class="w-full sm:w-auto">
+                    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                        Start Date
+                    </label>
+                    <input type="date" name="start_date" value="{{ $start }}"
+                        class="date-input w-56 max-w-full {{ $input }}">
+                </div>
 
-            <div>
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">End Date</label>
-                <input type="date" name="end_date" value="{{ $end }}"
-                    class="date-input border border-gray-300 dark:border-gray-600 rounded p-2 w-48 bg-white dark:bg-dark-eval-2 text-light-text dark:text-dark-text">
-            </div>
+                <div class="w-full sm:w-auto">
+                    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                        End Date
+                    </label>
+                    <input type="date" name="end_date" value="{{ $end }}"
+                        class="date-input w-56 max-w-full {{ $input }}">
+                </div>
 
-            <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-4 py-2 rounded transition duration-300">
-                Filter
-            </button>
+                <div class="flex items-center gap-2">
+                    <button type="submit" class="{{ $btnPrimary }}">Filter</button>
+                    <a href="{{ route('project.index') }}" class="{{ $btnGhost }}">Reset</a>
+                </div>
+            </div>
         </form>
 
-        {{-- ========================================================= STATISTIK CARDS ========================================================= --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            @php
-                $statusColors = [
-                    'Waiting' => 'blue',
-                    'In Progress' => 'purple',
-                    'Done' => 'green',
-                    'Void' => 'red',
-                    'Pending' => 'orange',
-                ];
+        {{-- ========================================================= STAT TABS ========================================================= --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            @foreach ($tabs as $key => $t)
+                <button type="button"
+                    @click="tab='{{ $key }}'; onTab(); $nextTick(() => document.getElementById('table-area')?.scrollIntoView({behavior:'smooth', block:'start'}))"
+                    class="group text-left rounded-2xl border shadow-sm p-5 transition-all duration-200
+                           bg-light-eval-1 dark:bg-dark-eval-1
+                           border-light-eval-3 dark:border-dark-eval-2
+                           hover:-translate-y-0.5 hover:shadow-md focus:outline-none"
+                    :class="tab === '{{ $key }}'
+                        ?
+                        'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30' :
+                        ''">
 
-                $statusIcons = [
-                    'Waiting' => '⏳',
-                    'In Progress' => '⚙️',
-                    'Done' => '✅',
-                    'Void' => '❌',
-                    'Pending' => '🕘',
-                ];
-            @endphp
+                    <div class="h-1.5 w-full rounded-full {{ $t['accent'] }}"
+                        :class="tab === '{{ $key }}' ? 'opacity-100' : 'opacity-50'"></div>
 
-            @foreach ($statusColors as $key => $color)
-                <div
-                    class="relative bg-light-eval-1 dark:bg-dark-eval-1 p-5 rounded shadow hover:scale-105 transform transition duration-300 border border-gray-200 dark:border-gray-700">
+                    <div class="mt-4 flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3">
 
-                    <!-- Icon kecil di pojok kiri atas, di dalam border -->
-                    <div class="absolute top-2 left-2 text-xl text-gray-400 dark:text-gray-500">
-                        {{ $statusIcons[$key] }}
+                            <div>
+                                <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                    {{ $t['label'] }}
+                                </div>
+                                <div class="text-xs mt-0.5 {{ $muted2 }}">
+                                    {{ $t['subtitle'] }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="text-3xl font-bold text-light-text dark:text-dark-text text-center">
-                        {{ $stats[strtolower(str_replace(' ', '_', $key))] }}
+                    <div class="mt-4 text-3xl font-bold tracking-tight text-light-text dark:text-dark-text">
+                        {{ $t['count'] }}
                     </div>
-                    <div class="font-semibold text-light-text-secondary dark:text-dark-text-secondary mt-2 text-center">
-                        {{ $key }}
-                    </div>
-                </div>
+                </button>
             @endforeach
         </div>
 
-        {{-- ========================================================= PROGRESS TABLE ========================================================= --}}
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="inline bg-blue-500 px-2 py-1 to-blue-50 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Project In Progress</h3>
-            <div class="overflow-x-auto py-4">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                        <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                project Code
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Project Name
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor Name
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Priority
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Percent
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Description
-                            </th>
+        {{-- ========================================================= TABLE AREA (ONLY ONE) ========================================================= --}}
+        <div id="table-area" class="space-y-6">
 
+            {{-- ================= IN PROGRESS ================= --}}
+            <div x-show="tab==='in_progress'" x-cloak class="{{ $card }} p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
+                            Project In Progress
+                        </div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['in_progress']['subtitle'] }}</div>
+                    </div>
+                    <span class="{{ $badgeBase }} {{ $tabs['in_progress']['badge'] }}">In Progress</span>
+                </div>
 
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                End Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Actual Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Total Pending Minutes
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                History
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($inProgressProject as $project)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <!-- Project Code: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->project_code ?? '-' }}
-                                </td>
-
-                                <!-- Project Name: Left -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-left">
-                                    {{ $project->project_name ?? '-' }}
-                                </td>
-
-                                <!-- Requestor: Left -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-left">
-                                    {{ $project->requestor->name ?? '-' }}
-                                </td>
-
-                                <!-- Priority: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->priority->priority_name }}
-                                </td>
-
-                                <!-- Progress %: Right -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-right">
-                                    {{ $project->progress_percent ?? '-' }}%
-                                </td>
-
-                                <!-- Progress Date: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->progress_date ?? '-' }}
-                                </td>
-
-                                <!-- Description: Left + Wrap -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text max-w-xs text-left">
-                                    <div class="whitespace-normal break-words">
-                                        {{ $project->description ?? '-' }}
-                                    </div>
-                                </td>
-
-                                <!-- Start Date: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->start_date ?? '-' }}
-                                </td>
-
-                                <!-- End Date: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->end_date ?? '-' }}
-                                </td>
-
-                                <!-- Actual Start: Center -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center">
-                                    {{ $project->actual_start_date ?? '-' }}
-                                </td>
-
-                                <!-- Total Pending Minutes: Right -->
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-right">
-                                    {{ $project->total_pending_minutes ?? '-' }}
-                                </td>
-
-                                <!-- Lihat Detail Button: Center -->
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <button onclick="showProjectModal({{ $project->id }})"
-                                        class="text-blue-500 hover:underline">
-                                        Lihat Detail
-                                    </button>
-                                </td>
-
-                                <!-- Action Buttons: Center -->
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <div class="flex justify-center items-center gap-2">
-                                        <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
-                                            data-code="{{ $project->project_code }}"
-                                            data-name="{{ $project->project_name }}"
-                                            data-progress="{{ $project->progress_percent }}"
-                                            data-status="{{ $project->status_id }}"
-                                            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-all duration-200">
-                                            Update
-                                        </button>
-                                        <button onclick="openPendingModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all duration-200">
-                                            Pending
-                                        </button>
-                                        <button onclick="openVoidModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all duration-200">
-                                            Void
-                                        </button>
-                                    </div>
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Project Name</th>
+                                <th class="{{ $th }}">Requestor Name</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Progress %</th>
+                                <th class="{{ $th }}">Progress Date</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
+                                <th class="{{ $th }}">Actual Start</th>
+                                <th class="{{ $th }}">Pending Minutes</th>
+                                <th class="{{ $th }}">History</th>
+                                <th class="{{ $th }} text-center">Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
+                        </thead>
 
-                </table>
-            </div>
-        </div>
-
-        {{-- ========================================================= WAITING TABLE ========================================================= --}}
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="inline bg-yellow-500 px-2 py-1 to-blue-50 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Project Waiting</h3>
-            <div class="overflow-x-auto py-4">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                        <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                project Code
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Project Name
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Request Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Priority
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Description
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                End Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                Action
-                            </th>
-                        </tr>
-
-                    </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($waitingProject as $project)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->request_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->requestor->name ?? '-' }}</td>
-
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->description ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->start_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->end_date ?? '-' }}</td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <div class="flex gap-2 justify-center">
-                                        <button onclick="openVoidModal({{ $project->id }})"
-                                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200">
-                                            Void
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($inProgressProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td
+                                        class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">
+                                        {{ $project->priority->priority_name }}</td>
+                                    <td class="{{ $td }} text-right">
+                                        {{ $project->progress_percent ?? '-' }}%</td>
+                                    <td class="{{ $td }} text-center">{{ $project->progress_date ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">
+                                        {{ $project->actual_start_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-right">
+                                        {{ $project->total_pending_minutes ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button onclick="showProjectModal({{ $project->id }})"
+                                            class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+                                            Lihat Detail
                                         </button>
-
-                                        <form action="{{ route('project.updateProgress', $project->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="2">
-                                            <button type="submit" onclick="return confirm('Apakah Anda Yakin')"
-                                                class="px-3 py-1 bg-blue-600 text-white rounded">
-                                                Pilih
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex justify-center items-center gap-2">
+                                            <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                                data-code="{{ $project->project_code }}"
+                                                data-name="{{ $project->project_name }}"
+                                                data-progress="{{ $project->progress_percent }}"
+                                                data-status="{{ $project->status_id }}"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                                Update
                                             </button>
 
+                                            <button onclick="openPendingModal({{ $project->id }})"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white transition-colors">
+                                                Pending
+                                            </button>
+
+                                            <button onclick="openVoidModal({{ $project->id }})"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                Void
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            {{-- ================= WAITING (DEFAULT) ================= --}}
+            <div x-show="tab==='waiting'" x-cloak class="{{ $card }} p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
+                            Project Waiting
+                        </div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['waiting']['subtitle'] }}</div>
+                    </div>
+                    <span class="{{ $badgeBase }} {{ $tabs['waiting']['badge'] }}">Waiting</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Project Name</th>
+                                <th class="{{ $th }}">Request Date</th>
+                                <th class="{{ $th }}">Requestor</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
+                                <th class="{{ $th }} text-center">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($waitingProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->end_date ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex gap-2 justify-center">
+                                            <button onclick="openVoidModal({{ $project->id }})"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                Void
+                                            </button>
+
+                                            <form action="{{ route('project.updateProgress', $project->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status_id" value="2">
+                                                <button type="submit" onclick="return confirm('Apakah Anda Yakin?')"
+                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                                    Pilih
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            {{-- ================= DONE ================= --}}
+            <div x-show="tab==='done'" x-cloak class="{{ $card }} p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
+                            Project Done
+                        </div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['done']['subtitle'] }}</div>
+                    </div>
+                    <span class="{{ $badgeBase }} {{ $tabs['done']['badge'] }}">Done</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Nama</th>
+                                <th class="{{ $th }}">Request Date</th>
+                                <th class="{{ $th }}">Requestor</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
+                                <th class="{{ $th }}">History</th>
+                                <th class="{{ $th }} text-center">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($doneProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->end_date ?? '-' }}</td>
+                                    <td class="px-4 py-3">
+                                        <button onclick="showProjectModal({{ $project->id }})"
+                                            class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+                                            Lihat Detail
+                                        </button>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <form action="{{ route('project.updateStatus', $project->id) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="status_id" value="2">
+                                            <button
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors"
+                                                onclick="return confirm('Apakah Anda Yakin?')">
+                                                Cancel
+                                            </button>
                                         </form>
-                                    </div>
-                                </td>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
 
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        {{-- ========================================================= DONE TABLE ========================================================= --}}
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="inline bg-green-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Project Done</h3>
-            <div class="overflow-x-auto py-4">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                        <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                project Code
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Nama
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Request Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor
-                            </th>
+            {{-- ================= PENDING ================= --}}
+            <div x-show="tab==='pending'" x-cloak class="{{ $card }} p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
+                            Project Pending
+                        </div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['pending']['subtitle'] }}</div>
+                    </div>
+                    <span class="{{ $badgeBase }} {{ $tabs['pending']['badge'] }}">Pending</span>
+                </div>
 
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Project Name</th>
+                                <th class="{{ $th }}">Request Date</th>
+                                <th class="{{ $th }}">Requestor</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Progress %</th>
+                                <th class="{{ $th }}">Progress Date</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
+                                <th class="{{ $th }}">History</th>
+                                <th class="{{ $th }} text-center">Action</th>
+                            </tr>
+                        </thead>
 
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Priority
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Description
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                End Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                History
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                Action
-                            </th>
-                        </tr>
-
-                    </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($doneProject as $project)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->request_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->requestor->name ?? '-' }}</td>
-
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->description ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->start_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->end_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    <button onclick="showProjectModal({{ $project->id }})"
-                                        class="text-blue-500 hover:underline">
-                                        Lihat Detail
-                                    </button>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <form action="{{ route('project.updateStatus', $project->id) }}" method="POST"
-                                        class="inline">
-                                        @csrf
-                                        <input type="hidden" name="status_id" value="2">
-                                        <button
-                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs"
-                                            onclick="return confirm('Apakah Anda Yakin?')">
-                                            Cancel
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($pendingProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->progress_percent ?? '-' }}%</td>
+                                    <td class="{{ $td }}">{{ $project->progress_date ?? '-' }}</td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->end_date ?? '-' }}</td>
+                                    <td class="px-4 py-3">
+                                        <button onclick="showProjectModal({{ $project->id }})"
+                                            class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+                                            Lihat Detail
                                         </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <form action="{{ route('project.continueProgress', $project->id) }}"
+                                            method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="status_id" value="2">
+                                            <button
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                                                onclick="return confirm('Apakah Anda Yakin?')">
+                                                Continue
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
-        </div>
 
-        {{-- ========================================================= PENDING TABLE ========================================================= --}}
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="inline bg-orange-600 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Project Pending</h3>
-            <div class="overflow-x-auto py-4">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                        <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                project Code
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Project Nmae
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Request Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Priority
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Percent
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Progress Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Description
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                End Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                History
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text text-center align-middle">
-                                Action
-                            </th>
-                        </tr>
+            {{-- ================= VOID ================= --}}
+            <div x-show="tab==='void'" x-cloak class="{{ $card }} p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
+                            Project Void
+                        </div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['void']['subtitle'] }}</div>
+                    </div>
+                    <span class="{{ $badgeBase }} {{ $tabs['void']['badge'] }}">Void</span>
+                </div>
 
-                    </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($pendingProject as $project)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->request_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->requestor->name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_percent ?? '-' }}%</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->progress_date ?? '-' }} </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->description ?? '-' }} </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->start_date ?? '-' }} </td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->end_date ?? '-' }} </td>
-
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    <button onclick="showProjectModal({{ $project->id }})"
-                                        class="text-blue-500 hover:underline">
-                                        Lihat Detail
-                                    </button>
-                                </td>
-                                </td>
-                                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
-                                    <form action="{{ route('project.continueProgress', $project->id) }}"
-                                        method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="status_id" value="2">
-                                        <button
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs"
-                                            onclick="return confirm('Apakah Anda Yakin?')">
-                                            continue
-                                        </button>
-                                    </form>
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Nama</th>
+                                <th class="{{ $th }}">Request Date</th>
+                                <th class="{{ $th }}">Requestor</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Notes</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($voidProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->notes ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->end_date ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
-        </div>
 
-        {{-- ========================================================= VOID TABLE ========================================================= --}}
-        <div
-            class="bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="inline bg-red-500 px-2 py-1 font-semibold text-lg mb-2 border-b border-gray-300 dark:border-gray-600 pb-1 text-light-text dark:text-dark-text">
-                Project Void</h3>
-            <div class="overflow-x-auto py-4">
-                <table class="datatable min-w-full border border-gray-300 dark:border-gray-600 text-sm">
-                    <thead class="bg-light-eval-2 dark:bg-dark-eval-2 text-left">
-                        <tr>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                project Code
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Nama
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Request Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Requestor
-                            </th>
-
-
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Priority
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Description
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                notes
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                Start Date
-                            </th>
-                            <th
-                                class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                End Date
-                            </th>
-
-                        </tr>
-
-                    </thead>
-                    <tbody class="bg-white dark:bg-dark-eval-1">
-                        @foreach ($voidProject as $project)
-                            <tr class="hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_code ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->project_name ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->request_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->requestor->name ?? '-' }}</td>
-
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->priority->priority_name }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->description ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->notes ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->start_date ?? '-' }}</td>
-                                <td
-                                    class="border border-gray-300 dark:border-gray-600 p-2 text-light-text dark:text-dark-text">
-                                    {{ $project->end_date ?? '-' }}</td>
-
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
+    {{-- Modal detail tetap --}}
     <x-modal-table name="project-detail" title="Detail Project">
         <div id="projectModalBody">
             <div class="p-6 text-center text-gray-500">
@@ -694,231 +576,53 @@
 
     <script>
         function showProjectModal(projectId) {
-            // tampilkan modal dulu (biar ada efek transisi)
             window.dispatchEvent(new CustomEvent('open-modal', {
                 detail: 'project-detail'
             }));
 
-            // tampilkan indikator loading
             const modalBody = document.getElementById('projectModalBody');
             modalBody.innerHTML = `
-        <div class="p-6 text-center text-gray-500">
-            <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-            </svg>
-            Loading...
-        </div>
-    `;
-
-            // ambil konten dari route history
-            fetch(`/projects/${projectId}/history`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Gagal memuat data');
-                    return response.text();
-                })
-                .then(html => {
-                    modalBody.innerHTML = html;
-                })
-                .catch(err => {
-                    modalBody.innerHTML = `
-                <div class="p-6 text-center text-red-500">
-                    ⚠️ Gagal memuat data project (${err.message})
+                <div class="p-6 text-center text-gray-500">
+                    <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    Loading...
                 </div>
             `;
-                });
+
+            fetch(`/projects/${projectId}/history`)
+                .then(r => {
+                    if (!r.ok) throw new Error('Gagal memuat data');
+                    return r.text();
+                })
+                .then(html => modalBody.innerHTML = html)
+                .catch(err => modalBody.innerHTML = `<div class="p-6 text-center text-red-500">⚠️ ${err.message}</div>`);
         }
     </script>
 
-    <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    new DataTable(".datatable", {
-        responsive: false,        // non-responsive, bisa diubah true kalau mau
-        pageLength: 3,            // default rows per page
-        lengthMenu: [              // pilihan Page Length
-            [3, 5, 10, 25, 50, -1], // nilai internal
-            [3, 5, 10, 25, 50, "All"] // label yang muncul di dropdown
-        ],
-        order: [[0, "desc"]],     // default sort, kolom pertama descending
-        layout: {
-            topStart: "pageLength", // tampilkan dropdown page length
-            topEnd: "search",       // search box
-            bottomStart: "info",    // info tabel
-            bottomEnd: "paging"     // pagination
-        }
-    });
-});
-</script>
-
-
-
-    <script>
-        $(document).ready(function() {
-            const isDark = document.documentElement.classList.contains('dark');
-
-            // =================== Developer Dropdown ===================
-            $(document).on('click', '#selected-developers', function() {
-                $('#developer-dropdown').toggleClass('hidden');
-                $('#dropdown-icon').toggleClass('rotate-180');
-            });
-
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
-                    $('#developer-dropdown').addClass('hidden');
-                    $('#dropdown-icon').removeClass('rotate-180');
-                }
-            });
-
-            $(document).on('change', '.dev-checkbox', function() {
-                // ❌ Uncheck semua dulu
-                $('.dev-checkbox').not(this).prop('checked', false);
-
-                // ✅ Ambil value yang dipilih
-                const selected = $(this).is(':checked') ? $(this).val() : '';
-
-                $('#selected-text').text(selected || 'Pilih Developer...');
-                $('#developer_name').val(selected);
-            });
-
-            // =================== Edit Modal ==================
-            window.openEditModal = function(button) {
-                const projectId = $(button).data('id');
-                const projectCode = $(button).data('code');
-                const projectName = $(button).data('name');
-                const progress = $(button).data('progress');
-                const statusId = $(button).data('status');
-                const developerName = $(button).data('developer');
-                const memo = $(button).data('memo');
-
-                $('#editProgressForm')[0].reset();
-                $('.dev-checkbox').prop('checked', false);
-                $('#dropdown-icon').removeClass('rotate-180');
-                $('#developer-dropdown').addClass('hidden');
-
-                $('#editProgressForm').attr('action', `/project/${projectId}`);
-                $('#modal_project_code').val(projectCode);
-                $('#modal_project_name').val(projectName);
-                $('#modal_progress_percent').val(progress);
-                $('#modal_status_id').val(statusId);
-                $('#modal_memo').val(memo);
-
-                if (developerName) {
-                    developerName.split(' | ').forEach(devName => {
-                        $(`.dev-checkbox[value="${devName.trim()}"]`).prop('checked', true);
-                    });
-                    $('#selected-text').text(developerName);
-                    $('#developer_name').val(developerName);
-                } else {
-                    $('#selected-text').text('Pilih Developer...');
-                    $('#developer_name').val('');
-                }
-
-                const now = new Date();
-                const datetime =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                $('#modal_progress_date').val(datetime);
-
-                openModal('editProgressModal');
-            };
-
-            // =================== Pending Modal ===================
-            window.openPendingModal = function(projectId) {
-                $('#pending_project_id').val(projectId);
-                $('#pendingForm').attr('action', '/project/' + projectId + '/pending');
-                openModal('pendingModal');
-            };
-
-            // =================== User Search ===================
-            const $input = $('#user-search');
-            const $results = $('#search-results');
-            const $hidden = $('#user-id');
-
-            if ($input.length) {
-                $input.on('focus', () => $results.show());
-                $input.on('input', function() {
-                    const val = $(this).val().toLowerCase();
-                    let visible = false;
-                    $results.children('li').each(function() {
-                        const match = $(this).text().toLowerCase().includes(val);
-                        $(this).toggle(match);
-                        if (match) visible = true;
-                    });
-                    $results.toggle(visible);
-                });
-
-                $results.on('click', 'li', function() {
-                    $input.val($(this).text());
-                    $hidden.val($(this).data('id'));
-                    $results.hide();
-                });
-
-                $(document).on('click', (e) => {
-                    if (!$(e.target).closest('#user-search, #search-results').length) {
-                        $results.hide();
-                    }
-                });
-            }
-
-            // Tambahkan di dalam $(document).ready() bersama function lainnya
-
-            // =================== Void Modal ===================
-            window.openVoidModal = function(projectId) {
-                // Reset form
-                $('#voidForm')[0].reset();
-
-                // Set action dengan route yang benar
-                const actionUrl = "{{ route('project.updateStatus', ':id') }}".replace(':id', projectId);
-                $('#voidForm').attr('action', actionUrl);
-
-                // Buka modal
-                openModal('voidModal');
-            };
-
-            // =================== Dark Mode Toggle Observer ===================
-            const observer = new MutationObserver(() => {
-                const dark = document.documentElement.classList.contains('dark');
-                // Update DataTable inputs, selects, pagination, info text
-                $('div.dataTables_filter input, div.dataTables_length select').removeClass().addClass(
-                    `rounded-md border px-2 py-1 text-sm transition ${dark ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400' : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400'}`
-                );
-                $('div.dataTables_paginate a').each(function() {
-                    $(this).removeClass().addClass(
-                        `px-3 py-1 border rounded-md mx-1 text-sm font-medium transition ${dark ? 'border-gray-700 text-gray-100 hover:bg-gray-700' : 'border-gray-300 text-gray-800 hover:bg-gray-100'}`
-                    );
-                });
-                $('div.dataTables_info').removeClass().addClass(dark ? 'text-gray-400 text-sm mt-2' :
-                    'text-gray-600 text-sm mt-2');
-            });
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-        });
-    </script>
     <style>
-        /* Styling untuk date input di light mode */
+        [x-cloak] {
+            display: none !important;
+        }
+
         .date-input::-webkit-calendar-picker-indicator {
             filter: invert(0);
             cursor: pointer;
         }
 
-        /* Styling untuk date input di dark mode */
         .dark .date-input::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
         }
 
-        /* Opsional: ubah opacity saat hover */
         .date-input::-webkit-calendar-picker-indicator:hover {
             opacity: 0.7;
         }
     </style>
 
-    <x-modal-table name="project-history-1" title="Project History" max-width="7xl">
-        @include('project.history')
-    </x-modal-table>
+    {{-- MODAL-MODAL kamu yang lain (pending/edit/create/void) tetap bisa dipakai apa adanya --}}
+    {{-- tinggal paste modal bagian bawah dari file lama lu (ga gue ubah logic-nya) --}}
 
     {{-- ============================================ MODAL FORM PENDING ============================================ --}}
     <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
@@ -926,245 +630,22 @@ document.addEventListener("DOMContentLoaded", () => {
             @csrf
             <input type="hidden" name="id_project_header" id="pending_project_id">
 
-
-            {{-- Reason --}}
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label class="block text-sm font-medium text-light-text dark:text-dark-text mb-2">
                     Reason <span class="text-red-500">*</span>
                 </label>
                 <input type="text" name="reason" required placeholder="Tulis alasan pending..."
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2
-                            bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                            focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full px-3 py-2 rounded-lg border
+                           bg-light-bg dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2
+                           text-light-text dark:text-dark-text
+                           focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500/40">
             </div>
 
-            {{-- Tombol --}}
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeModal('pendingModal')"
-                    class="px-4 py-2 bg-red-800 text-white rounded mr-2 hover:bg-red-900">Cancel</button>
-                <button type="submit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
-            </div>
-        </form>
-    </x-modal-form>
-
-    {{-- ============================================ MODAL FORM EDIT ============================================ --}}
-    <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
-        <form id="editProgressForm" method="POST">
-            @csrf
-            @method('PUT')
-
-            {{-- Project Code (readonly) --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Project Code
-                </label>
-                <input type="text" id="modal_project_code" readonly
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- Project Name (readonly) --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Project Name
-                </label>
-                <input type="text" id="modal_project_name" readonly
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- Developer Name --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Developer Name
-                </label>
-
-                <div id="selected-developers"
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-pointer flex justify-between items-center"
-                    onclick="toggleDropdown()">
-                    <span id="selected-text" class="truncate">Pilih Developer...</span>
-                    <svg id="dropdown-icon" class="w-4 h-4 transform transition-transform duration-200"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-
-                <input type="hidden" name="developer_name" id="developer_name">
-
-                <div id="developer-dropdown"
-                    class="hidden mt-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shadow-lg max-h-48 overflow-y-auto p-2">
-                    @foreach ($developers as $dev)
-                        <label
-                            class="flex items-center space-x-2 py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
-                            <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
-                            <span>{{ $dev->name }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Progress Date --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Progress Date
-                </label>
-                <input type="datetime-local" name="progress_date" id="modal_progress_date"
-                    class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- Progress Percent --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Progress Percent <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="progress_percent" id="modal_progress_percent" min="0"
-                    max="100" step="1"
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-        bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    required>
-            </div>
-
-
-
-
-            {{-- Memo --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Memo
-                </label>
-                <textarea name="memo" id="modal_memo" rows="3"
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
-            </div>
-
-            {{-- Status --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Status <span class="text-red-500">*</span>
-                </label>
-                <select name="status_id" id="modal_status_id" required
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">-- Pilih Status --</option>
-                    @foreach ($statuses as $status)
-                        @if (in_array($status->id, [2, 3]))
-                            <option value="{{ $status->id }}">{{ $status->status_name }}</option>
-                        @endif
-                    @endforeach
-
-                </select>
-            </div>
-
-            {{-- Tombol --}}
-            <div class="flex justify-end">
-                <button type="button" onclick="closeModal('editProgressModal')"
-                    class="px-4 py-2 bg-red-800 rounded mr-2 text-white">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Save
-                </button>
-            </div>
-        </form>
-
-    </x-modal-form>
-
-    {{-- ============================================ MODAL FORM TAMBAH ============================================ --}}
-    <x-modal-form id="projectModal" title="Create Project" size="max-w-4xl">
-        <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="from" value="user">
-
-            {{-- Project Code --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Project Code <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="project_code" value="{{ $generateticket }}" readonly
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- Project Name --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Project Name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="project_name" value=""
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- User --}}
-            <div class="mb-4 relative">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Pilih Requestor <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="user-search" placeholder="Cari user..." required
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <input type="hidden" name="requestor_id" id="user-id" required>
-                <ul id="search-results"
-                    class="hidden absolute z-50 w-full border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
-                    @foreach ($users as $user)
-                        <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                            data-id="{{ $user->id }}">{{ $user->name }}</li>
-                    @endforeach
-                </ul>
-            </div>
-
-
-            {{-- Priority --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Priority <span class="text-red-500">*</span>
-                </label>
-                <select name="priority_id" required
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <option value="" hidden>-- Pilih Priority --</option>
-                    @foreach ($priorities as $prt)
-                        <option value="{{ $prt->id }}" {{ old('priority_id') == $prt->id ? 'selected' : '' }}>
-                            {{ $prt->priority_name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Status (hidden) --}}
-            <input type="hidden" name="status_id" value="1">
-
-            {{-- Description --}}
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Description <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="description" value=""
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-            </div>
-
-            {{-- Start & End Date --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Start Date & Time <span class="text-red-500">*</span>
-                    </label>
-                    <input type="datetime-local" name="start_date"
-                        class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        End Date & Time <span class="text-red-500">*</span>
-                    </label>
-                    <input type="datetime-local" name="end_date"
-                        class="date-input w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                </div>
-            </div>
-
-
-
-            {{-- Tombol Submit --}}
-            <div class="flex justify-end">
-                <button type="button" onclick="closeModal('projectModal')"
-                    class="px-4 py-2 bg-red-800 rounded mr-2">Cancel</button>
-                <button type="submit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                    class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit" class="{{ $btnPrimary }}">Save</button>
             </div>
         </form>
     </x-modal-form>
@@ -1175,25 +656,24 @@ document.addEventListener("DOMContentLoaded", () => {
             @csrf
             <input type="hidden" name="status_id" value="4">
 
-            {{-- Notes --}}
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label class="block text-sm font-medium text-light-text dark:text-dark-text mb-2">
                     Notes <span class="text-red-500">*</span>
                 </label>
                 <textarea name="notes" required placeholder="Tulis alasan void..." rows="4"
-                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
-                    focus:outline-none focus:ring-red-500 focus:border-red-500 resize-none"></textarea>
+                    class="w-full px-3 py-2 rounded-lg border resize-none
+                           bg-light-bg dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2
+                           text-light-text dark:text-dark-text
+                           focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40"></textarea>
             </div>
 
-            {{-- Tombol --}}
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeModal('voidModal')"
-                    class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
-                    Cancel
-                </button>
+                    class="{{ $btnGhost }}">Cancel</button>
                 <button type="submit"
-                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                           bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
                     Save
                 </button>
             </div>
