@@ -4,10 +4,9 @@
         @auth
             @if (Auth::user()->role_id != 3)
                 <div class="flex items-center justify-between gap-4">
-                    <h2 class="m-0 font-semibold text-xl leading-tight text-light-text dark:text-dark-text">
+                    <h2 class="font-semibold text-xl leading-tight text-light-text dark:text-dark-text">
                         Project
                     </h2>
-
 
                     <button onclick="openModal('projectModal')"
                         class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
@@ -49,7 +48,6 @@
 
         $badgeBase = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold';
 
-        // ===== Stats tabs (format sesuai request lu) =====
         $tabs = [
             'waiting' => [
                 'label' => 'Waiting',
@@ -57,6 +55,7 @@
                 'badge' => 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300',
                 'accent' => 'bg-yellow-500',
                 'subtitle' => 'Project yang menunggu dieksekusi',
+                'icon' => '⏳',
             ],
             'in_progress' => [
                 'label' => 'In Progress',
@@ -64,6 +63,7 @@
                 'badge' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
                 'accent' => 'bg-blue-600',
                 'subtitle' => 'Project yang sedang berjalan',
+                'icon' => '⚙️',
             ],
             'done' => [
                 'label' => 'Done',
@@ -71,6 +71,7 @@
                 'badge' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
                 'accent' => 'bg-green-600',
                 'subtitle' => 'Project yang sudah selesai',
+                'icon' => '✅',
             ],
             'void' => [
                 'label' => 'Void',
@@ -78,6 +79,7 @@
                 'badge' => 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300',
                 'accent' => 'bg-red-600',
                 'subtitle' => 'Project yang dibatalkan',
+                'icon' => '❌',
             ],
             'pending' => [
                 'label' => 'Pending',
@@ -85,43 +87,54 @@
                 'badge' => 'bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
                 'accent' => 'bg-orange-600',
                 'subtitle' => 'Project yang sedang pending',
+                'icon' => '🕘',
             ],
         ];
     @endphp
 
-    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6" x-data="{
-        tab: 'waiting',
-        dt: null,
-        initDT() {
-            // init sekali (DataTables v2)
-            this.dt = new DataTable('.datatable', {
-                responsive: false,
-                pageLength: 3,
-                lengthMenu: [
-                    [3, 5, 10, 25, 50, -1],
-                    [3, 5, 10, 25, 50, 'All']
-                ],
-                order: [
-                    [0, 'desc']
-                ],
-                layout: {
-                    topStart: 'pageLength',
-                    topEnd: 'search',
-                    bottomStart: 'info',
-                    bottomEnd: 'paging'
-                }
-            });
-        },
-        onTab() {
-            // biar width table aman saat tab hidden
-            setTimeout(() => {
-                try {
-                    document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
-                    window.dispatchEvent(new Event('resize'));
-                } catch (e) {}
-            }, 60);
-        }
-    }" x-init="initDT()">
+    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6"
+        x-data="{
+            tab: 'waiting',
+            dts: [],
+            initDT() {
+                // init aman: per table + guard
+                if (this.dts.length) return;
+
+                document.querySelectorAll('table.datatable').forEach((table) => {
+                    if (table.dataset.dtInited === '1') return;
+
+                    const dt = new DataTable(table, {
+                        responsive: false,
+                        pageLength: 3,
+                        lengthMenu: [
+                            [3, 5, 10, 25, 50, -1],
+                            [3, 5, 10, 25, 50, 'All']
+                        ],
+                        order: [[0, 'desc']],
+                        layout: {
+                            topStart: 'pageLength',
+                            topEnd: 'search',
+                            bottomStart: 'info',
+                            bottomEnd: 'paging'
+                        }
+                    });
+
+                    table.dataset.dtInited = '1';
+                    this.dts.push(dt);
+                });
+            },
+            onTab() {
+                // biar width table aman saat tab hidden
+                setTimeout(() => {
+                    try {
+                        document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
+                        window.dispatchEvent(new Event('resize'));
+                    } catch (e) {}
+                }, 60);
+            }
+        }"
+        x-init="initDT()"
+    >
 
         {{-- ========================================================= FILTER DATE ========================================================= --}}
         <form method="GET" action="{{ route('project.index') }}" class="{{ $card }} p-4 sm:p-5">
@@ -159,15 +172,20 @@
                            border-light-eval-3 dark:border-dark-eval-2
                            hover:-translate-y-0.5 hover:shadow-md focus:outline-none"
                     :class="tab === '{{ $key }}'
-                        ?
-                        'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30' :
-                        ''">
+                        ? 'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30'
+                        : ''">
 
                     <div class="h-1.5 w-full rounded-full {{ $t['accent'] }}"
                         :class="tab === '{{ $key }}' ? 'opacity-100' : 'opacity-50'"></div>
 
                     <div class="mt-4 flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3">
+                            <div
+                                class="h-10 w-10 rounded-xl flex items-center justify-center
+                                        bg-light-bg dark:bg-dark-eval-2
+                                        border border-light-eval-3 dark:border-dark-eval-2">
+                                <span class="text-lg opacity-80">{{ $t['icon'] }}</span>
+                            </div>
 
                             <div>
                                 <div class="text-sm font-semibold text-light-text dark:text-dark-text">
@@ -178,6 +196,10 @@
                                 </div>
                             </div>
                         </div>
+
+                        <span class="{{ $badgeBase }} {{ $t['badge'] }}">
+                            {{ $t['count'] }}
+                        </span>
                     </div>
 
                     <div class="mt-4 text-3xl font-bold tracking-tight text-light-text dark:text-dark-text">
@@ -225,28 +247,25 @@
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
                             @foreach ($inProgressProject as $project)
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                    <td
-                                        class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
+                                    <td class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
                                         {{ $project->project_code ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
                                     <td class="{{ $td }} text-center">
-                                        {{ $project->priority->priority_name }}</td>
-                                    <td class="{{ $td }} text-right">
-                                        {{ $project->progress_percent ?? '-' }}%</td>
-                                    <td class="{{ $td }} text-center">{{ $project->progress_date ?? '-' }}
+                                        {{ $project->priority->priority_name ?? '-' }}
                                     </td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }} text-right">
+                                        {{ $project->progress_percent ?? '-' }}%
+                                    </td>
+                                    <td class="{{ $td }} text-center">{{ $project->progress_date ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}</td>
                                     <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}</td>
-                                    <td class="{{ $td }} text-center">
-                                        {{ $project->actual_start_date ?? '-' }}</td>
-                                    <td class="{{ $td }} text-right">
-                                        {{ $project->total_pending_minutes ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">{{ $project->actual_start_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-right">{{ $project->total_pending_minutes ?? '-' }}</td>
                                     <td class="px-4 py-3 text-center">
                                         <button onclick="showProjectModal({{ $project->id }})"
                                             class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
@@ -255,11 +274,15 @@
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <div class="flex justify-center items-center gap-2">
-                                            <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                            <button
+                                                onclick="openEditModal(this)"
+                                                data-id="{{ $project->id }}"
                                                 data-code="{{ $project->project_code }}"
                                                 data-name="{{ $project->project_name }}"
                                                 data-progress="{{ $project->progress_percent }}"
                                                 data-status="{{ $project->status_id }}"
+                                                data-developer="{{ $project->developer_name ?? '' }}"
+                                                data-memo="{{ $project->memo ?? '' }}"
                                                 class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
                                                 Update
                                             </button>
@@ -283,7 +306,7 @@
                 </div>
             </div>
 
-            {{-- ================= WAITING (DEFAULT) ================= --}}
+            {{-- ================= WAITING ================= --}}
             <div x-show="tab==='waiting'" x-cloak class="{{ $card }} p-4 sm:p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -320,9 +343,8 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -334,8 +356,7 @@
                                                 Void
                                             </button>
 
-                                            <form action="{{ route('project.updateProgress', $project->id) }}"
-                                                method="POST">
+                                            <form action="{{ route('project.updateProgress', $project->id) }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="status_id" value="2">
                                                 <button type="submit" onclick="return confirm('Apakah Anda Yakin?')"
@@ -391,9 +412,8 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -405,8 +425,7 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.updateStatus', $project->id) }}"
-                                            method="POST" class="inline">
+                                        <form action="{{ route('project.updateStatus', $project->id) }}" method="POST" class="inline">
                                             @csrf
                                             <input type="hidden" name="status_id" value="2">
                                             <button
@@ -464,12 +483,10 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
-                                    </td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->progress_percent ?? '-' }}%</td>
                                     <td class="{{ $td }}">{{ $project->progress_date ?? '-' }}</td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -481,8 +498,7 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.continueProgress', $project->id) }}"
-                                            method="POST" class="inline">
+                                        <form action="{{ route('project.continueProgress', $project->id) }}" method="POST" class="inline">
                                             @csrf
                                             <input type="hidden" name="status_id" value="2">
                                             <button
@@ -537,13 +553,11 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name }}</td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
-                                    <td
-                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->notes ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -559,14 +573,13 @@
         </div>
     </div>
 
-    {{-- Modal detail tetap --}}
+    {{-- ========================================================= MODAL: DETAIL HISTORY ========================================================= --}}
     <x-modal-table name="project-detail" title="Detail Project">
         <div id="projectModalBody">
             <div class="p-6 text-center text-gray-500">
                 <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                        stroke-width="4"></circle>
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 Loading...
@@ -574,6 +587,237 @@
         </div>
     </x-modal-table>
 
+    {{-- ========================================================= MODAL: CREATE PROJECT ========================================================= --}}
+    <x-modal-form id="projectModal" title="Create Project" size="max-w-4xl">
+        <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="from" value="user">
+
+            {{-- Project Code --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Project Code <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="project_code" value="{{ $generateticket ?? '' }}" readonly
+                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
+
+            {{-- Project Name --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Project Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="project_name" required class="{{ $input }}">
+            </div>
+
+            {{-- User Search --}}
+            <div class="mb-4 relative">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Pilih Requestor <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="user-search" placeholder="Cari user..." required class="{{ $input }}">
+                <input type="hidden" name="requestor_id" id="user-id" required>
+
+                <ul id="search-results"
+                    class="hidden absolute z-50 w-full rounded-lg mt-2 overflow-y-auto shadow-lg max-h-40
+                           bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+                    @foreach ($users as $user)
+                        <li class="px-3 py-2 cursor-pointer border-b border-light-eval-3 dark:border-dark-eval-2
+                                   hover:bg-light-eval-2 dark:hover:bg-dark-eval-1 text-light-text dark:text-dark-text"
+                            data-id="{{ $user->id }}">
+                            {{ $user->name }}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            {{-- Priority --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Priority <span class="text-red-500">*</span>
+                </label>
+                <select name="priority_id" required class="{{ $input }}">
+                    <option value="" hidden>-- Pilih Priority --</option>
+                    @foreach ($priorities as $prt)
+                        <option value="{{ $prt->id }}">{{ $prt->priority_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Status hidden --}}
+            <input type="hidden" name="status_id" value="1">
+
+            {{-- Description --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Description <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="description" required class="{{ $input }}">
+            </div>
+
+            {{-- Start & End --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                        Start Date & Time <span class="text-red-500">*</span>
+                    </label>
+                    <input type="datetime-local" name="start_date" required class="{{ $input }}">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                        End Date & Time <span class="text-red-500">*</span>
+                    </label>
+                    <input type="datetime-local" name="end_date" required class="{{ $input }}">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('projectModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit" class="{{ $btnPrimary }}">Save</button>
+            </div>
+        </form>
+    </x-modal-form>
+
+    {{-- ========================================================= MODAL: EDIT PROGRESS ========================================================= --}}
+    <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
+        <form id="editProgressForm" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project Code</label>
+                <input type="text" id="modal_project_code" readonly
+                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project Name</label>
+                <input type="text" id="modal_project_name" readonly
+                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
+
+            {{-- Developer dropdown --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer Name</label>
+
+                <div id="selected-developers"
+                    class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
+                           bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
+                           border-light-eval-3 dark:border-dark-eval-2">
+                    <span id="selected-text" class="truncate">Pilih Developer...</span>
+                    <svg id="dropdown-icon" class="w-4 h-4 transform transition-transform duration-200"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+
+                <input type="hidden" name="developer_name" id="developer_name">
+
+                <div id="developer-dropdown"
+                    class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
+                           bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+                    @foreach ($developers as $dev)
+                        <label class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer
+                                      hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
+                            <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
+                            <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Progress Date</label>
+                <input type="datetime-local" name="progress_date" id="modal_progress_date" class="{{ $input }}">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Progress Percent <span class="text-red-500">*</span>
+                </label>
+                <input type="number" name="progress_percent" id="modal_progress_percent" min="0" max="100" step="1" required
+                    class="{{ $input }}">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Memo</label>
+                <textarea name="memo" id="modal_memo" rows="3" class="{{ $input }}"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Status <span class="text-red-500">*</span>
+                </label>
+                <select name="status_id" id="modal_status_id" required class="{{ $input }}">
+                    <option value="">-- Pilih Status --</option>
+                    @foreach ($statuses as $status)
+                        @if (in_array($status->id, [2, 3]))
+                            <option value="{{ $status->id }}">{{ $status->status_name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('editProgressModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit" class="{{ $btnPrimary }}">Save</button>
+            </div>
+        </form>
+    </x-modal-form>
+
+    {{-- ========================================================= MODAL: PENDING ========================================================= --}}
+    <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
+        <form id="pendingForm" method="POST">
+            @csrf
+            <input type="hidden" name="id_project_header" id="pending_project_id">
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Reason <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="reason" required placeholder="Tulis alasan pending..." class="{{ $input }}">
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('pendingModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit" class="{{ $btnPrimary }}">Save</button>
+            </div>
+        </form>
+    </x-modal-form>
+
+    {{-- ========================================================= MODAL: VOID ========================================================= --}}
+    <x-modal-form id="voidModal" title="Void Project" size="max-w-md">
+        <form id="voidForm" method="POST">
+            @csrf
+            <input type="hidden" name="status_id" value="4">
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Notes <span class="text-red-500">*</span>
+                </label>
+                <textarea name="notes" required placeholder="Tulis alasan void..." rows="4"
+                    class="w-full px-3 py-2 rounded-lg border resize-none
+                           bg-light-bg dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2
+                           text-light-text dark:text-dark-text
+                           focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('voidModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit"
+                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                           bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
+                    Save
+                </button>
+            </div>
+        </form>
+    </x-modal-form>
+
+    {{-- ========================================================= SCRIPTS ========================================================= --}}
     <script>
         function showProjectModal(projectId) {
             window.dispatchEvent(new CustomEvent('open-modal', {
@@ -601,82 +845,190 @@
         }
     </script>
 
+    {{-- jQuery (kalau layout belum include) --}}
+    <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // =========================
+            // DEV DROPDOWN (Edit Modal)
+            // =========================
+            $(document).on('click', '#selected-developers', function() {
+                $('#developer-dropdown').toggleClass('hidden');
+                $('#dropdown-icon').toggleClass('rotate-180');
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#selected-developers, #developer-dropdown').length) {
+                    $('#developer-dropdown').addClass('hidden');
+                    $('#dropdown-icon').removeClass('rotate-180');
+                }
+            });
+
+            // 1 pilihan saja (sesuai logic lama)
+            $(document).on('change', '.dev-checkbox', function() {
+                $('.dev-checkbox').not(this).prop('checked', false);
+                const selected = $(this).is(':checked') ? $(this).val() : '';
+                $('#selected-text').text(selected || 'Pilih Developer...');
+                $('#developer_name').val(selected);
+            });
+
+            // =========================
+            // OPEN EDIT MODAL
+            // =========================
+            window.openEditModal = function(button) {
+                const projectId = $(button).data('id');
+                const projectCode = $(button).data('code');
+                const projectName = $(button).data('name');
+                const progress = $(button).data('progress');
+                const statusId = $(button).data('status');
+                const developerName = $(button).data('developer');
+                const memo = $(button).data('memo');
+
+                const $form = $('#editProgressForm');
+                if (!$form.length) return;
+
+                $form[0].reset();
+                $('.dev-checkbox').prop('checked', false);
+                $('#dropdown-icon').removeClass('rotate-180');
+                $('#developer-dropdown').addClass('hidden');
+
+                // route update (PUT)
+                $form.attr('action', `/project/${projectId}`);
+
+                $('#modal_project_code').val(projectCode || '');
+                $('#modal_project_name').val(projectName || '');
+                $('#modal_progress_percent').val(progress ?? '');
+                $('#modal_status_id').val(statusId ?? '');
+                $('#modal_memo').val(memo ?? '');
+
+                if (developerName) {
+                    developerName.split(' | ').forEach(dev => {
+                        $(`.dev-checkbox[value="${dev.trim()}"]`).prop('checked', true);
+                    });
+                    $('#selected-text').text(developerName);
+                    $('#developer_name').val(developerName);
+                } else {
+                    $('#selected-text').text('Pilih Developer...');
+                    $('#developer_name').val('');
+                }
+
+                const now = new Date();
+                const datetime =
+                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                $('#modal_progress_date').val(datetime);
+
+                openModal('editProgressModal');
+            };
+
+            // =========================
+            // OPEN PENDING MODAL
+            // =========================
+            window.openPendingModal = function(projectId) {
+                const $form = $('#pendingForm');
+                if (!$form.length) return;
+
+                $('#pending_project_id').val(projectId);
+                $form.attr('action', `/project/${projectId}/pending`);
+                openModal('pendingModal');
+            };
+
+            // =========================
+            // OPEN VOID MODAL
+            // =========================
+            window.openVoidModal = function(projectId) {
+                const $form = $('#voidForm');
+                if (!$form.length) return;
+
+                $form[0].reset();
+                const actionUrl = "{{ route('project.updateStatus', ':id') }}".replace(':id', projectId);
+                $form.attr('action', actionUrl);
+
+                openModal('voidModal');
+            };
+
+            // =========================
+            // USER SEARCH (Create Modal)
+            // =========================
+            const $input = $('#user-search');
+            const $results = $('#search-results');
+            const $hidden = $('#user-id');
+
+            if ($input.length) {
+                $input.on('focus', () => $results.show());
+
+                $input.on('input', function() {
+                    const val = $(this).val().toLowerCase();
+                    let anyVisible = false;
+
+                    $results.children('li').each(function() {
+                        const match = $(this).text().toLowerCase().includes(val);
+                        $(this).toggle(match);
+                        if (match) anyVisible = true;
+                    });
+
+                    $results.toggle(anyVisible);
+                });
+
+                $results.on('click', 'li', function() {
+                    $input.val($(this).text());
+                    $hidden.val($(this).data('id'));
+                    $results.hide();
+                });
+
+                $(document).on('click', (e) => {
+                    if (!$(e.target).closest('#user-search, #search-results').length) {
+                        $results.hide();
+                    }
+                });
+            }
+
+            // =========================
+            // DATATABLE THEME (dark/light) - optional
+            // =========================
+            const applyDTTheme = () => {
+                const dark = document.documentElement.classList.contains('dark');
+
+                $('div.dt-search input, div.dt-length select, div.dataTables_filter input, div.dataTables_length select')
+                    .each(function() {
+                        $(this).removeClass().addClass(
+                            `rounded-lg border px-3 py-2 text-sm transition ` +
+                            (dark
+                                ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400'
+                                : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400')
+                        );
+                    });
+
+                $('div.dt-paging button, div.dataTables_paginate a').each(function() {
+                    $(this).removeClass().addClass(
+                        `px-3 py-1 border rounded-lg mx-1 text-sm font-medium transition ` +
+                        (dark
+                            ? 'border-gray-700 text-gray-100 hover:bg-gray-700'
+                            : 'border-gray-300 text-gray-800 hover:bg-gray-100')
+                    );
+                });
+
+                $('div.dt-info, div.dataTables_info').each(function() {
+                    $(this).removeClass().addClass(dark ? 'text-gray-400 text-sm mt-2' : 'text-gray-600 text-sm mt-2');
+                });
+            };
+
+            applyDTTheme();
+
+            const observer = new MutationObserver(() => applyDTTheme());
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+    </script>
+
     <style>
-        [x-cloak] {
-            display: none !important;
-        }
+        [x-cloak] { display: none !important; }
 
-        .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(0);
-            cursor: pointer;
-        }
-
-        .dark .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
-
-        .date-input::-webkit-calendar-picker-indicator:hover {
-            opacity: 0.7;
-        }
+        .date-input::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
+        .dark .date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        .date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.7; }
     </style>
-
-    {{-- MODAL-MODAL kamu yang lain (pending/edit/create/void) tetap bisa dipakai apa adanya --}}
-    {{-- tinggal paste modal bagian bawah dari file lama lu (ga gue ubah logic-nya) --}}
-
-    {{-- ============================================ MODAL FORM PENDING ============================================ --}}
-    <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
-        <form id="pendingForm" method="POST">
-            @csrf
-            <input type="hidden" name="id_project_header" id="pending_project_id">
-
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-light-text dark:text-dark-text mb-2">
-                    Reason <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="reason" required placeholder="Tulis alasan pending..."
-                    class="w-full px-3 py-2 rounded-lg border
-                           bg-light-bg dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2
-                           text-light-text dark:text-dark-text
-                           focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500/40">
-            </div>
-
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('pendingModal')"
-                    class="{{ $btnGhost }}">Cancel</button>
-                <button type="submit" class="{{ $btnPrimary }}">Save</button>
-            </div>
-        </form>
-    </x-modal-form>
-
-    {{-- ============================================ MODAL FORM VOID ============================================ --}}
-    <x-modal-form id="voidModal" title="Void Project" size="max-w-md">
-        <form id="voidForm" method="POST">
-            @csrf
-            <input type="hidden" name="status_id" value="4">
-
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-light-text dark:text-dark-text mb-2">
-                    Notes <span class="text-red-500">*</span>
-                </label>
-                <textarea name="notes" required placeholder="Tulis alasan void..." rows="4"
-                    class="w-full px-3 py-2 rounded-lg border resize-none
-                           bg-light-bg dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2
-                           text-light-text dark:text-dark-text
-                           focus:ring-2 focus:ring-red-500/20 focus:border-red-500/40"></textarea>
-            </div>
-
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('voidModal')"
-                    class="{{ $btnGhost }}">Cancel</button>
-                <button type="submit"
-                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
-                           bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
-                    Save
-                </button>
-            </div>
-        </form>
-    </x-modal-form>
 </x-app-layout>
