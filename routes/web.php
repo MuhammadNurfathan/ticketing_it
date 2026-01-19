@@ -64,7 +64,9 @@ Route::middleware(['auth', 'role:1,2,3'])->group(function () {
     Route::resource('DashboardTicketsAdmin', TicketsController::class)->except(['show']);
     Route::get('/DashboardTicketsUser', [TicketsController::class, 'indexUser'])->name('DashboardTicketsUser.indexUser');
     Route::get('/DashboardTicketsUser/create', [TicketsController::class, 'createUser'])->name('DashboardTicketsUser.createUser');
-    Route::get('/DashboardTicketsUser/{ticket_id}', [TicketsController::class, 'editUser'])->name('DashboardTicketsUser.edit');
+    Route::get('/DashboardTicketsUser/{ticket_id}', [TicketsController::class, 'editUser'])
+        ->whereNumber('ticket_id')
+        ->name('DashboardTicketsUser.edit');
     Route::get('/feedback/{ticket_id}', [FeedbackController::class, 'form'])->name('feedback.form');
     Route::post('/feedback/save', [FeedbackController::class, 'save'])->name('feedback.save');
     Route::put(
