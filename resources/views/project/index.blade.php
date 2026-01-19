@@ -55,7 +55,6 @@
                 'badge' => 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300',
                 'accent' => 'bg-yellow-500',
                 'subtitle' => 'Project yang menunggu dieksekusi',
-                'icon' => '⏳',
             ],
             'in_progress' => [
                 'label' => 'In Progress',
@@ -63,7 +62,6 @@
                 'badge' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
                 'accent' => 'bg-blue-600',
                 'subtitle' => 'Project yang sedang berjalan',
-                'icon' => '⚙️',
             ],
             'done' => [
                 'label' => 'Done',
@@ -71,7 +69,6 @@
                 'badge' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
                 'accent' => 'bg-green-600',
                 'subtitle' => 'Project yang sudah selesai',
-                'icon' => '✅',
             ],
             'void' => [
                 'label' => 'Void',
@@ -79,7 +76,6 @@
                 'badge' => 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300',
                 'accent' => 'bg-red-600',
                 'subtitle' => 'Project yang dibatalkan',
-                'icon' => '❌',
             ],
             'pending' => [
                 'label' => 'Pending',
@@ -87,7 +83,6 @@
                 'badge' => 'bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
                 'accent' => 'bg-orange-600',
                 'subtitle' => 'Project yang sedang pending',
-                'icon' => '🕘',
             ],
         ];
     @endphp
@@ -180,12 +175,6 @@
 
                     <div class="mt-4 flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <div
-                                class="h-10 w-10 rounded-xl flex items-center justify-center
-                                        bg-light-bg dark:bg-dark-eval-2
-                                        border border-light-eval-3 dark:border-dark-eval-2">
-                                <span class="text-lg opacity-80">{{ $t['icon'] }}</span>
-                            </div>
 
                             <div>
                                 <div class="text-sm font-semibold text-light-text dark:text-dark-text">
@@ -197,9 +186,6 @@
                             </div>
                         </div>
 
-                        <span class="{{ $badgeBase }} {{ $t['badge'] }}">
-                            {{ $t['count'] }}
-                        </span>
                     </div>
 
                     <div class="mt-4 text-3xl font-bold tracking-tight text-light-text dark:text-dark-text">
