@@ -43,6 +43,12 @@ class ProjectHeader extends Model
         'is_late' => 'boolean',
     ];
 
+    public function developer()
+{
+    return $this->belongsTo(User::class, 'dev_id')->where('role_id', 1);
+}
+
+
     public function details()
     {
         return $this->hasMany(ProjectDetail::class, 'project_header_id', 'id')->withTrashed();
