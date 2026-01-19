@@ -165,8 +165,7 @@
                                     <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
-                                                class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium
-                                                      bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
                                                 Berikan Feedback
                                             </a>
                                         @elseif ($ticket->status_id == 1)
@@ -346,8 +345,9 @@
                                     @if ($ticket->status_id == 3)
                                         <div class="mt-3 pt-3 border-t border-light-eval-3 dark:border-dark-eval-2">
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
-                                                class="block w-full text-center px-4 py-2 rounded-lg text-sm font-medium
-                                                      bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
+                                                class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
+            dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
+            text-sm font-medium transition-colors shadow-sm">
                                                 Berikan Feedback
                                             </a>
                                         </div>
