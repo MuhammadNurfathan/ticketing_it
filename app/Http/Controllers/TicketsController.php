@@ -217,7 +217,7 @@ class TicketsController extends Controller
         }
     }
 
-      public function editUser($id)
+    public function editUser($id)
     {
         $ticket = Ticket::with(['user', 'support', 'problemCategory', 'assets', 'priority', 'status'])->findOrFail($id);
         $data = Ticket::data();
@@ -228,22 +228,22 @@ class TicketsController extends Controller
             'categories'  => $data['categories'],
         ]);
     }
-public function updateUser(Request $request, $id)
-{
-    $ticket = Ticket::findOrFail($id);
+    public function updateUser(Request $request, $id)
+    {
+        $ticket = Ticket::findOrFail($id);
 
-    $validated = $request->validate([
-        'nama_pembuat' => 'sometimes|nullable|string',
-        'problem' => 'sometimes|nullable|string',
-        'problem_category_id' => 'sometimes|nullable|exists:problem_categories,id',
-    ]);
+        $validated = $request->validate([
+            'nama_pembuat' => 'sometimes|nullable|string',
+            'problem' => 'sometimes|nullable|string',
+            'problem_category_id' => 'sometimes|nullable|exists:problem_categories,id',
+        ]);
 
-    $ticket->update($validated);
+        $ticket->update($validated);
 
-    return redirect()
-        ->route('DashboardTicketsUser.indexUser')
-        ->with('success', '✅ Ticket berhasil diupdate!');
-}
+        return redirect()
+            ->route('DashboardTicketsUser.indexUser')
+            ->with('success', '✅ Ticket berhasil diupdate!');
+    }
 
 
     public function update(Request $request, $id)
