@@ -148,7 +148,7 @@
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
                                                 class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs font-medium transition-colors">
-                                                Berikan Feedback
+                                                Feedback
                                             </a>
                                         @elseif ($ticket->status_id == 1)
                                             <a href="{{ route('DashboardTicketsUser.edit', $ticket->id) }}"
@@ -357,7 +357,7 @@
                                                 class="block w-full text-center px-4 py-2 bg-red-500 hover:bg-red-600
             dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg
             text-sm font-medium transition-colors shadow-sm">
-                                                Berikan Feedback
+                                                Feedback
                                             </a>
                                         </div>
                                         @elseif ($ticket->status_id == 1)
