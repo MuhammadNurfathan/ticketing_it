@@ -24,10 +24,9 @@ use Illuminate\Support\Facades\Route;
 
 // Route login & profile
 Route::middleware('guest')->group(function () {
-    Route::get('/', function () {
-        return view('auth/login');
-    });
+    Route::get('/', fn () => redirect()->route('login'));
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -209,9 +209,9 @@
                     </div>
                     <span class="{{ $badgeBase }} {{ $tabs['in_progress']['badge'] }}">In Progress</span>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="datatable w-full text-light-text dark:text-dark-text">
+<div class="dt-wrap">
+  <div class="overflow-x-auto">
+    <table class="datatable w-full text-light-text dark:text-dark-text">
                         <thead class="{{ $thead }}">
                             <tr>
                                 <th class="{{ $th }}">Project Code</th>
@@ -290,6 +290,7 @@
 
                     </table>
                 </div>
+                    </div>
             </div>
 
             {{-- ================= WAITING ================= --}}
@@ -1017,4 +1018,34 @@
         .dark .date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.7; }
     </style>
+
+    <style>
+  /* Biar control DT (Entries + Search) gak kepotong */
+  .dt-layout-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .dt-layout-cell {
+    flex: 1 1 auto !important;
+    min-width: 220px !important; /* penting biar select entries ga ke-clip */
+  }
+
+  /* Length select biar keliatan full */
+  .dt-length select {
+    min-width: 70px !important;
+    border-radius: 0 !important;
+  }
+
+
+  /* Search input biar enak */
+  .dt-search input {
+    min-width: 220px !important;
+  }
+</style>
+
+
+
 </x-app-layout>
