@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Assets\AssetStoreRequest;
+use App\Http\Requests\Assets\AssetUpdateRequest;
 use App\Models\Assets;
-use Illuminate\Http\Request;
 
 class AssetsController extends Controller
 {
@@ -18,27 +19,15 @@ class AssetsController extends Controller
         return view('master/assets.create');
     }
 
-    public function store(Request $request)
+    public function store(AssetStoreRequest $request)
     {
-        $request->validate([
-            'assets_code' => 'required|max:255|unique:assets',
-            'assets_name' => 'required|max:255',
-            'category'    => 'required|max:255',
-            'status'      => 'required|max:255',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $data = $request->except('image');
-
-        if ($request->hasFile('image')) {
-            $fileName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/assets'), $fileName);
-            $data['image'] = $fileName;
-        }
+        $data = $request->validated();
 
         Assets::create($data);
 
-        return redirect()->route('assets.index')->with('success', 'Data aset berhasil ditambahkan.');
+        return redirect()
+            ->route('assets.index')
+            ->with('success', 'Data aset berhasil ditambahkan.');
     }
 
     public function edit(Assets $asset)
@@ -46,32 +35,23 @@ class AssetsController extends Controller
         return view('master/assets.edit', compact('asset'));
     }
 
-    public function update(Request $request, Assets $asset)
+    public function update(AssetUpdateRequest $request, Assets $asset)
     {
-        $request->validate([
-            'assets_code' => 'required|max:255|unique:assets,assets_code,' . $asset->id,
-            'assets_name' => 'required|max:255',
-            'category'    => 'required|max:255',
-            'status'      => 'required|max:255',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $data = $request->except('image');
-
-        if ($request->hasFile('image')) {
-            $fileName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/assets'), $fileName);
-            $data['image'] = $fileName;
-        }
+        $data = $request->validated();
 
         $asset->update($data);
 
-        return redirect()->route('assets.index')->with('success', 'Data aset berhasil diperbarui.');
+        return redirect()
+            ->route('assets.index')
+            ->with('success', 'Data aset berhasil diperbarui.');
     }
 
     public function destroy(Assets $asset)
     {
         $asset->delete();
-        return redirect()->route('assets.index')->with('success', 'Data aset berhasil dihapus.');
+
+        return redirect()
+            ->route('assets.index')
+            ->with('success', 'Data aset berhasil dihapus.');
     }
 }

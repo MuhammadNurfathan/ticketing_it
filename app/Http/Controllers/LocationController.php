@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\Locations\LocationStoreRequest;
+use App\Http\Requests\Locations\LocationUpdateRequest;
 use App\Models\Location;
-use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
@@ -16,14 +17,10 @@ class LocationController extends Controller
         return view('master/location.create');
     }
 
-    public function store(Request $request){
-        $request->validate([
-            'location_name' => 'required|string|max:255|unique:locations,location_name',
-        ]);
+    public function store(LocationStoreRequest $request){
+        $data = $request->validated();
 
-        Location::create([
-            'location_name' => $request->location_name,
-        ]);
+        Location::create($data);
 
         return redirect()->route('locations.index')
             ->with('success', 'Location berhasil ditambahkan!');
@@ -37,14 +34,10 @@ class LocationController extends Controller
         return view('master/location.edit', compact('location'));
     }
 
-    public function update(Request $request, Location $location){
-        $request->validate([
-            'location_name' => 'required|string|max:255|unique:locations,location_name,' . $location->id,
-        ]);
+    public function update(LocationUpdateRequest $request, Location $location){
+          $data = $request->validated();
 
-        $location->update([
-            'location_name' => $request->location_name,
-        ]);
+        $location->update($data);
 
         return redirect()->route('locations.index')
             ->with('success', 'Location berhasil diupdate!');

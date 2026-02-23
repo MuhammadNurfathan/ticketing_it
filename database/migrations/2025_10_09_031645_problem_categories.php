@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('problem_categories', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('problem_category_name', 255);
+            $table->string('name', 255);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('problem_categories');
+        Schema::dropIfExists('categories');
     }
 };

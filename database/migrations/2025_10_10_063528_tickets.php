@@ -12,12 +12,11 @@ return new class extends Migration
             $table->id();
             $table->string('ticket_code', 10)->unique();
             $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('restrict');
-            $table->string('nama_pembuat',255);
             $table->foreignId('support_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreignId('problem_category_id')->nullable()->constrained('problem_categories')->nullOnDelete();
-            $table->foreignId('assets_id')->nullable()->constrained('assets')->nullOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
+            $table->foreignId('asset_id')->nullable()->constrained('assets')->nullOnDelete();
             $table->foreignId('status_id')->nullable()->constrained('status')->nullOnDelete();
-            $table->foreignId('priority_id')->nullable()->constrained('priority')->nullOnDelete();
+            $table->foreignId('priority_id')->nullable()->constrained('priorities')->nullOnDelete();
             $table->text('problem')->nullable();
             $table->string('image', 255)->nullable();
             $table->text('solution')->nullable();

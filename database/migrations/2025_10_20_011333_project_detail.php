@@ -11,23 +11,20 @@ return new class extends Migration
        */
       public function up(): void
       {
-            Schema::create('project_detail', function (Blueprint $table) {
+            Schema::create('project_details', function (Blueprint $table) {
                   $table->id();
                   $table->foreignId('project_header_id')->constrained('project_header')->onUpdate('cascade')->onDelete('cascade');
-                  $table->string('developer_name', 255)->nullable();
+                  $table->foreignId('developer_id')->constrainced('users')->onUpdate('cascade')->onDelete('cascade');
                   $table->datetime('progress_date')->nullable();
                   $table->foreignId('status_id')->constrained('status')->onUpdate('cascade')->onDelete('restrict');
                   $table->float('progress_percent')->default(0);
-                  $table->string('memo', 255)->nullable();
+                  $table->string('description', 255)->nullable();
                   $table->timestamps();
             });
       }
 
-      /**
-       * Reverse the migrations.
-       */
       public function down(): void
       {
-            schema::dropIfExists('project_detail');
+            schema::dropIfExists('project_details');
       }
 };
