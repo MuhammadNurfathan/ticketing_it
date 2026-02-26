@@ -6,19 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-      /**
-       * Run the migrations.
-       */
       public function up(): void
       {
             Schema::create('project_details', function (Blueprint $table) {
                   $table->id();
-                  $table->foreignId('project_header_id')->constrained('project_header')->onUpdate('cascade')->onDelete('cascade');
-                  $table->foreignId('developer_id')->constrainced('users')->onUpdate('cascade')->onDelete('cascade');
-                  $table->datetime('progress_date')->nullable();
-                  $table->foreignId('status_id')->constrained('status')->onUpdate('cascade')->onDelete('restrict');
-                  $table->float('progress_percent')->default(0);
-                  $table->string('description', 255)->nullable();
+
+                  $table->foreignId('project_header_id')
+                        ->constrained('project_header')
+                        ->cascadeOnUpdate()
+                        ->cascadeOnDelete();
+
+                  $table->foreignId('developer_id')
+                        ->constrained('users') // ✅ FIX TYPO
+                        ->cascadeOnUpdate()
+                        ->cascadeOnDelete();
+
+                  $table->dateTime('progress_date')->nullable();
+
+                  $table->foreignId('status_id')
+                        ->constrained('statuses')
+                        ->cascadeOnUpdate()
+                        ->restrictOnDelete();
+
+                  $table->unsignedTinyInteger('progress_percent')->default(0); // ✅ konsisten
+                  $table->text('description')->nullable();
+
                   $table->timestamps();
             });
       }

@@ -21,17 +21,17 @@
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label for="department_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Nama Department
                             </label>
                             <input type="text" 
-                                   name="department_name" 
-                                   id="department_name" 
-                                   value="{{ old('department_name', $department->department_name) }}"
-                                   class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('department_name') border-red-500 dark:border-red-600 @enderror"
+                                   name="name" 
+                                   id="name" 
+                                   value="{{ old('name', $department->name) }}"
+                                   class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('name') border-red-500 dark:border-red-600 @enderror"
                                    placeholder="Contoh: Marketing"
                                    required>
-                            @error('department_name')
+                            @error('name')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>

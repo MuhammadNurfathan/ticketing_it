@@ -14,8 +14,21 @@ class DepartmentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:departments,name'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'name' => ['required','string','max:255','unique:departments,name',],
+            'location_id' => ['required','exists:locations,id',],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama departemen wajib diisi.',
+            'name.string'   => 'Nama departemen harus berupa teks.',
+            'name.max'      => 'Nama departemen maksimal 255 karakter.',
+            'name.unique'   => 'Nama departemen sudah terdaftar.',
+
+            'location_id.required' => 'Lokasi wajib dipilih.',
+            'location_id.exists'   => 'Lokasi yang dipilih tidak valid.',
         ];
     }
 }

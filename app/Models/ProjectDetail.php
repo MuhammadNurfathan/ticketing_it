@@ -7,28 +7,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectDetail extends Model
 {
-    use HasFactory; // ✅ HAPUS SoftDeletes
-    
+    use HasFactory;
+
     protected $table = 'project_detail';
-    
+
     protected $fillable = [
         'project_header_id',
         'progress_date',
         'memo',
         'status_id',
         'progress_percent',
-        'developer_name',
+        'developer_id',
     ];
 
     protected $casts = [
         'progress_date' => 'datetime',
     ];
 
-    public function header(){
-        return $this->belongsTo(ProjectHeader::class, 'project_header_id')->withTrashed();
+    public function header()
+    {
+        return $this->belongsTo(ProjectHeader::class, 'project_header_id');
     }
 
-    public function status(){
-        return $this->belongsTo(Status::class, 'status_id')->withTrashed();
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_id');
+    }
+
+    public function developer()
+    {
+        return $this->belongsTo(User::class, 'developer_id');
     }
 }

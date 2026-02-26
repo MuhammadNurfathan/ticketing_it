@@ -18,10 +18,8 @@
     </x-slot>
 
     @php
-        // ===== Base styles =====
         $page = "min-h-screen bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text";
         $wrap = "w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6";
-
 
         $card = "rounded-2xl border shadow-sm
                  bg-light-eval-1 dark:bg-dark-eval-1
@@ -57,7 +55,6 @@
         $sectionTitle = "text-base sm:text-lg font-semibold text-light-text dark:text-dark-text";
         $badgeBase = "inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold";
 
-        // ===== Tabs meta =====
         $tabs = [
             'waiting' => [
                 'label' => 'Waiting',
@@ -71,7 +68,6 @@
                 'count' => $stats['in_progress'] ?? 0,
                 'badge' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
                 'accent' => 'bg-blue-600',
-
                 'subtitle' => 'Tickets yang sedang dikerjakan',
             ],
             'done' => [
@@ -97,7 +93,6 @@
                 tab: 'waiting',
                 dt: null,
                 initDT() {
-                    // init DataTables once
                     this.dt = new DataTable('.datatable', {
                         responsive: false,
                         pageLength: 3,
@@ -115,11 +110,9 @@
                     });
                 },
                 onTabChange() {
-                    // small delay then adjust columns to prevent hidden-tab width issue
                     setTimeout(() => {
                         try {
                             document.querySelectorAll('table.datatable').forEach(t => {
-                                // DataTables v2 auto handles, but this helps layout
                                 t.style.width = '100%';
                             });
                             window.dispatchEvent(new Event('resize'));
@@ -133,21 +126,21 @@
             {{-- FILTER DATE --}}
             <form method="GET" action="{{ route('DashboardTicketsAdmin.index') }}"
                   class="{{ $card }} p-4 sm:p-5">
-                <div class="flex flex-col lg:flex-row lg:items-end gap-4">
-                    <div class="w-full sm:w-auto">
+                <div class="flex items-end gap-4">
+                    <div>
                         <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                             Request Date
                         </label>
                         <input type="date" name="start_date" value="{{ $start }}"
-                               class="date-input w-56 max-w-full {{ $input }}">
+                               class="date-input w-56 {{ $input }}">
                     </div>
 
-                    <div class="w-full sm:w-auto">
+                    <div>
                         <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                             End Date
                         </label>
                         <input type="date" name="end_date" value="{{ $end }}"
-                               class="date-input w-56 max-w-full {{ $input }}">
+                               class="date-input w-56 {{ $input }}">
                     </div>
 
                     <div class="flex items-center gap-2">
@@ -157,7 +150,7 @@
                 </div>
             </form>
 
-            {{-- STAT TABS (PREMIUM) --}}
+            {{-- STAT TABS --}}
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach ($tabs as $key => $t)
                     <button type="button"
@@ -168,21 +161,15 @@
                                hover:-translate-y-0.5 hover:shadow-md focus:outline-none"
                         :class="tab === '{{ $key }}' ? 'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30' : ''">
 
-                        {{-- accent bar --}}
                         <div class="h-1.5 w-full rounded-full {{ $t['accent'] }}"
                              :class="tab === '{{ $key }}' ? 'opacity-100' : 'opacity-50'"></div>
 
-                        <div class="mt-4 flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                               
-                                <div>
-                                    <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                        {{ $t['label'] }}
-                                    </div>
-                                    <div class="text-xs mt-0.5 {{ $muted2 }}">
-                                        Click to filter
-                                    </div>
-                                </div>
+                        <div class="mt-4">
+                            <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                {{ $t['label'] }}
+                            </div>
+                            <div class="text-xs mt-0.5 {{ $muted2 }}">
+                                Click to filter
                             </div>
                         </div>
 
@@ -193,10 +180,9 @@
                 @endforeach
             </div>
 
-            {{-- TABLE AREA (ONLY ONE SHOWS) --}}
             <div id="table-area" class="space-y-6">
 
-                {{-- ================= WAITING (DEFAULT) ================= --}}
+                {{-- ================= WAITING ================= --}}
                 <div x-show="tab==='waiting'" x-cloak class="{{ $tableWrap }} p-4 sm:p-5">
                     <div class="flex items-center justify-between mb-4">
                         <div>
@@ -213,9 +199,10 @@
                                     <th class="{{ $th }}">Ticket Code</th>
                                     <th class="{{ $th }}">Requestor</th>
                                     <th class="{{ $th }}">Department</th>
-                                    <th class="{{ $th }}">Kategori</th>
-                                    <th class="{{ $th }}">Masalah</th>
-                                    <th class="{{ $th }}">Tanggal Req</th>
+                                    <th class="{{ $th }}">Location</th>
+                                    <th class="{{ $th }}">Category</th>
+                                    <th class="{{ $th }}">Problem</th>
+                                    <th class="{{ $th }}">Request Date</th>
 
                                     @auth
                                         @if (Auth::user()->role_id != 3)
@@ -232,18 +219,15 @@
                                             {{ $ticket->ticket_code }}
                                         </td>
                                         <td class="{{ $td }}">{{ $ticket->nama_pembuat ?? '-' }}</td>
-                                        <td class="{{ $td }}">
-                                            {{ $ticket->user->department->department_name }} -
-                                            {{ $ticket->user->department->location->location_name }}
-                                        </td>
-                                        <td class="{{ $td }}">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->location?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">{{ $ticket->problem }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d H:i:s') }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d H:i:s') ?? '-' }}</td>
 
                                         @auth
                                             @if (Auth::user()->role_id != 3)
                                                 <td class="px-4 py-3 text-center" x-data="{ open: false }">
-                                                    {{-- Void --}}
                                                     <button @click="open = true"
                                                         class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold
                                                                bg-light-eval-3 hover:bg-light-eval-4
@@ -252,33 +236,15 @@
                                                         Void
                                                     </button>
 
-                                                    {{-- Execution --}}
                                                     <a href="{{ route('DashboardTicketsAdmin.edit', $ticket->id) }}"
                                                        class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold
                                                               bg-blue-600 hover:bg-blue-700 text-white transition-colors ml-1">
                                                         Execution
                                                     </a>
 
-                                                    {{-- Modal Overlay --}}
                                                     <div x-show="open" x-cloak
-                                                         x-transition:enter="transition ease-out duration-200"
-                                                         x-transition:enter-start="opacity-0"
-                                                         x-transition:enter-end="opacity-100"
-                                                         x-transition:leave="transition ease-in duration-150"
-                                                         x-transition:leave-start="opacity-100"
-                                                         x-transition:leave-end="opacity-0"
                                                          class="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm z-50">
-
-                                                        {{-- Modal Content --}}
-                                                        <div x-show="open"
-                                                             x-transition:enter="transition ease-out duration-200 transform"
-                                                             x-transition:enter-start="scale-95 opacity-0"
-                                                             x-transition:enter-end="scale-100 opacity-100"
-                                                             x-transition:leave="transition ease-in duration-150 transform"
-                                                             x-transition:leave-start="scale-100 opacity-100"
-                                                             x-transition:leave-end="scale-95 opacity-0"
-                                                             class="{{ $card }} w-[92%] sm:w-[420px] p-6">
-
+                                                        <div x-show="open" class="{{ $card }} w-[420px] p-6">
                                                             <h2 class="text-lg font-semibold mb-3 text-light-text dark:text-dark-text">
                                                                 Masukkan Catatan Void
                                                             </h2>
@@ -336,10 +302,11 @@
                                     <th class="{{ $th }}">Ticket Code</th>
                                     <th class="{{ $th }}">Requestor</th>
                                     <th class="{{ $th }}">Department</th>
+                                    <th class="{{ $th }}">Location</th>
                                     <th class="{{ $th }}">Assignee</th>
-                                    <th class="{{ $th }}">Kategori</th>
-                                    <th class="{{ $th }}">Masalah</th>
-                                    <th class="{{ $th }}">Tanggal Req</th>
+                                    <th class="{{ $th }}">Category</th>
+                                    <th class="{{ $th }}">Problem</th>
+                                    <th class="{{ $th }}">Request Date</th>
                                     <th class="{{ $th }}">Start Date</th>
                                     <th class="{{ $th }}">End Date</th>
 
@@ -358,15 +325,13 @@
                                             {{ $ticket->ticket_code }}
                                         </td>
                                         <td class="{{ $td }}">{{ $ticket->nama_pembuat ?? '-' }}</td>
-                                        <td class="{{ $td }}">
-                                            {{ $ticket->user->department->department_name }} -
-                                            {{ $ticket->user->department->location->location_name }}
-                                        </td>
-                                        <td class="{{ $td }}">{{ $ticket->support->name ?? '-' }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->location?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->support?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">{{ $ticket->problem }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->start_date?->format('Y-m-d H:i:s') }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->start_date?->format('Y-m-d H:i:s') ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->end_date?->format('Y-m-d H:i:s') ?? '-' }}</td>
 
                                         @auth
@@ -379,19 +344,17 @@
                                                         Done
                                                     </button>
 
-                                                    {{-- Modal --}}
                                                     <div
                                                         class="timeSpentModal fixed inset-0 z-50 hidden items-center justify-center
                                                                bg-black/40 dark:bg-black/60 backdrop-blur-sm">
                                                         <div
-                                                            class="modalContent w-[92%] sm:w-[420px]
-                                                                   {{ $card }} p-5 sm:p-6
+                                                            class="modalContent w-[420px]
+                                                                   {{ $card }} p-6
                                                                    transform scale-95 opacity-0 transition-all duration-200">
                                                             <h3 class="text-lg font-semibold mb-4 text-light-text dark:text-dark-text">
                                                                 Time Spent & Solution
                                                             </h3>
 
-                                                            {{-- Time Spent --}}
                                                             <div class="mb-4">
                                                                 <div class="flex items-center justify-between gap-3">
                                                                     <label class="block text-sm font-medium {{ $muted }}">
@@ -411,7 +374,6 @@
                                                                     readonly>
                                                             </div>
 
-                                                            {{-- Notes --}}
                                                             <div class="mb-4 hidden notesContainer">
                                                                 <label class="block text-sm font-medium {{ $muted }} mb-2">
                                                                     Notes (Kenapa manual) <span class="text-red-500">*</span>
@@ -424,12 +386,11 @@
                                                                     rows="2" placeholder="Enter Notes..."></textarea>
                                                             </div>
 
-                                                            {{-- Solution --}}
                                                             <div class="mb-5">
                                                                 <label class="block text-sm font-medium {{ $muted }} mb-2">
                                                                     Solution <span class="text-red-500">*</span>
                                                                 </label>
-                                                                <textarea name="solution"
+                                                                <textarea
                                                                     class="solutionInput w-full px-3 py-2 rounded-lg border
                                                                            bg-light-bg dark:bg-dark-eval-2
                                                                            border-light-eval-3 dark:border-dark-eval-2
@@ -437,7 +398,6 @@
                                                                     rows="3" placeholder="Enter Solution..." required>{{ $ticket->solution ?? '' }}</textarea>
                                                             </div>
 
-                                                            {{-- Buttons --}}
                                                             <div class="flex justify-end gap-2">
                                                                 <button type="button" class="cancelBtn {{ $btnGhost }}">Cancel</button>
                                                                 <button type="button"
@@ -449,7 +409,6 @@
                                                         </div>
                                                     </div>
 
-                                                    {{-- Hidden form --}}
                                                     <form class="doneForm"
                                                         action="{{ route('DashboardTicketsAdmin.updateStatusDone', $ticket->id) }}"
                                                         method="POST">
@@ -486,14 +445,15 @@
                                     <th class="{{ $th }}">Ticket Code</th>
                                     <th class="{{ $th }}">Requestor</th>
                                     <th class="{{ $th }}">Department</th>
+                                    <th class="{{ $th }}">Location</th>
                                     <th class="{{ $th }}">Assignee</th>
-                                    <th class="{{ $th }}">Kategori</th>
-                                    <th class="{{ $th }}">Masalah</th>
-                                    <th class="{{ $th }}">Tanggal Req</th>
+                                    <th class="{{ $th }}">Category</th>
+                                    <th class="{{ $th }}">Problem</th>
+                                    <th class="{{ $th }}">Request Date</th>
                                     <th class="{{ $th }}">Time Spent</th>
                                     <th class="{{ $th }}">Feedback</th>
-                                    <th class="{{ $th }}">Solusi</th>
-                                    <th class="{{ $th }}">Status</th>
+                                    <th class="{{ $th }}">Solution</th>
+                                    <th class="{{ $th }}">SLA</th>
                                 </tr>
                             </thead>
 
@@ -504,17 +464,15 @@
                                             {{ $ticket->ticket_code }}
                                         </td>
                                         <td class="{{ $td }}">{{ $ticket->nama_pembuat ?? '-' }}</td>
-                                        <td class="{{ $td }}">
-                                            {{ $ticket->user->department->department_name }} -
-                                            {{ $ticket->user->department->location->location_name }}
-                                        </td>
-                                        <td class="{{ $td }}">{{ $ticket->support->name ?? '-' }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->location?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->support?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">{{ $ticket->problem }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->time_spent ?? '-' }} menit</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">
-                                            {{ $ticket->feedback->description ?? '-' }}
+                                            {{ $ticket->feedback?->description ?? '-' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">
                                             {{ $ticket->solution ?? '-' }}
@@ -546,10 +504,11 @@
                                     <th class="{{ $th }}">Ticket Code</th>
                                     <th class="{{ $th }}">Requestor</th>
                                     <th class="{{ $th }}">Department</th>
+                                    <th class="{{ $th }}">Location</th>
                                     <th class="{{ $th }}">Assignee</th>
-                                    <th class="{{ $th }}">Kategori</th>
-                                    <th class="{{ $th }}">Masalah</th>
-                                    <th class="{{ $th }}">Tanggal Req</th>
+                                    <th class="{{ $th }}">Category</th>
+                                    <th class="{{ $th }}">Problem</th>
+                                    <th class="{{ $th }}">Request Date</th>
                                 </tr>
                             </thead>
 
@@ -560,12 +519,10 @@
                                             {{ $ticket->ticket_code ?? '-' }}
                                         </td>
                                         <td class="{{ $td }}">{{ $ticket->nama_pembuat ?? '-' }}</td>
-                                        <td class="{{ $td }}">
-                                            {{ $ticket->user->department->department_name }} -
-                                            {{ $ticket->user->department->location->location_name }}
-                                        </td>
-                                        <td class="{{ $td }}">{{ $ticket->support->name ?? '-' }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->problemCategory?->problem_category_name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->department?->location?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->support?->name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">{{ $ticket->problem ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
                                     </tr>
@@ -575,20 +532,17 @@
                     </div>
                 </div>
 
-            </div> {{-- end table-area --}}
+            </div>
         </div>
     </div>
 
     <style>
         [x-cloak] { display: none !important; }
-
-        /* Styling untuk date input icon */
         .date-input::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
         .dark .date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         .date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.7; }
     </style>
 
-    {{-- ================= DONE BUTTON (MODAL LOGIC) ================= --}}
     <script>
         document.querySelectorAll('.doneBtn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -610,7 +564,7 @@
                 }, 10);
 
                 const calcAutoTime = () => {
-                    if (!manualCheckbox.checked && start) {
+                    if (!manualCheckbox.checked && start && !isNaN(start)) {
                         const now = new Date();
                         const diff = Math.floor((now - start) / (1000 * 60));
                         timeInput.value = diff > 0 ? diff : 0;

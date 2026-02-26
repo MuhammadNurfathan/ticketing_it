@@ -10,25 +10,61 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('ticket_code', 10)->unique();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreignId('support_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->foreignId('asset_id')->nullable()->constrained('assets')->nullOnDelete();
-            $table->foreignId('status_id')->nullable()->constrained('status')->nullOnDelete();
-            $table->foreignId('priority_id')->nullable()->constrained('priorities')->nullOnDelete();
+
+            $table->string('ticket_code', 20)->unique();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained('users')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreignId('support_id')
+                ->nullable()
+                ->constrained('users')
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
+
+            $table->foreignId('category_id')
+                ->nullable()
+                ->constrained('categories')
+                ->nullOnDelete();
+
+            $table->foreignId('asset_id')
+                ->nullable()
+                ->constrained('assets')
+                ->nullOnDelete();
+
+            $table->foreignId('status_id')
+                ->nullable()
+                ->constrained('statuses')
+                ->nullOnDelete();
+
+            $table->foreignId('priority_id')
+                ->nullable()
+                ->constrained('priorities')
+                ->nullOnDelete();
+
             $table->text('problem')->nullable();
             $table->string('image', 255)->nullable();
             $table->text('solution')->nullable();
             $table->text('notes')->nullable();
+
             $table->dateTime('request_date')->nullable();
-            $table->integer('waiting_hour')->nullable();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
+
+            $table->integer('waiting_hour')->nullable();
             $table->integer('time_spent')->nullable();
-            $table->boolean('is_late')->default(false)->comment('false = On Time, true = Late');
+
+            $table->boolean('is_late')->default(false)
+                ->comment('false = On Time, true = Late');
+
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->index(['status_id', 'priority_id']);
+            $table->index('user_id');
+            $table->index('support_id');
         });
     }
 

@@ -13,24 +13,40 @@ class RoleMiddleware
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $roles
+     * @param  mixed  ...$roles
      * @return mixed
      */
-  public function handle(Request $request, Closure $next, ...$roles)
-{
-    if (!Auth::check()) {
-        return redirect('/'); // belum login
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        // cek login
+        if (!Auth::check()) {
+            return redirect('/login'); // redirect ke login kalau belum login
+        }
+
+        $user = Auth::user();
+
+        // ubah semua role numeric ke integer, role string tetap
+        $rolesNormalized = array_map(function ($r) {
+            return is_numeric($r) ? (int)$r : $r;
+        }, $roles);
+
+        $allowed = false;
+
+        foreach ($rolesNormalized as $role) {
+            // support role_id atau role_name
+            if (is_int($role) && $user->role_id === $role) {
+                $allowed = true;
+                break;
+            } elseif (is_string($role) && strtolower($user->role->name) === strtolower($role)) {
+                $allowed = true;
+                break;
+            }
+        }
+
+        if (! $allowed) {
+            abort(403, 'Unauthorized action for your role.');
+        }
+
+        return $next($request);
     }
-
-    $user = Auth::user();
-    $rolesArray = array_map('intval', $roles); // semua param jadi integer
-
-    if (!in_array((int)$user->role_id, $rolesArray)) {
-    abort(403); // Laravel otomatis pakai resources/views/errors/403.blade.php
-}
-
-
-    return $next($request);
-}
-
 }

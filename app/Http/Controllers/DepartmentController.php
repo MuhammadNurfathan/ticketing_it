@@ -24,12 +24,11 @@ class DepartmentController extends Controller
     public function store(DepartmentStoreRequest $request)
     {
         $data = $request->validated();
-
         Department::create($data);
 
         return redirect()
             ->route('departments.index')
-            ->with('success', 'Data Department berhasil disimpan');
+            ->with('success', 'Data Department berhasil disimpan.');
     }
 
     public function edit(Department $department)
@@ -41,26 +40,24 @@ class DepartmentController extends Controller
     public function update(DepartmentUpdateRequest $request, Department $department)
     {
         $data = $request->validated();
-
         $department->update($data);
 
         return redirect()
             ->route('departments.index')
-            ->with('success', 'Data Department berhasil diperbarui');
+            ->with('success', 'Data Department berhasil diperbarui.');
     }
 
     public function destroy(Department $department)
     {
         try {
             $department->delete();
-
             return redirect()
                 ->route('departments.index')
-                ->with('success', 'Department berhasil dihapus!');
+                ->with('success', 'Department berhasil dihapus.');
         } catch (\Throwable $e) {
             return redirect()
                 ->route('departments.index')
-                ->with('error', 'Department tidak dapat dihapus karena masih digunakan!');
+                ->with('error', 'Department tidak dapat dihapus: ' . $e->getMessage());
         }
     }
 }

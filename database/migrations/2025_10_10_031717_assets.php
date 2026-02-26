@@ -10,12 +10,11 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->string('assets_code', 50)->nullable();
-            $table->string('assets_name', 255)->nullable();
+            $table->string('code', 50)->nullable();
+            $table->string('name', 255)->nullable();
             $table->string('category', 255)->nullable();
             $table->string('status', 255)->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

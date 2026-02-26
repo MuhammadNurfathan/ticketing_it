@@ -1,11 +1,31 @@
 <?php
 namespace App\Models;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 use Illuminate\Database\Eloquent\Model;
+
 class Status extends Model
 {
-    use SoftDeletes;
-    protected $table = 'status';
-    protected $fillable = ['status_name'];
-    public $timestamps =    true;
+    protected $table = 'statuses';
+
+    protected $fillable = [
+        'name',
+        'type',
+        'context',
+    ];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(ProjectHeader::class);
+    }
+
+    public function scopeContext($query, string $context)
+    {
+        return $query->where('context', $context);
+    }
+
 }

@@ -67,8 +67,8 @@
                     </p>
                 </div>
 
-                @if (!$hasDoneTicket)
-                    <a href="{{ route('DashboardTicketsUser.createUser') }}"
+                @if (!$hasDoneWithoutFeedback)
+                    <a href="{{ route('DashboardTicketsUser.create') }}"
                         class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
                               bg-blue-600 text-white hover:bg-blue-700
                               dark:bg-blue-600 dark:hover:bg-blue-700
@@ -142,7 +142,7 @@
                                     </td>
 
                                     <td class="{{ $tdBase }}">
-                                        {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
+                                        {{ $ticket->Category?->name ?? '-' }}
                                     </td>
 
                                     <td
@@ -245,7 +245,7 @@
                                             border-light-eval-3 dark:border-dark-eval-2
                                             {{ $ticket->status_id == 3 ? 'ring-2 ring-blue-500/40 dark:ring-blue-400/35' : '' }}"
                                     data-code="{{ strtolower($ticket->ticket_code) }}"
-                                    data-category="{{ strtolower($ticket->problemCategory?->problem_category_name ?? '') }}"
+                                    data-category="{{ strtolower($ticket->Category?->name ?? '') }}"
                                     data-problem="{{ strtolower($ticket->problem) }}"
                                     data-status="{{ strtolower($ticket->status->status_name) }}"
                                     data-support="{{ strtolower($ticket->support->name ?? '') }}"
@@ -285,7 +285,7 @@
                                                 class="shrink-0 w-[80px] text-xs {{ $muted2 }}">Category:</span>
                                             <span
                                                 class="min-w-0 flex-1 text-xs text-light-text dark:text-dark-text break-words whitespace-normal">
-                                                {{ $ticket->problemCategory?->problem_category_name ?? '-' }}
+                                                {{ $ticket->Category?->name ?? '-' }}
                                             </span>
                                         </div>
 
@@ -401,7 +401,7 @@
                 <label class="block text-sm font-medium mb-1 {{ $muted }}">
                     Category <span class="text-red-500">*</span>
                 </label>
-                <select name="problem_category_id" required
+                <select name="category_id" required
                     class="w-full px-3 py-2 rounded-lg border
                                bg-light-bg dark:bg-dark-eval-2
                                text-light-text dark:text-dark-text text-sm
@@ -409,7 +409,7 @@
                                focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/40">
                     <option value="">-- Select Category --</option>
                     @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}">{{ $cat->problem_category_name }}</option>
+                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                     @endforeach
                 </select>
             </div>

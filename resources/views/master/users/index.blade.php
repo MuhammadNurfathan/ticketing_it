@@ -12,7 +12,7 @@
 
             <a href="{{ route('users.create') }}"
                 class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
+                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                 <span class="text-base">＋</span>
                 <span>Tambah User</span>
             </a>
@@ -43,8 +43,7 @@
 
             {{-- Alert Success --}}
             @if (session('success'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
                     <div class="text-sm font-medium text-green-700 dark:text-green-300">
                         {{ session('success') }}
                     </div>
@@ -53,8 +52,7 @@
 
             {{-- Alert Error --}}
             @if (session('error'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
                     <div class="text-sm font-medium text-red-700 dark:text-red-300">
                         {{ session('error') }}
                     </div>
@@ -62,37 +60,40 @@
             @endif
 
             <div class="{{ $card }}">
-                <x-datatable-wrapper
-                    title="List Users"
-                    subtitle="Data user & role akses"
-                    :count="$users->count()"
-                >
+                <x-datatable-wrapper title="List Users" subtitle="Data user & role akses" :count="$users->count()">
                     <table class="datatable w-full min-w-[900px] text-sm">
                         <thead class="{{ $thead }}">
                             <tr>
                                 <th class="{{ $th }} w-14 text-center">No</th>
                                 <th class="{{ $th }}">Username</th>
                                 <th class="{{ $th }}">Email</th>
+                                <th class="{{ $th }}">Phone</th>
+                                <th class="{{ $th }}">Department</th>
+                                <th class="{{ $th }}">Location</th>
                                 <th class="{{ $th }}">Role</th>
                                 <th class="{{ $th }} text-right">Aksi</th>
                             </tr>
                         </thead>
 
+                        {{-- IMPORTANT: kalau kosong, jangan render row @empty --}}
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2 bg-light-bg dark:bg-dark-eval-2">
-                            @forelse ($users as $index => $user)
+                            @foreach ($users as $index => $user)
                                 @php
-                                    $roleName = $user->role->role_name ?? '-';
+                                    $roleName = $user->role?->name ?? '-';
                                     $r = strtolower($roleName);
 
                                     if (str_contains($r, 'admin')) {
                                         $roleBadge = 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300';
-                                    } elseif (str_contains($r, 'support')) {
+                                    } elseif (str_contains($r, 'user')) {
                                         $roleBadge = 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300';
                                     } elseif (str_contains($r, 'manager') || str_contains($r, 'lead')) {
                                         $roleBadge = 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300';
                                     } else {
                                         $roleBadge = 'bg-light-eval-2 text-light-text-secondary dark:bg-dark-eval-1 dark:text-dark-text-secondary';
                                     }
+
+                                    $deptName = $user->department?->department_name ?? $user->department?->name ?? '-';
+                                    $locName  = $user->department?->location?->location_name ?? $user->department?->location?->name ?? '-';
                                 @endphp
 
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
@@ -102,12 +103,24 @@
 
                                     <td class="px-4 py-3">
                                         <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                            {{ $user->username ?? '-' }}
+                                            {{ $user->username ?? $user->name ?? '-' }}
                                         </div>
                                     </td>
 
                                     <td class="{{ $td }} whitespace-nowrap">
                                         {{ $user->email ?? '-' }}
+                                    </td>
+
+                                    <td class="{{ $td }} whitespace-nowrap">
+                                        {{ $user->phone ?? '-' }}
+                                    </td>
+
+                                    <td class="{{ $td }} whitespace-nowrap">
+                                        {{ $deptName }}
+                                    </td>
+
+                                    <td class="{{ $td }} whitespace-nowrap">
+                                        {{ $locName }}
                                     </td>
 
                                     <td class="px-4 py-3">
@@ -128,7 +141,7 @@
                                             </a>
 
                                             <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                                  onsubmit="return confirm('Yakin ingin menghapus user ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -142,14 +155,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5"
-                                        class="py-10 text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">
-                                        Tidak ada data Users
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </x-datatable-wrapper>
@@ -160,15 +166,21 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: false,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength",
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
+            document.querySelectorAll(".datatable").forEach((table) => {
+                new DataTable(table, {
+                    responsive: false,
+                    pageLength: 10,
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    },
+                    language: {
+                        emptyTable: "Tidak ada data Users",
+                        zeroRecords: "Tidak ada data Users"
+                    }
+                });
             });
         });
     </script>

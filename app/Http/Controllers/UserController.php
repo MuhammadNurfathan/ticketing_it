@@ -12,12 +12,12 @@ class UserController extends Controller
 {
     use Notifiable;
     public function index(){
-        $users = User::latest()->get();
+        $users = User::latest()->with('role')->get();
         return view('master/users.index', compact('users'));
     }
 
     public function create(){
-        $roles = role::all();
+        $roles = Role::all();
         $departments = Department::all();
         return view('master/users.create', compact('departments', 'roles'));
     }

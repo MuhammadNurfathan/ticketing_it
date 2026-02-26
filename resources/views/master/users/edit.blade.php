@@ -54,7 +54,7 @@
                                 <option value="">-- Pilih Role --</option>
                                 @foreach($roles as $role)
                                     <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>
-                                        {{ $role->role_name }}
+                                        {{ $role->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -68,7 +68,7 @@
                                 <option value="">-- Pilih Department --</option>
                                 @foreach($departments as $dept)
                                     <option value="{{ $dept->id }}" {{ old('department_id', $user->department_id) == $dept->id ? 'selected' : '' }}>
-                                        {{ $dept->department_name }}
+                                        {{ $dept->name }}
                                     </option>
                                 @endforeach
                             </select>

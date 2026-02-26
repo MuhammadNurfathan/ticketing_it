@@ -1,67 +1,60 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\Status\StatusStoreRequest;
+use App\Http\Requests\Status\StatusUpdateRequest;
 use App\Models\Status;
-use Illuminate\Http\Request;
 
 class StatusController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $statuses = Status::latest()->get();
         return view('master/status.index', compact('statuses'));
     }
 
-    public function create(){
+    public function create()
+    {
         return view('master/status.create');
     }
 
-    public function store(Request $request){
-        $request->validate([
-            'status_name' => 'required|string|max:255|unique:status,status_name',
-        ]);
+    public function store(StatusStoreRequest $request)
+    {
+        $data = $request->validated();
+        Status::create($data);
 
-        try {
-            Status::create([
-                'status_name' => $request->status_name,
-            ]);
-
-            return redirect()->route('status.index')
-                ->with('success', 'Status berhasil ditambahkan');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Gagal menambahkan status: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('status.index')
+            ->with('success', 'Status berhasil ditambahkan.');
     }
 
-    public function edit(Status $status){
+    public function edit(Status $status)
+    {
         return view('master/status.edit', compact('status'));
     }
 
-    public function update(Request $request, Status $status){
-        $request->validate([
-            'status_name' => 'required|string|max:255',
-        ]);
+    public function update(StatusUpdateRequest $request, Status $status)
+    {
+        $data = $request->validated();
+        $status->update($data);
 
-        try {
-            $status->update([
-                'status_name' => $request->status_name,
-            ]);
-
-            return redirect()->route('status.index')
-                ->with('success', 'Status berhasil diupdate');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Gagal mengupdate status: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('status.index')
+            ->with('success', 'Status berhasil diperbarui.');
     }
 
-    public function destroy(Status $status){
+    public function destroy(Status $status)
+    {
         try {
             $status->delete();
-            return redirect()->route('status.index')
-                ->with('success', 'Status berhasil dihapus');
-        } catch (\Exception $e) {
-            return redirect()->route('status.index')
+
+            return redirect()
+                ->route('status.index')
+                ->with('success', 'Status berhasil dihapus.');
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('status.index')
                 ->with('error', 'Gagal menghapus status: ' . $e->getMessage());
         }
     }

@@ -1,10 +1,27 @@
 <?php
+
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Priority extends Model
 {
-    use SoftDeletes;
-    protected $table = 'priority';
-    protected $fillable = ['priority_name'];
+    use HasFactory;
+
+    protected $table = 'priorities';
+
+    protected $fillable = [
+        'name',
+    ];
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'priority_id');
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(ProjectHeader::class, 'priority_id');
+    }
 }

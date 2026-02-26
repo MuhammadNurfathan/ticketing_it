@@ -14,10 +14,21 @@ class AssetStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'assets_code' => ['required', 'max:255', 'unique:assets,assets_code'],
-            'assets_name' => ['required', 'max:255'],
-            'category'    => ['required', 'max:255'],
-            'status'      => ['required', 'max:255'],
+            'code'     => ['required', 'string', 'max:255', 'unique:assets,code'],
+            'name'     => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'image'    => ['nullable', 'image', 'max:2048'], // opsional
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'code.required' => 'Kode asset wajib diisi',
+            'code.unique'   => 'Kode asset sudah digunakan',
+            'name.required' => 'Nama asset wajib diisi',
+            'category.required' => 'Kategori asset wajib diisi',
+            'image.image'   => 'File harus berupa gambar',
         ];
     }
 }

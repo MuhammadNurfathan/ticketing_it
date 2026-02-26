@@ -25,10 +25,25 @@
 
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Status</label>
-                            <input type="text" name="status_name" value="{{ old('status_name') }}" 
+                            <input type="text" name="name" value="{{ old('name') }}" 
                                 class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
                                 placeholder="Contoh: Open, In Progress, Closed" 
                                 required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Type Status</label>
+                            <input type="text" name="type" value="{{ old('type') }}" 
+                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Contoh: open, in_progress, closed" 
+                                required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Contex Status</label>
+                            <select name="context" id="" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-600 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" >
+                                <option value="">-- Pilih Context --</option>
+                                <option value="ticket">Ticket</option>
+                                <option value="project">Project</option>
+                            </select>
                         </div>
 
                         <div class="flex items-center gap-3">

@@ -8,12 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('status', function (Blueprint $table) {
+        Schema::create('statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
-            $table->string('type', 50);
+            $table->string('name');          // Waiting, In Progress, Done
+            $table->string('type');          // waiting, in_progress, done
+            $table->string('context');       // ticket, project
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->unique(['type', 'context']);
         });
     }
 

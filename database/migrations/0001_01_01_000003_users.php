@@ -10,18 +10,17 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->string('username', 255)->unique('deleted_at');
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('restrict')->onUpdate('cascade');;
-            $table->string('email', 255)->unique()->nullable();
-            $table->string('password', 255);
+            $table->string('name', 150);
+            $table->string('username', 100)->unique();
+            $table->foreignId('department_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
+            $table->foreignId('role_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
+            $table->string('email', 150)->nullable()->unique();
+            $table->string('password');
             $table->string('phone', 20)->nullable();
             $table->string('job_position', 100)->nullable();
-            $table->string('status', 100)->nullable();
+            $table->string('status', 50)->default('aktif');
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

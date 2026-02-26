@@ -2,16 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 class ProjectHeader extends Model
 {
-    use HasFactory, SoftDeletes;
-    
+    use HasFactory;
+
     protected $table = 'project_header';
-    
+
     protected $fillable = [
         'project_code',
         'project_name',
@@ -22,8 +20,8 @@ class ProjectHeader extends Model
         'priority_id',
         'status_id',
         'progress_percent',
-        'start_date',           // ✅ TAMBAHIN INI
-        'end_date',             // ✅ TAMBAHIN INI
+        'start_date',
+        'end_date',
         'actual_start_date',
         'actual_end_date',
         'effective_end_date',
@@ -32,202 +30,186 @@ class ProjectHeader extends Model
         'notes'
     ];
 
-    // ✅ GANTI $date (typo) jadi $casts
     protected $casts = [
-        'request_date' => 'datetime',
-        'start_date' => 'datetime',        // ✅ TAMBAHIN INI
-        'end_date' => 'datetime',          // ✅ TAMBAHIN INI
-        'actual_start_date' => 'datetime',
-        'actual_end_date' => 'datetime',
-        'effective_end_date' => 'datetime',
-        'is_late' => 'boolean',
+        'request_date'         => 'datetime',
+        'start_date'           => 'datetime',
+        'end_date'             => 'datetime',
+        'actual_start_date'    => 'datetime',
+        'actual_end_date'      => 'datetime',
+        'effective_end_date'   => 'datetime',
+        'is_late'              => 'boolean',
     ];
 
-    public function developer()
-{
-    return $this->belongsTo(User::class, 'dev_id')->where('role_id', 1);
-}
-
-
-    public function details()
-    {
-        return $this->hasMany(ProjectDetail::class, 'project_header_id', 'id')->withTrashed();
-    }
-
-    public function status()
-    {
-        return $this->belongsTo(Status::class, 'status_id')->withTrashed();
-    }
+    /* =======================
+     | RELATIONS
+     ======================= */
 
     public function requestor()
     {
-        return $this->belongsTo(User::class, 'requestor_id')->withTrashed();
+        return $this->belongsTo(User::class, 'requestor_id');
+    }
+
+    public function developer()
+    {
+        return $this->belongsTo(User::class, 'dev_id');
     }
 
     public function priority()
     {
-        return $this->belongsTo(Priority::class, 'priority_id')->withTrashed();
+        return $this->belongsTo(Priority::class, 'priority_id');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class)
+            ->where('context', 'project');
+    }
+
+    public function details()
+    {
+        return $this->hasMany(ProjectDetail::class, 'project_header_id');
     }
 
     public function pendings()
     {
         return $this->hasMany(Pending::class, 'id_project_header');
     }
-    
+
+    /* =======================
+     | SCOPES
+     ======================= */
 
     public function scopeBetweenRequestDates($query, $start, $end)
     {
         if ($start && $end) {
-            $start = date('Y-m-d 00:00:00', strtotime($start));
-            $end   = date('Y-m-d 23:59:59', strtotime($end));
-            return $query->whereBetween('request_date', [$start, $end]);
+            return $query->whereBetween('request_date', [
+                $start . ' 00:00:00',
+                $end . ' 23:59:59'
+            ]);
         }
+
         return $query;
     }
 
-    public function scopeByStatus($query, $status)
+    /* =======================
+ | SCOPES STATUS PROJECT
+ ======================= */
+
+    public function scopeByStatusType($query, string $type)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', $status));
+        return $query->whereHas(
+            'status',
+            fn($q) =>
+            $q->where('type', $type)
+                ->where('context', 'project')
+        );
     }
 
     public function scopeWaiting($query)
     {
-        return $this->scopeByStatus($query, 'Waiting');
+        return $this->scopeByStatusType($query, 'waiting');
     }
 
     public function scopeInProgress($query)
     {
-        return $this->scopeByStatus($query, 'In Progress');
+        return $this->scopeByStatusType($query, 'in_progress');
     }
 
     public function scopeDone($query)
     {
-        return $this->scopeByStatus($query, 'Done');
+        return $this->scopeByStatusType($query, 'done');
     }
 
     public function scopeVoid($query)
     {
-        return $this->scopeByStatus($query, 'Void');
+        return $this->scopeByStatusType($query, 'void');
     }
+
     public function scopePending($query)
     {
-        return $this->scopeByStatus($query, 'Pending');
+        return $this->scopeByStatusType($query, 'pending');
     }
+
+    /* =======================
+     | STATISTIK
+     ======================= */
 
     public static function statistik($start = null, $end = null)
     {
-        $waitingCount = self::Waiting()->betweenRequestDates($start, $end)->count();
-        $inProgressCount = self::inProgress()->betweenRequestDates($start, $end)->count();
-        $doneCount = self::Done()->betweenRequestDates($start, $end)->count();
-        $voidCount = self::Void()->betweenRequestDates($start, $end)->count();
-        $voidCount = self::Pending()->betweenRequestDates($start, $end)->count();
-
         return [
-            'waiting' => $waitingCount,
-            'in_progress' => $inProgressCount,
-            'done' => $doneCount,
-            'void' => $voidCount,
-            'pending' => $voidCount,
+            'waiting'      => self::waiting()->betweenRequestDates($start, $end)->count(),
+            'in_progress'  => self::inProgress()->betweenRequestDates($start, $end)->count(),
+            'done'         => self::done()->betweenRequestDates($start, $end)->count(),
+            'void'         => self::void()->betweenRequestDates($start, $end)->count(),
+            'pending'      => self::pending()->betweenRequestDates($start, $end)->count(),
         ];
     }
 
-
+    /* =======================
+     | DATA FORM
+     ======================= */
 
     public static function data()
     {
-        $lastproject = self::latest('id')->first();
+        $last = self::latest('id')->first();
 
-        if ($lastproject) {
-            $lastNumber = (int)substr($lastproject->project_code, 4);
-            $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '001';
-        }
-
-        $generateticket = "PRJ-{$newNumber}";
-
-        $users      = User::all();
-        $statuses   = Status::all();
-        $developers = User::where('role_id', 1)->get();
-        $priorities = Priority::all();
-        $pendings = Pending::all();
+        $number = $last
+            ? str_pad(((int) substr($last->project_code, 4)) + 1, 3, '0', STR_PAD_LEFT)
+            : '001';
 
         return [
-            'users'           => $users,
-            'statuses'        => $statuses,
-            'developers'      => $developers,
-            'priorities'      => $priorities,
-            'generateticket'  => $generateticket,
+            'users'          => User::all(),
+            'statuses'       => Status::all(),
+            'developers'     => User::where('role_id', 1)->get(),
+            'priorities'     => Priority::all(),
+            'generateticket' => "PRJ-{$number}",
         ];
     }
-public static function summary($year = null)
-{
-    $baseQuery = self::query();
 
-    // ======================
-    // STATUS REAL-TIME (NO YEAR)
-    // ======================
-    $active  = (clone $baseQuery)->where('status_id', 2)->count(); // In Progress
-    $waiting = (clone $baseQuery)->where('status_id', 1)->count();
-    $pending = (clone $baseQuery)->where('status_id', 6)->count();
-    $void    = (clone $baseQuery)->where('status_id', 4)->count();
+    /* =======================
+     | SUMMARY DASHBOARD
+     ======================= */
 
-    // ======================
-    // TOTAL PROJECT AKTIF DI TAHUN (OVERLAP)
-    // ======================
-    $totalQuery = self::query();
+    public static function summary($year = null)
+    {
+        $base = self::query();
 
-    if ($year) {
-        $totalQuery
-            ->whereDate('start_date', '<=', "$year-12-31")
-            ->where(function ($q) use ($year) {
-                $q->whereNull('effective_end_date')
-                  ->orWhereDate('effective_end_date', '>=', "$year-01-01");
-            });
+        if ($year) {
+            $base->whereDate('start_date', '<=', "$year-12-31")
+                ->where(function ($q) use ($year) {
+                    $q->whereNull('effective_end_date')
+                        ->orWhereDate('effective_end_date', '>=', "$year-01-01");
+                });
+        }
+
+        $total = (clone $base)->where('status_id', '!=', 5)->count();
+
+        $active  = (clone $base)->where('status_id', 2)->count();
+        $waiting = (clone $base)->where('status_id', 1)->count();
+        $pending = (clone $base)->where('status_id', 6)->count();
+        $void    = (clone $base)->where('status_id', 4)->count();
+
+        $closedQuery = self::query();
+        if ($year) {
+            $closedQuery->whereYear('effective_end_date', $year);
+        }
+
+        $closed        = (clone $closedQuery)->where('status_id', 3)->count();
+        $closedOnTime  = (clone $closedQuery)->where('status_id', 3)->where('is_late', false)->count();
+        $closedLate    = (clone $closedQuery)->where('status_id', 3)->where('is_late', true)->count();
+
+        $sla = $closed > 0 ? round(($closedOnTime / $closed) * 100, 2) : 0;
+
+        return compact(
+            'total',
+            'active',
+            'waiting',
+            'pending',
+            'void',
+            'closed',
+            'closedOnTime',
+            'closedLate',
+            'sla'
+        );
     }
-
-    $total = $totalQuery
-        ->where('status_id', '!=', 5) // exclude cancelled (kalau ada)
-        ->count();
-
-    // ======================
-    // CLOSED & SLA (BY YEAR)
-    // ======================
-    $closedQuery = self::query();
-
-    if ($year) {
-        $closedQuery->whereYear('effective_end_date', $year);
-    }
-
-    $closed = (clone $closedQuery)->where('status_id', 3)->count();
-
-    $closedOnTime = (clone $closedQuery)
-        ->where('status_id', 3)
-        ->where('is_late', 0)
-        ->count();
-
-    $closedLate = (clone $closedQuery)
-        ->where('status_id', 3)
-        ->where('is_late', 1)
-        ->count();
-
-    $sla = $closed > 0
-        ? round(($closedOnTime / $closed) * 100, 2)
-        : 0;
-
-    return [
-        'total'         => $total,
-        'active'        => $active,
-        'waiting'       => $waiting,
-        'pending'       => $pending,
-        'void'          => $void,
-        'closed'        => $closed,
-        'closedOnTime'  => $closedOnTime,
-        'closedLate'    => $closedLate,
-        'sla'           => $sla,
-    ];
-}
-
-
-
 }

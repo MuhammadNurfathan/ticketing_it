@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests\Assets;
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -13,13 +14,31 @@ class AssetUpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        $assetId = $this->route('asset')?->id ?? $this->route('asset');
+        $assetId = $this->route('asset') instanceof \App\Models\Assets
+            ? $this->route('asset')->id
+            : $this->route('asset');
 
         return [
-            'assets_code' => ['required', 'max:255', Rule::unique('assets', 'assets_code')->ignore($assetId)],
-            'assets_name' => ['required', 'max:255'],
-            'category'    => ['required', 'max:255'],
-            'status'      => ['required', 'max:255'],
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('assets', 'code')->ignore($assetId),
+            ],
+            'name'     => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:255'],
+            'image'    => ['nullable', 'image', 'max:2048'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'code.required' => 'Kode asset wajib diisi',
+            'code.unique'   => 'Kode asset sudah digunakan',
+            'name.required' => 'Nama asset wajib diisi',
+            'category.required' => 'Kategori asset wajib diisi',
+            'image.image'   => 'File harus berupa gambar',
         ];
     }
 }

@@ -8,7 +8,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
 
                 {{-- Create Ticket Card --}}
-                <a href="{{ route('DashboardTicketsUser.createUser') }}"
+                <a href="{{ route('DashboardTicketsUser.create') }}"
                    class="group relative overflow-hidden rounded-2xl bg-white/70 dark:bg-gray-900/60
                           ring-1 ring-gray-200/70 dark:ring-gray-800
                           shadow-sm hover:shadow-lg transition-all duration-300
@@ -59,7 +59,7 @@
                 </a>
 
                 {{-- My Tickets Card --}}
-                <a href="{{ route('DashboardTicketsUser.indexUser') }}"
+                <a href="{{ route('DashboardTicketsUser.index') }}"
                    class="group relative overflow-hidden rounded-2xl bg-white/70 dark:bg-gray-900/60
                           ring-1 ring-gray-200/70 dark:ring-gray-800
                           shadow-sm hover:shadow-lg transition-all duration-300

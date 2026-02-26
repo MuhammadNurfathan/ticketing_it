@@ -9,31 +9,23 @@ class Pending extends Model
 {
     use HasFactory;
 
-    // Nama tabel
     protected $table = 'pending';
 
-    // Field yang bisa diisi massal
     protected $fillable = [
-        'id_project_header',
+        'project_header_id',
         'pending_start',
         'pending_end',
         'reason',
         'duration_minutes',
     ];
 
-    // Timestamp default Laravel aktif (created_at & updated_at)
-    public $timestamps = true;
-
-    // Opsional: kalau mau cast field tanggal otomatis
-    protected $dates = [
-        'pending_start',
-        'pending_end',
+    protected $casts = [
+        'pending_start' => 'datetime',
+        'pending_end'   => 'datetime',
     ];
 
-     public function projectHeader()
+    public function projectHeader()
     {
-        return $this->belongsTo(ProjectHeader::class, 'id_project_header')->withTrashed();
+        return $this->belongsTo(ProjectHeader::class, 'project_header_id');
     }
-
-
 }

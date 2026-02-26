@@ -12,7 +12,7 @@
 
             <a href="{{ route('roles.create') }}"
                 class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
+                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                 <span class="text-base">＋</span>
                 <span>Tambah Role</span>
             </a>
@@ -41,8 +41,7 @@
 
             {{-- Alert Success --}}
             @if (session('success'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
                     <div class="text-sm font-medium text-green-700 dark:text-green-300">
                         {{ session('success') }}
                     </div>
@@ -51,8 +50,7 @@
 
             {{-- Alert Error --}}
             @if (session('error'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
                     <div class="text-sm font-medium text-red-700 dark:text-red-300">
                         {{ session('error') }}
                     </div>
@@ -75,8 +73,9 @@
                             </tr>
                         </thead>
 
+                        {{-- IMPORTANT: kalau kosong, jangan render row @empty --}}
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2 bg-light-bg dark:bg-dark-eval-2">
-                            @forelse ($roles as $index => $role)
+                            @foreach ($roles as $index => $role)
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
                                     <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
                                         {{ $index + 1 }}
@@ -84,7 +83,7 @@
 
                                     <td class="px-4 py-3">
                                         <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                            {{ $role->role_name ?? '-' }}
+                                            {{ $role->name ?? '-' }}
                                         </div>
                                     </td>
 
@@ -104,7 +103,7 @@
                                             </a>
 
                                             <form action="{{ route('roles.destroy', $role) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus role ini?');">
+                                                  onsubmit="return confirm('Yakin ingin menghapus role ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -118,14 +117,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4"
-                                        class="py-10 text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">
-                                        Tidak ada data Roles
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </x-datatable-wrapper>
@@ -136,15 +128,21 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: false,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength",
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
+            document.querySelectorAll(".datatable").forEach((table) => {
+                new DataTable(table, {
+                    responsive: false,
+                    pageLength: 10,
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    },
+                    language: {
+                        emptyTable: "Tidak ada data Roles",
+                        zeroRecords: "Tidak ada data Roles"
+                    }
+                });
             });
         });
     </script>

@@ -1,70 +1,68 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\Roles\RoleStoreRequest;
+use App\Http\Requests\Roles\RoleUpdateRequest;
 use App\Models\Role;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $roles = Role::latest()->get();
         return view('master/roles.index', compact('roles'));
     }
 
-    public function create(){
+    public function create()
+    {
         return view('master/roles.create');
     }
 
-    public function store(Request $request){
-        $request->validate([
-            'role_name' => 'required|string|max:255|unique:roles,role_name',
-        ]);
+    public function store(RoleStoreRequest $request)
+    {
+        $data = $request->validated();
+        Role::create($data);
 
-        try {
-            Role::create([
-                'role_name' => $request->role_name,
-            ]);
-
-            return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menambahkan role: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('roles.index')
+            ->with('success', 'Role berhasil ditambahkan.');
     }
 
-    public function show(Role $role){
-        return view('master/roles.show', compact('role'));
-    }
-
-    public function edit(Role $role){
+    public function edit(Role $role)
+    {
         return view('master/roles.edit', compact('role'));
     }
 
-    public function update(Request $request, Role $role){
-        $request->validate([
-            'role_name' => 'required|string|max:255|unique:roles,role_name,' . $role->id,
-        ]);
+    public function update(RoleUpdateRequest $request, Role $role)
+    {
+        $data = $request->validated();
+        $role->update($data);
 
-        try {
-            $role->update([
-                'role_name' => $request->role_name,
-            ]);
-
-            return redirect()->route('roles.index')->with('success', 'Role berhasil diupdate');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal mengupdate role: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('roles.index')
+            ->with('success', 'Role berhasil diperbarui.');
     }
 
-    public function destroy(Role $role){
+    public function destroy(Role $role)
+    {
         try {
             if ($role->users()->count() > 0) {
-                return redirect()->back()->with('error', 'Role tidak dapat dihapus karena masih digunakan oleh user');
+                return redirect()
+                    ->route('roles.index')
+                    ->with('error', 'Role tidak dapat dihapus karena masih digunakan oleh user.');
             }
 
             $role->delete();
-            return redirect()->route('roles.index')->with('success', 'Role berhasil dihapus');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus role: ' . $e->getMessage());
+
+            return redirect()
+                ->route('roles.index')
+                ->with('success', 'Role berhasil dihapus.');
+        } catch (\Throwable $e) {
+            return redirect()
+                ->route('roles.index')
+                ->with('error', 'Gagal menghapus role: ' . $e->getMessage());
         }
     }
 }

@@ -20,12 +20,12 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('problem_categories.store') }}" method="POST">
+                    <form action="{{ route('categories.store') }}" method="POST">
                         @csrf
 
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Problem Category Name</label>
-                            <input type="text" name="problem_category_name" value="{{ old('problem_category_name') }}" 
+                            <input type="text" name="name" value="{{ old('name') }}" 
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                                 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 
                                 focus:outline-none focus:ring-blue-500 focus:border-blue-500"  placeholder="Contoh: Software, Hardware, Dll"
@@ -36,7 +36,7 @@
                             <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Simpan
                             </button>
-                            <a href="{{ route('problem_categories.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            <a href="{{ route('categories.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Kembali
                             </a>
                         </div>

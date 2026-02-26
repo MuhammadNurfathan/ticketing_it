@@ -12,7 +12,7 @@
 
             <a href="{{ route('status.create') }}"
                 class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
+                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                 <span class="text-base">＋</span>
                 <span>Tambah Status</span>
             </a>
@@ -32,8 +32,6 @@
 
         $th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap
                text-light-text-secondary dark:text-dark-text-secondary";
-
-        $td = 'px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary';
     @endphp
 
     <div class="{{ $page }}">
@@ -41,8 +39,7 @@
 
             {{-- Alert Success --}}
             @if (session('success'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
                     <div class="text-sm font-medium text-green-700 dark:text-green-300">
                         {{ session('success') }}
                     </div>
@@ -51,8 +48,7 @@
 
             {{-- Alert Error --}}
             @if (session('error'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
                     <div class="text-sm font-medium text-red-700 dark:text-red-300">
                         {{ session('error') }}
                     </div>
@@ -70,12 +66,15 @@
                             <tr>
                                 <th class="{{ $th }} w-14 text-center">No</th>
                                 <th class="{{ $th }}">Nama Status</th>
+                                <th class="{{ $th }}">Type Status</th>
+                                <th class="{{ $th }}">Context</th>
                                 <th class="{{ $th }} text-right">Aksi</th>
                             </tr>
                         </thead>
 
+                        {{-- IMPORTANT: kalau kosong, jangan render row @empty --}}
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2 bg-light-bg dark:bg-dark-eval-2">
-                            @forelse ($statuses as $index => $status)
+                            @foreach ($statuses as $index => $status)
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
                                     <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
                                         {{ $index + 1 }}
@@ -83,7 +82,19 @@
 
                                     <td class="px-4 py-3">
                                         <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                            {{ $status->status_name ?? '-' }}
+                                            {{ $status->status_name ?? $status->name ?? '-' }}
+                                        </div>
+                                    </td>
+
+                                    <td class="px-4 py-3">
+                                        <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                            {{ $status->type ?? '-' }}
+                                        </div>
+                                    </td>
+
+                                    <td class="px-4 py-3">
+                                        <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                            {{ $status->context ?? '-' }}
                                         </div>
                                     </td>
 
@@ -99,7 +110,7 @@
                                             </a>
 
                                             <form action="{{ route('status.destroy', $status) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus status ini?');">
+                                                  onsubmit="return confirm('Yakin ingin menghapus status ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -113,14 +124,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3"
-                                        class="py-10 text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">
-                                        Tidak ada data Status
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </x-datatable-wrapper>
@@ -131,15 +135,21 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: false,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength",
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
+            document.querySelectorAll(".datatable").forEach((table) => {
+                new DataTable(table, {
+                    responsive: false,
+                    pageLength: 10,
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    },
+                    language: {
+                        emptyTable: "Tidak ada data Status",
+                        zeroRecords: "Tidak ada data Status"
+                    }
+                });
             });
         });
     </script>

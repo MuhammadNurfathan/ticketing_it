@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model; 
 
 class Ticket extends Model
 {
-    use SoftDeletes;
 
-    protected $fillable =
-    [
+    protected $table = 'tickets';
+
+    protected $fillable = [
         'ticket_code',
         'user_id',
         'support_id',
-        'problem_category_id',
-        'assets_id',
+        'category_id',
+        'asset_id',
         'status_id',
         'priority_id',
         'problem',
@@ -28,178 +27,188 @@ class Ticket extends Model
         'end_date',
         'time_spent',
         'is_late',
-        'updated_at',
-        'created_at',
-        'nama_pembuat'
+        'nama_pembuat',
     ];
 
-    protected $casts =
-    [
+    protected $casts = [
         'request_date' => 'datetime',
         'start_date'   => 'datetime',
         'end_date'     => 'datetime',
+        'is_late'      => 'boolean',
     ];
 
-    // ==================== RELATIONSHIPS ====================
+    /* =======================
+     | RELATIONS
+     ======================= */
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id')->withTrashed();
-    }
-    public function support()
-    {
-        return $this->belongsTo(User::class, 'support_id')->withTrashed();
-    }
-    public function problemCategory()
-    {
-        return $this->belongsTo(ProblemCategory::class)->withTrashed();
-    }
-    public function assets()
-    {
-        return $this->belongsTo(Assets::class)->withTrashed();
-    }
-    public function status()
-    {
-        return $this->belongsTo(Status::class)->withTrashed();
-    }
-    public function priority()
-    {
-        return $this->belongsTo(Priority::class)->withTrashed();
-    }
-    public function feedback()
-    {
-        return $this->hasOne(Feedback::class, 'ticket_id')->withTrashed();
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // ==================== SCOPES ====================
+    public function support()
+    {
+        return $this->belongsTo(User::class, 'support_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function asset()
+    {
+        return $this->belongsTo(Assets::class, 'assets_id');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class)->where('context', 'ticket');
+    }
+
+    public function priority()
+    {
+        return $this->belongsTo(Priority::class, 'priority_id');
+    }
+
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'ticket_id');
+    }
+
+    /* =======================
+     | SCOPES
+     ======================= */
+
     public function scopeBetweenRequestDates($query, $start, $end)
     {
         if ($start && $end) {
-            $start = date('Y-m-d 00:00:00', strtotime($start));
-            $end   = date('Y-m-d 23:59:59', strtotime($end));
-            return $query->whereBetween('request_date', [$start, $end]);
+            return $query->whereBetween('request_date', [
+                "$start 00:00:00",
+                "$end 23:59:59"
+            ]);
         }
+
         return $query;
     }
 
-    // ==================== FILTER TABLE BY STATUS ====================
-    public function scopeByStatus($query, $status)
+    public function scopeByStatusName($query, $status)
     {
-        return $query->whereHas('status', fn($q) => $q->where('status_name', $status));
-    }
-    public function scopeWaiting($query)
-    {
-        return $this->scopeByStatus($query, 'Waiting');
-    }
-    public function scopeInProgress($query)
-    {
-        return $this->scopeByStatus($query, 'In Progress');
-    }
-    public function scopeDone($query)
-    {
-        return $query->whereHas('status', function ($q) {
-             $q->whereIn('id', [3,5]);
+        return $query->whereHas('status', function ($q) use ($status) {
+            $q->where('name', $status);
         });
     }
+
+    public function scopeWaiting($query)
+    {
+        return $query->whereHas(
+            'status',
+            fn($q) =>
+            $q->where('type', 'waiting')
+        );
+    }
+
+    public function scopeInProgress($query)
+    {
+        return $query->whereHas(
+            'status',
+            fn($q) =>
+            $q->where('type', 'in_progress')
+        );
+    }
+
+    public function scopeDone($query)
+    {
+        return $query->whereHas(
+            'status',
+            fn($q) =>
+            $q->where('type', 'done')
+        );
+    }
+
     public function scopeVoid($query)
     {
-        return $this->scopeByStatus($query, 'Void');
+        return $query->whereHas(
+            'status',
+            fn($q) =>
+            $q->where('type', 'void')
+        );
     }
 
-    // ==================== GENERATE TICKET CODE (Called during store) ====================
-    public static function generateTicketCode()
+
+    /* =======================
+     | BUSINESS LOGIC
+     ======================= */
+
+    public static function generateTicketCode(): string
     {
-        $lastTicket = self::latest('id')->first();
+        $last = self::latest('id')->first();
 
-        if ($lastTicket) {
-            $lastNumber = (int)substr($lastTicket->ticket_code, 4);
-            $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '001';
-        }
+        $number = $last
+            ? str_pad(((int) substr($last->ticket_code, 4)) + 1, 3, '0', STR_PAD_LEFT)
+            : '001';
 
-        return "TCK-{$newNumber}";
+        return "TCK-{$number}";
     }
 
-    // ==================== FUNGSI GET DATA ====================
-    public static function data()
+    public static function formData(): array
     {
-        // Ambil data untuk form
-        $locations  = Location::all();
-        $users      = User::all();
-        $assets     = Assets::all();
-        $statuses   = Status::all();
-        $categories = ProblemCategory::all();
-        $developers = User::where('role_id', 1)->get();
-        $priorities = Priority::all();
-
         return [
-            'locations'       => $locations,
-            'users'           => $users,
-            'assets'          => $assets,
-            'statuses'        => $statuses,
-            'categories'      => $categories,
-            'developers'      => $developers,
-            'priorities'      => $priorities,
+            'locations'  => Location::all(),
+            'users'      => User::all(),
+            'assets'     => Assets::all(),
+            'statuses'   => Status::all(),
+            'categories' => Category::all(),
+            'supports'   => User::where('role_id', 1)->get(),
+            'priorities' => Priority::all(),
         ];
     }
 
-    // ==================== STATISTIK KHUSUS: HANYA DONE YANG DIFILTER ====================
-    public static function getStatsFiltered($start = null, $end = null)
-    {
-        // Hitung status lain TANPA filter tanggal
-        $waitingCount    = self::waiting()->count();
-        $inProgressCount = self::inProgress()->count();
-        $voidCount       = self::void()->count();
+    /* =======================
+     | STATISTICS
+     ======================= */
 
-        // DONE difilter berdasarkan request_date
-        $doneCount = self::done()->betweenRequestDates($start, $end)->count();
+    public static function stats($start = null, $end = null): array
+    {
+        $query = self::query()->betweenRequestDates($start, $end);
 
         return [
-            'waiting'     => $waitingCount,
-            'in_progress' => $inProgressCount,
-            'done'        => $doneCount,
-            'void'        => $voidCount,
+            'waiting'     => (clone $query)->waiting()->count(),
+            'in_progress' => (clone $query)->inProgress()->count(),
+            'done'        => (clone $query)->done()->count(),
+            'void'        => (clone $query)->void()->count(),
         ];
     }
 
-  public static function Statistik($query)
-{
-    // ======================== Konstanta ========================
-    $SLA_MINUTES = 480; // 8 jam = 480 menit
+    public static function statistik($query): array
+    {
+        $SLA_MINUTES = 480;
 
-    // ======================== Status Count ========================
-    $waiting    = (clone $query)->waiting()->count();
-    $inProgress = (clone $query)->inProgress()->count();
-    $done       = (clone $query)->done()->count();
-    $void       = (clone $query)->void()->count();
+        $waiting    = (clone $query)->waiting()->count();
+        $inProgress = (clone $query)->inProgress()->count();
+        $done       = (clone $query)->done()->count();
+        $void       = (clone $query)->void()->count();
 
-    $totalAll   = $waiting + $inProgress + $done + $void;
-    $totalValid = $waiting + $inProgress + $done; // void tidak dihitung SLA
+        $totalValid = $waiting + $inProgress + $done;
 
-    // ======================== Statistik Waktu ========================
-    $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2); // menit / jam sesuai field
-    $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);   // MENIT
-    $sumTimeSpent = (clone $query)->sum('time_spent');             // MENIT
+        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2);
+        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);
+        $sumTimeSpent = (clone $query)->sum('time_spent');
 
-    // ======================== SLA ========================
-    $solvedInSLA = (clone $query)
-        ->done()
-        ->where('time_spent', '<=', $SLA_MINUTES)
-        ->count();
+        $solvedInSLA = (clone $query)
+            ->done()
+            ->where('time_spent', '<=', $SLA_MINUTES)
+            ->count();
 
-    $slaPercent = $totalValid > 0
-        ? round(($solvedInSLA / $totalValid) * 100, 2)
-        : 0;
+        $sla = $totalValid > 0
+            ? round(($solvedInSLA / $totalValid) * 100, 2)
+            : 0;
 
-    // ======================== Return ========================
-    return [
-        'avg_waiting'     => $avgWaiting,
-        'avg_time_spent'  => $avgTimeSpent,
-        'sum_time_spent'  => $sumTimeSpent,
-        'sla'             => $slaPercent,
-    ];
-}
-
-
- 
+        return [
+            'avg_waiting'    => $avgWaiting,
+            'avg_time_spent' => $avgTimeSpent,
+            'sum_time_spent' => $sumTimeSpent,
+            'sla'            => $sla,
+        ];
+    }
 }

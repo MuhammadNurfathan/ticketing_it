@@ -35,40 +35,26 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">
                         </div>
 
-                        {{-- Nama Pembuat (EDITABLE) --}}
-                        <div class="mb-4">
-                            <label for="nama_pembuat" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nama Pembuat <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" name="nama_pembuat" id="nama_pembuat" 
-                                value="{{ old('nama_pembuat', $ticket->nama_pembuat) }}" 
-                                required
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Masukkan nama pembuat">
-                            @error('nama_pembuat')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
 
                         {{-- Category (EDITABLE) --}}
                         <div class="mb-4">
                             <label for="problem_category_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Category <span class="text-red-500">*</span>
                             </label>
-                            <select name="problem_category_id" id="problem_category_id" required
+                            <select name="category_id" id="category_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" disabled {{ old('problem_category_id', $ticket->problem_category_id) ? '' : 'selected' }}>
+                                <option value="" disabled {{ old('category_id', $ticket->category_id) ? '' : 'selected' }}>
                                     -- Pilih Category --
                                 </option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}"
-                                        {{ old('problem_category_id', $ticket->problem_category_id) == $cat->id ? 'selected' : '' }}
+                                        {{ old('category_id', $ticket->category_id) == $cat->id ? 'selected' : '' }}
                                         class="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-100">
-                                        {{ $cat->problem_category_name }}
+                                        {{ $cat->name }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('problem_category_id')
+                            @error('category_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>

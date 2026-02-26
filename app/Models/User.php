@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes,HasApiTokens;
-    protected $fillable = 
-    [
+    use HasFactory, Notifiable, HasApiTokens;
+
+    protected $fillable = [
         'name',
         'username',
         'department_id',
@@ -22,30 +21,59 @@ class User extends Authenticatable
         'job_position',
         'password',
     ];
-    protected $hidden = 
-    [
+
+    protected $hidden = [
         'password',
         'remember_token',
     ];
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password'          => 'hashed',
+    ];
+
     public function department()
     {
-        return $this->belongsTo(Department::class)->withTrashed();
+        return $this->belongsTo(Department::class);
     }
+
     public function role()
     {
-        return $this->belongsTo(Role::class)->withTrashed();
+        return $this->belongsTo(Role::class);
     }
 
-    public function tickets()
-{
-    return $this->hasMany(Ticket::class, 'support_id')->withTrashed();
-}
+    public function requestedTickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
 
+    public function handledTickets()
+    {
+        return $this->hasMany(Ticket::class, 'support_id');
+    }
+
+    public function requestedProjects()
+    {
+        return $this->hasMany(ProjectHeader::class, 'requestor_id');
+    }
+
+    public function developedProjects()
+    {
+        return $this->hasMany(ProjectHeader::class, 'dev_id');
+    }
+
+    public function scopeDeveloper($query)
+    {
+        return $query->where('role_id', 1);
+    }
+
+    public function scopeManager($query)
+    {
+        return $query->where('role_id', 2);
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
 }

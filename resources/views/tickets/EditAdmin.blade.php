@@ -48,16 +48,7 @@
                             <input type="hidden" name="user_id" value="{{ $ticket->user_id }}">
                         </div>
 
-                           {{-- Problem (READ ONLY) --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nama Pembuat
-                            </label>
-                            <textarea readonly rows="3"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">{{ $ticket->nama_pembuat }}</textarea>
-                            <input type="hidden" name="nama_pembuat" value="{{ $ticket->nama_pembuat }}">
-                        </div>
-
+                        
                         {{-- IT Support (MANDATORY) --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -66,10 +57,10 @@
                             <select name="support_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="" hidden>-- Pilih IT Support --</option>
-                                @foreach ($developers as $dev)
-                                    <option value="{{ $dev->id }}"
-                                        {{ old('support_id', $ticket->support_id) == $dev->id ? 'selected' : '' }}>
-                                        {{ $dev->name }}
+                                @foreach ($supports as $sup)
+                                    <option value="{{ $sup->id }}"
+                                        {{ old('support_id', $ticket->support_id) == $sup->id ? 'selected' : '' }}>
+                                        {{ $sup->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -80,11 +71,11 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Category Problem
                             </label>
-                            <input type="text" value="{{ $ticket->problemCategory->problem_category_name ?? 'N/A' }}"
+                            <input type="text" value="{{ $ticket->category->name ?? 'N/A' }}"
                                 readonly
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed">
-                            <input type="hidden" name="problem_category_id"
-                                value="{{ $ticket->problem_category_id }}">
+                            <input type="hidden" name="category_id"
+                                value="{{ $ticket->category_id }}">
                         </div>
 
 
@@ -153,7 +144,7 @@
                                 @foreach ($priorities as $prt)
                                     <option value="{{ $prt->id }}"
                                         {{ old('priority_id', $ticket->priority_id) == $prt->id ? 'selected' : '' }}>
-                                        {{ $prt->priority_name }}
+                                        {{ $prt->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -170,9 +161,9 @@
                                 @foreach ($statuses as $stat)
                                     @if (!in_array($stat->id, [4, 5, 6]))
                                         <option value="{{ $stat->id }}"
-                                            data-name="{{ strtolower($stat->status_name) }}"
+                                            data-name="{{ strtolower($stat->name) }}"
                                             {{ old('status_id', $ticket->status_id) == $stat->id ? 'selected' : '' }}>
-                                            {{ $stat->status_name }}
+                                            {{ $stat->name }}
                                         </option>
                                     @endif
                                 @endforeach

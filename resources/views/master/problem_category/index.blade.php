@@ -10,9 +10,9 @@
                 </p>
             </div>
 
-            <a href="{{ route('problem_categories.create') }}"
+            <a href="{{ route('categories.create') }}"
                 class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                      bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
+                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
                 <span class="text-base">＋</span>
                 <span>Tambah Problem Category</span>
             </a>
@@ -32,8 +32,6 @@
 
         $th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap
                text-light-text-secondary dark:text-dark-text-secondary";
-
-        $td = 'px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary';
     @endphp
 
     <div class="{{ $page }}">
@@ -41,8 +39,7 @@
 
             {{-- Alert Success --}}
             @if (session('success'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
                     <div class="text-sm font-medium text-green-700 dark:text-green-300">
                         {{ session('success') }}
                     </div>
@@ -51,8 +48,7 @@
 
             {{-- Alert Error --}}
             @if (session('error'))
-                <div
-                    class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
+                <div class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
                     <div class="text-sm font-medium text-red-700 dark:text-red-300">
                         {{ session('error') }}
                     </div>
@@ -63,7 +59,7 @@
                 <x-datatable-wrapper
                     title="List Problem Category"
                     subtitle="Data kategori problem & aksi cepat"
-                    :count="$problemCategories->count()"
+                    :count="$categories->count()"
                 >
                     <table class="datatable w-full min-w-[650px] text-sm">
                         <thead class="{{ $thead }}">
@@ -74,8 +70,9 @@
                             </tr>
                         </thead>
 
+                        {{-- IMPORTANT: kalau kosong, jangan render row @empty --}}
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2 bg-light-bg dark:bg-dark-eval-2">
-                            @forelse ($problemCategories as $index => $pc)
+                            @foreach ($categories as $index => $pc)
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
                                     <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
                                         {{ $index + 1 }}
@@ -83,13 +80,13 @@
 
                                     <td class="px-4 py-3">
                                         <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                            {{ $pc->problem_category_name ?? '-' }}
+                                            {{ $pc->problem_category_name ?? $pc->name ?? '-' }}
                                         </div>
                                     </td>
 
                                     <td class="px-4 py-3">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ route('problem_categories.edit', $pc) }}"
+                                            <a href="{{ route('categories.edit', $pc) }}"
                                                 class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold
                                                        border border-light-eval-3 dark:border-dark-eval-2
                                                        bg-light-bg dark:bg-dark-eval-1
@@ -98,8 +95,8 @@
                                                 Edit
                                             </a>
 
-                                            <form action="{{ route('problem_categories.destroy', $pc) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus Problem Category ini?');">
+                                            <form action="{{ route('categories.destroy', $pc) }}" method="POST"
+                                                  onsubmit="return confirm('Yakin ingin menghapus Problem Category ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -113,14 +110,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3"
-                                        class="py-10 text-center text-sm italic text-light-text-muted dark:text-dark-text-secondary">
-                                        Tidak ada data Problem Category
-                                    </td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </x-datatable-wrapper>
@@ -131,15 +121,21 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            new DataTable(".datatable", {
-                responsive: false,
-                pageLength: 10,
-                layout: {
-                    topStart: "pageLength",
-                    topEnd: "search",
-                    bottomStart: "info",
-                    bottomEnd: "paging"
-                }
+            document.querySelectorAll(".datatable").forEach((table) => {
+                new DataTable(table, {
+                    responsive: false,
+                    pageLength: 10,
+                    layout: {
+                        topStart: "pageLength",
+                        topEnd: "search",
+                        bottomStart: "info",
+                        bottomEnd: "paging"
+                    },
+                    language: {
+                        emptyTable: "Tidak ada data Problem Category",
+                        zeroRecords: "Tidak ada data Problem Category"
+                    }
+                });
             });
         });
     </script>

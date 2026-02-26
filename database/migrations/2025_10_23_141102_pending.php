@@ -10,13 +10,17 @@ return new class extends Migration
     {
         Schema::create('pending', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('project_header_id');
+
+            $table->foreignId('project_header_id')
+                ->constrained('project_header')
+                ->cascadeOnDelete();
+
             $table->timestamp('pending_start')->nullable();
             $table->timestamp('pending_end')->nullable();
             $table->string('reason');
             $table->integer('duration_minutes')->nullable();
+
             $table->timestamps();
-            $table->foreign('id_project_header')->references('id')->on('project_header')->onDelete('cascade');
         });
     }
 

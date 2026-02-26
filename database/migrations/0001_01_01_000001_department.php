@@ -10,10 +10,10 @@ return new class extends Migration
     {
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id')->constrained('locations')->onDelete('restrict')->onUpdate('cascade');
-            $table->string('name', 225);
+            $table->foreignId('location_id')->constrained()->restrictOnDelete()->cascadeOnUpdate();
+            $table->string('name', 150);
             $table->timestamps();
-            $table->softDeletes();
+            $table->unique(['location_id', 'name']);
         });
     }
 

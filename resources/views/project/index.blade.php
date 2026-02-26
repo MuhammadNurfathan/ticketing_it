@@ -87,49 +87,48 @@
         ];
     @endphp
 
-    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6"
-        x-data="{
-            tab: 'waiting',
-            dts: [],
-            initDT() {
-                // init aman: per table + guard
-                if (this.dts.length) return;
-
-                document.querySelectorAll('table.datatable').forEach((table) => {
-                    if (table.dataset.dtInited === '1') return;
-
-                    const dt = new DataTable(table, {
-                        responsive: false,
-                        pageLength: 3,
-                        lengthMenu: [
-                            [3, 5, 10, 25, 50, -1],
-                            [3, 5, 10, 25, 50, 'All']
-                        ],
-                        order: [[0, 'desc']],
-                        layout: {
-                            topStart: 'pageLength',
-                            topEnd: 'search',
-                            bottomStart: 'info',
-                            bottomEnd: 'paging'
-                        }
-                    });
-
-                    table.dataset.dtInited = '1';
-                    this.dts.push(dt);
+    <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6" x-data="{
+        tab: 'waiting',
+        dts: [],
+        initDT() {
+            // init aman: per table + guard
+            if (this.dts.length) return;
+    
+            document.querySelectorAll('table.datatable').forEach((table) => {
+                if (table.dataset.dtInited === '1') return;
+    
+                const dt = new DataTable(table, {
+                    responsive: false,
+                    pageLength: 3,
+                    lengthMenu: [
+                        [3, 5, 10, 25, 50, -1],
+                        [3, 5, 10, 25, 50, 'All']
+                    ],
+                    order: [
+                        [0, 'desc']
+                    ],
+                    layout: {
+                        topStart: 'pageLength',
+                        topEnd: 'search',
+                        bottomStart: 'info',
+                        bottomEnd: 'paging'
+                    }
                 });
-            },
-            onTab() {
-                // biar width table aman saat tab hidden
-                setTimeout(() => {
-                    try {
-                        document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
-                        window.dispatchEvent(new Event('resize'));
-                    } catch (e) {}
-                }, 60);
-            }
-        }"
-        x-init="initDT()"
-    >
+    
+                table.dataset.dtInited = '1';
+                this.dts.push(dt);
+            });
+        },
+        onTab() {
+            // biar width table aman saat tab hidden
+            setTimeout(() => {
+                try {
+                    document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
+                    window.dispatchEvent(new Event('resize'));
+                } catch (e) {}
+            }, 60);
+        }
+    }" x-init="initDT()">
 
         {{-- ========================================================= FILTER DATE ========================================================= --}}
         <form method="GET" action="{{ route('project.index') }}" class="{{ $card }} p-4 sm:p-5">
@@ -167,8 +166,9 @@
                            border-light-eval-3 dark:border-dark-eval-2
                            hover:-translate-y-0.5 hover:shadow-md focus:outline-none"
                     :class="tab === '{{ $key }}'
-                        ? 'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30'
-                        : ''">
+                        ?
+                        'ring-2 ring-blue-500/25 dark:ring-blue-400/20 border-blue-500/30' :
+                        ''">
 
                     <div class="h-1.5 w-full rounded-full {{ $t['accent'] }}"
                         :class="tab === '{{ $key }}' ? 'opacity-100' : 'opacity-50'"></div>
@@ -209,88 +209,93 @@
                     </div>
                     <span class="{{ $badgeBase }} {{ $tabs['in_progress']['badge'] }}">In Progress</span>
                 </div>
-<div class="dt-wrap">
-  <div class="overflow-x-auto">
-    <table class="datatable w-full text-light-text dark:text-dark-text">
-                        <thead class="{{ $thead }}">
-                            <tr>
-                                <th class="{{ $th }}">Project Code</th>
-                                <th class="{{ $th }}">Project Name</th>
-                                <th class="{{ $th }}">Requestor Name</th>
-                                <th class="{{ $th }}">Priority</th>
-                                <th class="{{ $th }}">Progress %</th>
-                                <th class="{{ $th }}">Progress Date</th>
-                                <th class="{{ $th }}">Description</th>
-                                <th class="{{ $th }}">Start Date</th>
-                                <th class="{{ $th }}">End Date</th>
-                                <th class="{{ $th }}">Actual Start</th>
-                                <th class="{{ $th }}">Pending Minutes</th>
-                                <th class="{{ $th }}">History</th>
-                                <th class="{{ $th }} text-center">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
-                            @foreach ($inProgressProject as $project)
-                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                    <td class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
-                                        {{ $project->project_code ?? '-' }}
-                                    </td>
-                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }} text-center">
-                                        {{ $project->priority->priority_name ?? '-' }}
-                                    </td>
-                                    <td class="{{ $td }} text-right">
-                                        {{ $project->progress_percent ?? '-' }}%
-                                    </td>
-                                    <td class="{{ $td }} text-center">{{ $project->progress_date ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
-                                        {{ $project->description ?? '-' }}
-                                    </td>
-                                    <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}</td>
-                                    <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}</td>
-                                    <td class="{{ $td }} text-center">{{ $project->actual_start_date ?? '-' }}</td>
-                                    <td class="{{ $td }} text-right">{{ $project->total_pending_minutes ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-center">
-                                        <button onclick="showProjectModal({{ $project->id }})"
-                                            class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
-                                            Lihat Detail
-                                        </button>
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <div class="flex justify-center items-center gap-2">
-                                            <button
-                                                onclick="openEditModal(this)"
-                                                data-id="{{ $project->id }}"
-                                                data-code="{{ $project->project_code }}"
-                                                data-name="{{ $project->project_name }}"
-                                                data-progress="{{ $project->progress_percent }}"
-                                                data-status="{{ $project->status_id }}"
-                                                data-developer="{{ $project->developer_name ?? '' }}"
-                                                data-memo="{{ $project->memo ?? '' }}"
-                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
-                                                Update
-                                            </button>
-
-                                            <button onclick="openPendingModal({{ $project->id }})"
-                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white transition-colors">
-                                                Pending
-                                            </button>
-
-                                            <button onclick="openVoidModal({{ $project->id }})"
-                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
-                                                Void
-                                            </button>
-                                        </div>
-                                    </td>
+                <div class="dt-wrap">
+                    <div class="overflow-x-auto">
+                        <table class="datatable w-full text-light-text dark:text-dark-text">
+                            <thead class="{{ $thead }}">
+                                <tr>
+                                    <th class="{{ $th }}">Project Code</th>
+                                    <th class="{{ $th }}">Project Name</th>
+                                    <th class="{{ $th }}">Requestor Name</th>
+                                    <th class="{{ $th }}">Priority</th>
+                                    <th class="{{ $th }}">Progress %</th>
+                                    <th class="{{ $th }}">Progress Date</th>
+                                    <th class="{{ $th }}">Description</th>
+                                    <th class="{{ $th }}">Start Date</th>
+                                    <th class="{{ $th }}">End Date</th>
+                                    <th class="{{ $th }}">Actual Start</th>
+                                    <th class="{{ $th }}">Pending Minutes</th>
+                                    <th class="{{ $th }}">History</th>
+                                    <th class="{{ $th }} text-center">Action</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
 
-                    </table>
-                </div>
+                            <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                                @foreach ($inProgressProject as $project)
+                                    <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                        <td
+                                            class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
+                                            {{ $project->project_code ?? '-' }}
+                                        </td>
+                                        <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                        <td class="{{ $td }} text-center">
+                                            {{ $project->priority->priority_name ?? '-' }}
+                                        </td>
+                                        <td class="{{ $td }} text-right">
+                                            {{ $project->progress_percent ?? '-' }}%
+                                        </td>
+                                        <td class="{{ $td }} text-center">
+                                            {{ $project->progress_date ?? '-' }}</td>
+                                        <td
+                                            class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                            {{ $project->description ?? '-' }}
+                                        </td>
+                                        <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}
+                                        </td>
+                                        <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}
+                                        </td>
+                                        <td class="{{ $td }} text-center">
+                                            {{ $project->actual_start_date ?? '-' }}</td>
+                                        <td class="{{ $td }} text-right">
+                                            {{ $project->total_pending_minutes ?? '-' }}</td>
+                                        <td class="px-4 py-3 text-center">
+                                            <button onclick="showProjectModal({{ $project->id }})"
+                                                class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+                                                Lihat Detail
+                                            </button>
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <div class="flex justify-center items-center gap-2">
+                                                <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                                    data-code="{{ $project->project_code }}"
+                                                    data-name="{{ $project->project_name }}"
+                                                    data-progress="{{ $project->progress_percent }}"
+                                                    data-status="{{ $project->status_id }}"
+                                                    data-developer="{{ $project->developer_name ?? '' }}"
+                                                    data-memo="{{ $project->memo ?? '' }}"
+                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                                    Update
+                                                </button>
+
+                                                <button onclick="openPendingModal({{ $project->id }})"
+                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white transition-colors">
+                                                    Pending
+                                                </button>
+
+                                                <button onclick="openVoidModal({{ $project->id }})"
+                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                    Void
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+
+                        </table>
                     </div>
+                </div>
             </div>
 
             {{-- ================= WAITING ================= --}}
@@ -330,8 +335,10 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -343,7 +350,8 @@
                                                 Void
                                             </button>
 
-                                            <form action="{{ route('project.updateProgress', $project->id) }}" method="POST">
+                                            <form action="{{ route('project.updateProgress', $project->id) }}"
+                                                method="POST">
                                                 @csrf
                                                 <input type="hidden" name="status_id" value="2">
                                                 <button type="submit" onclick="return confirm('Apakah Anda Yakin?')"
@@ -399,8 +407,10 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -412,7 +422,8 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.updateStatus', $project->id) }}" method="POST" class="inline">
+                                        <form action="{{ route('project.updateStatus', $project->id) }}"
+                                            method="POST" class="inline">
                                             @csrf
                                             <input type="hidden" name="status_id" value="2">
                                             <button
@@ -470,10 +481,12 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
+                                    </td>
                                     <td class="{{ $td }}">{{ $project->progress_percent ?? '-' }}%</td>
                                     <td class="{{ $td }}">{{ $project->progress_date ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -485,7 +498,8 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.continueProgress', $project->id) }}" method="POST" class="inline">
+                                        <form action="{{ route('project.continueProgress', $project->id) }}"
+                                            method="POST" class="inline">
                                             @csrf
                                             <input type="hidden" name="status_id" value="2">
                                             <button
@@ -540,11 +554,14 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->notes ?? '-' }}
                                     </td>
                                     <td class="{{ $td }}">{{ $project->start_date ?? '-' }}</td>
@@ -566,7 +583,8 @@
             <div class="p-6 text-center text-gray-500">
                 <svg class="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                        stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
                 Loading...
@@ -603,7 +621,8 @@
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Pilih Requestor <span class="text-red-500">*</span>
                 </label>
-                <input type="text" id="user-search" placeholder="Cari user..." required class="{{ $input }}">
+                <input type="text" id="user-search" placeholder="Cari user..." required
+                    class="{{ $input }}">
                 <input type="hidden" name="requestor_id" id="user-id" required>
 
                 <ul id="search-results"
@@ -612,8 +631,7 @@
                     @foreach ($users as $user)
                         <li class="px-3 py-2 cursor-pointer border-b border-light-eval-3 dark:border-dark-eval-2
                                    hover:bg-light-eval-2 dark:hover:bg-dark-eval-1 text-light-text dark:text-dark-text"
-                            data-id="{{ $user->id }}">
-                            {{ $user->name }}
+                            data-id="{{ $user->id }}"> {{ $user->name }}
                         </li>
                     @endforeach
                 </ul>
@@ -627,7 +645,7 @@
                 <select name="priority_id" required class="{{ $input }}">
                     <option value="" hidden>-- Pilih Priority --</option>
                     @foreach ($priorities as $prt)
-                        <option value="{{ $prt->id }}">{{ $prt->priority_name }}</option>
+                        <option value="{{ $prt->id }}">{{ $prt->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -660,7 +678,8 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('projectModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="button" onclick="closeModal('projectModal')"
+                    class="{{ $btnGhost }}">Cancel</button>
                 <button type="submit" class="{{ $btnPrimary }}">Save</button>
             </div>
         </form>
@@ -673,14 +692,16 @@
             @method('PUT')
 
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project Code</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
+                    Code</label>
                 <input type="text" id="modal_project_code" readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
                            border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project Name</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
+                    Name</label>
                 <input type="text" id="modal_project_name" readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
                            border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
@@ -688,7 +709,8 @@
 
             {{-- Developer dropdown --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer Name</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer
+                    Name</label>
 
                 <div id="selected-developers"
                     class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
@@ -707,7 +729,8 @@
                     class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
                            bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
                     @foreach ($developers as $dev)
-                        <label class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer
+                        <label
+                            class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer
                                       hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
                             <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
                             <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
@@ -717,16 +740,18 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Progress Date</label>
-                <input type="datetime-local" name="progress_date" id="modal_progress_date" class="{{ $input }}">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Progress
+                    Date</label>
+                <input type="datetime-local" name="progress_date" id="modal_progress_date"
+                    class="{{ $input }}">
             </div>
 
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Progress Percent <span class="text-red-500">*</span>
                 </label>
-                <input type="number" name="progress_percent" id="modal_progress_percent" min="0" max="100" step="1" required
-                    class="{{ $input }}">
+                <input type="number" name="progress_percent" id="modal_progress_percent" min="0"
+                    max="100" step="1" required class="{{ $input }}">
             </div>
 
             <div class="mb-4">
@@ -749,7 +774,8 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('editProgressModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="button" onclick="closeModal('editProgressModal')"
+                    class="{{ $btnGhost }}">Cancel</button>
                 <button type="submit" class="{{ $btnPrimary }}">Save</button>
             </div>
         </form>
@@ -765,11 +791,13 @@
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Reason <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="reason" required placeholder="Tulis alasan pending..." class="{{ $input }}">
+                <input type="text" name="reason" required placeholder="Tulis alasan pending..."
+                    class="{{ $input }}">
             </div>
 
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('pendingModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="button" onclick="closeModal('pendingModal')"
+                    class="{{ $btnGhost }}">Cancel</button>
                 <button type="submit" class="{{ $btnPrimary }}">Save</button>
             </div>
         </form>
@@ -794,7 +822,8 @@
             </div>
 
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('voidModal')" class="{{ $btnGhost }}">Cancel</button>
+                <button type="button" onclick="closeModal('voidModal')"
+                    class="{{ $btnGhost }}">Cancel</button>
                 <button type="submit"
                     class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
                            bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm">
@@ -981,23 +1010,24 @@
                     .each(function() {
                         $(this).removeClass().addClass(
                             `rounded-lg border px-3 py-2 text-sm transition ` +
-                            (dark
-                                ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400'
-                                : 'bg-white border-gray-300 text-gray-800 placeholder-gray-400')
+                            (dark ?
+                                'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400' :
+                                'bg-white border-gray-300 text-gray-800 placeholder-gray-400')
                         );
                     });
 
                 $('div.dt-paging button, div.dataTables_paginate a').each(function() {
                     $(this).removeClass().addClass(
                         `px-3 py-1 border rounded-lg mx-1 text-sm font-medium transition ` +
-                        (dark
-                            ? 'border-gray-700 text-gray-100 hover:bg-gray-700'
-                            : 'border-gray-300 text-gray-800 hover:bg-gray-100')
+                        (dark ?
+                            'border-gray-700 text-gray-100 hover:bg-gray-700' :
+                            'border-gray-300 text-gray-800 hover:bg-gray-100')
                     );
                 });
 
                 $('div.dt-info, div.dataTables_info').each(function() {
-                    $(this).removeClass().addClass(dark ? 'text-gray-400 text-sm mt-2' : 'text-gray-600 text-sm mt-2');
+                    $(this).removeClass().addClass(dark ? 'text-gray-400 text-sm mt-2' :
+                        'text-gray-600 text-sm mt-2');
                 });
             };
 
@@ -1012,39 +1042,53 @@
     </script>
 
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
 
-        .date-input::-webkit-calendar-picker-indicator { filter: invert(0); cursor: pointer; }
-        .dark .date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-        .date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.7; }
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
+
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
+        }
     </style>
 
     <style>
-  /* Biar control DT (Entries + Search) gak kepotong */
-  .dt-layout-row {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 12px !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-  }
-  .dt-layout-cell {
-    flex: 1 1 auto !important;
-    min-width: 220px !important; /* penting biar select entries ga ke-clip */
-  }
+        /* Biar control DT (Entries + Search) gak kepotong */
+        .dt-layout-row {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 12px !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
 
-  /* Length select biar keliatan full */
-  .dt-length select {
-    min-width: 70px !important;
-    border-radius: 0 !important;
-  }
+        .dt-layout-cell {
+            flex: 1 1 auto !important;
+            min-width: 220px !important;
+            /* penting biar select entries ga ke-clip */
+        }
+
+        /* Length select biar keliatan full */
+        .dt-length select {
+            min-width: 70px !important;
+            border-radius: 0 !important;
+        }
 
 
-  /* Search input biar enak */
-  .dt-search input {
-    min-width: 220px !important;
-  }
-</style>
+        /* Search input biar enak */
+        .dt-search input {
+            min-width: 220px !important;
+        }
+    </style>
 
 
 

@@ -49,13 +49,7 @@
                             </ul>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nama Pembuat <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="nama_pembuat" placeholder="Enter Nama Pembuat..." 
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
-                        </div>
+
 
                         {{-- IT Support --}}
                         <div class="mb-4">
@@ -65,10 +59,10 @@
                             <select name="support_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="" hidden>-- Choose IT Support --</option>
-                                @foreach ($developers as $dev)
-                                    <option value="{{ $dev->id }}"
-                                        {{ old('support_id') == $dev->id ? 'selected' : '' }}>
-                                        {{ $dev->name }}
+                                @foreach ($supports as $sup)
+                                    <option value="{{ $sup->id }}"
+                                        {{ old('support_id') == $sup->id ? 'selected' : '' }}>
+                                        {{ $sup->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -79,13 +73,13 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Category <span class="text-red-500">*</span>
                             </label>
-                            <select name="problem_category_id" required
+                            <select name="category_id" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="" hidden>-- Choose Category --</option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}"
-                                        {{ old('problem_category_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->problem_category_name }}
+                                        {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -98,7 +92,7 @@
                             <input type="text" id="assets-search" placeholder="Cari assets..."
                                 value="{{ old('assets_search') }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}">
+                            <input type="hidden" name="asset_id" id="assets-id" value="{{ old('asset_id') }}">
                             <ul id="assets-results"
                                 class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
                                 @foreach ($assets as $ass)
@@ -130,7 +124,7 @@
                                 @foreach ($priorities as $prt)
                                     <option value="{{ $prt->id }}"
                                         {{ old('priority_id') == $prt->id ? 'selected' : '' }}>
-                                        {{ $prt->priority_name }}
+                                        {{ $prt->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -147,8 +141,8 @@
                                 @foreach ($statuses as $stat)
                                     @if (!in_array($stat->id, [4, 5, 6]))
                                         <option value="{{ $stat->id }}"
-                                            data-name="{{ strtolower($stat->status_name) }}">
-                                            {{ $stat->status_name }}
+                                            data-name="{{ strtolower($stat->name) }}">
+                                            {{ $stat->name }}
                                         </option>
                                     @endif
                                 @endforeach
@@ -399,8 +393,8 @@
                 });
             @endif
 
-            @if (old('assets_id'))
-                const assetsId = "{{ old('assets_id') }}";
+            @if (old('asset_id'))
+                const assetsId = "{{ old('asset_id') }}";
                 const assetsSearch = document.getElementById('assets-search');
                 const assetsResults = document.querySelectorAll('#assets-results li');
                 assetsResults.forEach(li => {

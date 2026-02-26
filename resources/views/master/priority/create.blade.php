@@ -25,7 +25,7 @@
 
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama priority</label>
-                            <input type="text" name="priority_name" value="{{ old('priority_name') }}" 
+                            <input type="text" name="name" value="{{ old('name') }}" 
                                 class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 bg-white text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
                                 placeholder="Contoh: Low, Medium, Dan High." 
                                 required>

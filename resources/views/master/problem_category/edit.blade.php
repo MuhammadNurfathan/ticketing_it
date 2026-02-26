@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Problem Category') }}
+            {{ __('Edit Problem category') }}
         </h2>
     </x-slot>
 
@@ -20,13 +20,13 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('problem_categories.update', $problemCategory) }}" method="POST">
+                    <form action="{{ route('categories.update', $category) }}" method="POST">
                         @csrf
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Problem Category</label>
-                            <input type="text" name="problem_category_name" value="{{ old('problem_category_name', $problemCategory->problem_category_name) }}" 
+                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Problem category</label>
+                            <input type="text" name="name" value="{{ old('name', $category->name) }}" 
                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 
                                 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 
                                 focus:outline-none focus:ring-blue-500 focus:border-blue-500"  placeholder="Contoh: Netsuite Error"

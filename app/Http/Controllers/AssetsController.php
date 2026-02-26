@@ -22,7 +22,6 @@ class AssetsController extends Controller
     public function store(AssetStoreRequest $request)
     {
         $data = $request->validated();
-
         Assets::create($data);
 
         return redirect()
@@ -38,7 +37,6 @@ class AssetsController extends Controller
     public function update(AssetUpdateRequest $request, Assets $asset)
     {
         $data = $request->validated();
-
         $asset->update($data);
 
         return redirect()

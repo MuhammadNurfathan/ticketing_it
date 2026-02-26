@@ -1,19 +1,26 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-use Carbon\Traits\Timestamp;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Feedback extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['ticket_id','description','rating'];
+    use HasFactory;
+
     protected $table = 'feedback';
-    
+
+    protected $fillable = [
+    'ticket_id',
+    'speed_rating',
+    'waiting_rating',
+    'solution_rating',
+    'comment',
+];
+
     public function ticket()
     {
-        return $this->belongsTo(Ticket::class,'ticket_id')->withTrashed();
+        return $this->belongsTo(Ticket::class, 'ticket_id');
     }
 }

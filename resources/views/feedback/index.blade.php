@@ -56,18 +56,22 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
-                                 bg-light-eval-2 dark:bg-dark-eval-2
-                                 text-light-text dark:text-dark-text
-                                 border border-light-eval-3 dark:border-dark-eval-2">
-                        Total: {{ $feedback->count() }}
-                    </span>
-
-                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
-                                 bg-blue-600/10 dark:bg-blue-400/10
-                                 text-blue-700 dark:text-blue-300">
-                        Average: {{ $Rate }} ⭐
-                    </span>
+                  <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+             bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300">
+    Avg Speed: {{ $avgSpeed }} ⭐
+</span>
+<span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+             bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300">
+    Avg Waiting: {{ $avgWaiting }} ⭐
+</span>
+<span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+             bg-blue-600/10 dark:bg-blue-400/10 text-blue-700 dark:text-blue-300">
+    Avg Solution: {{ $avgSolution }} ⭐
+</span>
+<span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold
+             bg-green-600/10 dark:bg-green-400/10 text-green-700 dark:text-green-300">
+    Overall: {{ $avgOverall }} ⭐
+</span>
                 </div>
             </div>
 
@@ -78,8 +82,10 @@
                             <th class="{{ $th }}">Ticket</th>
                             <th class="{{ $th }}">Requestor</th>
                             <th class="{{ $th }}">IT Support</th>
-                            <th class="{{ $th }}">Deskripsi</th>
-                            <th class="{{ $th }}">Rating</th>
+                            <th class="{{ $th }}">Speed Rating</th>
+                            <th class="{{ $th }}">Waiting Rating</th>
+                            <th class="{{ $th }}">Solution Rating</th>
+                            <th class="{{ $th }}">Comment</th>
                         </tr>
                     </thead>
 
@@ -93,24 +99,24 @@
                                 </td>
 
                                 <td class="{{ $td }}">
-                                    {{ $f->ticket->nama_pembuat ?? '-' }}
+                                    {{ $f->ticket->user->username ?? '-' }}
                                 </td>
 
                                 <td class="{{ $td }}">
                                     {{ $f->ticket->support->name ?? '-' }}
                                 </td>
-
-                                <td class="px-4 py-3 text-sm {{ $muted }} max-w-xl break-words whitespace-normal">
-                                    {{ $f->description ?? '-' }}
+                                <td class="{{ $td }}">
+                                    {{ $f->speed_rating ?? '-' }}
+                                </td>
+                                <td class="{{ $td }}">
+                                    {{ $f->waiting_rating ?? '-' }}
+                                </td>
+                                <td class="{{ $td }}">
+                                    {{ $f->solution_rating ?? '-' }}
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold
-                                                 bg-light-eval-2 dark:bg-dark-eval-2
-                                                 text-light-text dark:text-dark-text
-                                                 border border-light-eval-3 dark:border-dark-eval-2">
-                                        {{ $f->rating ?? '-' }}/5
-                                    </span>
+                                <td class="px-4 py-3 text-sm {{ $muted }} max-w-xl break-words whitespace-normal">
+                                    {{ $f->comment ?? '-' }}
                                 </td>
                             </tr>
                         @endforeach

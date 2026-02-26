@@ -14,12 +14,12 @@
                         @csrf
 
                         <div class="mb-4">
-                            <label for="department_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Department</label>
-                            <input type="text" name="department_name" id="department_name"
-                                   value="{{ old('department_name') }}"
-                                   class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('department_name') border-red-500 dark:border-red-600 @enderror"
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Department</label>
+                            <input type="text" name="name" id="name"
+                                   value="{{ old('name') }}"
+                                   class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('name') border-red-500 dark:border-red-600 @enderror"
                                    placeholder="Contoh: Jakarta" required>
-                            @error('department_name')
+                            @error('name')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
@@ -32,7 +32,7 @@
                                 <option value="">-- Pilih Location --</option>
                                 @foreach ($locations as $location)
                                     <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
-                                        {{ $location->location_name }}
+                                        {{ $location->name }}
                                     </option>
                                 @endforeach
                             </select>
