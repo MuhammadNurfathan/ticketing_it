@@ -17,6 +17,8 @@ class Pending extends Model
         'pending_end',
         'reason',
         'duration_minutes',
+        'count_to_effective',
+        'duration_override',
     ];
 
     protected $casts = [

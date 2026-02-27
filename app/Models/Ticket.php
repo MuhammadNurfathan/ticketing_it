@@ -157,7 +157,7 @@ class Ticket extends Model
             'locations'  => Location::all(),
             'users'      => User::all(),
             'assets'     => Assets::all(),
-            'statuses'   => Status::all(),
+            'statuses'   => Status::where('context', 'ticket')->get(),
             'categories' => Category::all(),
             'supports'   => User::where('role_id', 1)->get(),
             'priorities' => Priority::all(),

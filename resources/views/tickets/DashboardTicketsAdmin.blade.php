@@ -472,7 +472,7 @@
                                         <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->time_spent ?? '-' }} menit</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">
-                                            {{ $ticket->feedback?->description ?? '-' }}
+                                            {{ $ticket->feedback?->comment ?? '-' }}
                                         </td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">
                                             {{ $ticket->solution ?? '-' }}

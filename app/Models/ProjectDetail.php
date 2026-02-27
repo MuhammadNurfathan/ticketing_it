@@ -9,12 +9,12 @@ class ProjectDetail extends Model
 {
     use HasFactory;
 
-    protected $table = 'project_detail';
+    protected $table = 'project_details';
 
     protected $fillable = [
         'project_header_id',
         'progress_date',
-        'memo',
+        'description',
         'status_id',
         'progress_percent',
         'developer_id',
@@ -31,7 +31,8 @@ class ProjectDetail extends Model
 
     public function status()
     {
-        return $this->belongsTo(Status::class, 'status_id');
+        return $this->belongsTo(Status::class, 'status_id')
+            ->where('context', 'project');
     }
 
     public function developer()

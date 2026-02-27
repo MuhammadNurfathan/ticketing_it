@@ -85,13 +85,20 @@
                 'subtitle' => 'Project yang sedang pending',
             ],
         ];
+
+        // ✅ mapping status id by type (biar ga hardcode)
+        $statusMap = collect($statuses ?? [])->keyBy('type');
+        $stWaiting = optional($statusMap->get('waiting'))->id;
+        $stInProgress = optional($statusMap->get('in_progress'))->id;
+        $stDone = optional($statusMap->get('done'))->id;
+        $stVoid = optional($statusMap->get('void'))->id;
+        $stPending = optional($statusMap->get('pending'))->id;
     @endphp
 
     <div class="px-4 sm:px-6 lg:px-8 py-6 space-y-6" x-data="{
         tab: 'waiting',
         dts: [],
         initDT() {
-            // init aman: per table + guard
             if (this.dts.length) return;
     
             document.querySelectorAll('table.datatable').forEach((table) => {
@@ -120,7 +127,6 @@
             });
         },
         onTab() {
-            // biar width table aman saat tab hidden
             setTimeout(() => {
                 try {
                     document.querySelectorAll('table.datatable').forEach(t => t.style.width = '100%');
@@ -173,19 +179,13 @@
                     <div class="h-1.5 w-full rounded-full {{ $t['accent'] }}"
                         :class="tab === '{{ $key }}' ? 'opacity-100' : 'opacity-50'"></div>
 
-                    <div class="mt-4 flex items-start justify-between gap-3">
-                        <div class="flex items-center gap-3">
-
-                            <div>
-                                <div class="text-sm font-semibold text-light-text dark:text-dark-text">
-                                    {{ $t['label'] }}
-                                </div>
-                                <div class="text-xs mt-0.5 {{ $muted2 }}">
-                                    {{ $t['subtitle'] }}
-                                </div>
-                            </div>
+                    <div class="mt-4">
+                        <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                            {{ $t['label'] }}
                         </div>
-
+                        <div class="text-xs mt-0.5 {{ $muted2 }}">
+                            {{ $t['subtitle'] }}
+                        </div>
                     </div>
 
                     <div class="mt-4 text-3xl font-bold tracking-tight text-light-text dark:text-dark-text">
@@ -195,7 +195,7 @@
             @endforeach
         </div>
 
-        {{-- ========================================================= TABLE AREA (ONLY ONE) ========================================================= --}}
+        {{-- ========================================================= TABLE AREA ========================================================= --}}
         <div id="table-area" class="space-y-6">
 
             {{-- ================= IN PROGRESS ================= --}}
@@ -209,92 +209,102 @@
                     </div>
                     <span class="{{ $badgeBase }} {{ $tabs['in_progress']['badge'] }}">In Progress</span>
                 </div>
-                <div class="dt-wrap">
-                    <div class="overflow-x-auto">
-                        <table class="datatable w-full text-light-text dark:text-dark-text">
-                            <thead class="{{ $thead }}">
-                                <tr>
-                                    <th class="{{ $th }}">Project Code</th>
-                                    <th class="{{ $th }}">Project Name</th>
-                                    <th class="{{ $th }}">Requestor Name</th>
-                                    <th class="{{ $th }}">Priority</th>
-                                    <th class="{{ $th }}">Progress %</th>
-                                    <th class="{{ $th }}">Progress Date</th>
-                                    <th class="{{ $th }}">Description</th>
-                                    <th class="{{ $th }}">Start Date</th>
-                                    <th class="{{ $th }}">End Date</th>
-                                    <th class="{{ $th }}">Actual Start</th>
-                                    <th class="{{ $th }}">Pending Minutes</th>
-                                    <th class="{{ $th }}">History</th>
-                                    <th class="{{ $th }} text-center">Action</th>
-                                </tr>
-                            </thead>
 
-                            <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
-                                @foreach ($inProgressProject as $project)
-                                    <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
-                                        <td
-                                            class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
-                                            {{ $project->project_code ?? '-' }}
-                                        </td>
-                                        <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
-                                        <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                        <td class="{{ $td }} text-center">
-                                            {{ $project->priority->priority_name ?? '-' }}
-                                        </td>
-                                        <td class="{{ $td }} text-right">
-                                            {{ $project->progress_percent ?? '-' }}%
-                                        </td>
-                                        <td class="{{ $td }} text-center">
-                                            {{ $project->progress_date ?? '-' }}</td>
-                                        <td
-                                            class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
-                                            {{ $project->description ?? '-' }}
-                                        </td>
-                                        <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}
-                                        </td>
-                                        <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}
-                                        </td>
-                                        <td class="{{ $td }} text-center">
-                                            {{ $project->actual_start_date ?? '-' }}</td>
-                                        <td class="{{ $td }} text-right">
-                                            {{ $project->total_pending_minutes ?? '-' }}</td>
-                                        <td class="px-4 py-3 text-center">
-                                            <button onclick="showProjectModal({{ $project->id }})"
-                                                class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
-                                                Lihat Detail
+                <div class="overflow-x-auto">
+                    <table class="datatable w-full text-light-text dark:text-dark-text">
+                        <thead class="{{ $thead }}">
+                            <tr>
+                                <th class="{{ $th }}">Project Code</th>
+                                <th class="{{ $th }}">Project Name</th>
+                                <th class="{{ $th }}">Requestor Name</th>
+                                <th class="{{ $th }}">Priority</th>
+                                <th class="{{ $th }}">Progress %</th>
+                                <th class="{{ $th }}">Progress Date</th>
+                                <th class="{{ $th }}">Description</th>
+                                <th class="{{ $th }}">Start Date</th>
+                                <th class="{{ $th }}">End Date</th>
+                                <th class="{{ $th }}">Actual Start</th>
+                                <th class="{{ $th }}">Pending Minutes</th>
+                                <th class="{{ $th }}">History</th>
+                                <th class="{{ $th }} text-center">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
+                            @foreach ($inProgressProject as $project)
+                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
+                                    <td
+                                        class="px-4 py-3 text-sm font-semibold text-center text-light-text dark:text-dark-text">
+                                        {{ $project->project_code ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
+                                    <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">{{ $project->priority->name ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }} text-right">
+                                        {{ $project->progress_percent ?? '-' }}%</td>
+                                    <td class="{{ $td }} text-center">{{ $project->progress_date ?? '-' }}
+                                    </td>
+                                    <td
+                                        class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
+                                        {{ $project->description ?? '-' }}
+                                    </td>
+                                    <td class="{{ $td }} text-center">{{ $project->start_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">{{ $project->end_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-center">
+                                        {{ $project->actual_start_date ?? '-' }}</td>
+                                    <td class="{{ $td }} text-right">
+                                        {{ $project->total_pending_minutes ?? '-' }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button onclick="showProjectModal({{ $project->id }})"
+                                            class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+                                            Lihat Detail
+                                        </button>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <div class="flex justify-center items-center gap-2 flex-wrap">
+
+                                            {{-- UPDATE PROGRESS --}}
+                                            <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
+                                                data-code="{{ $project->project_code }}"
+                                                data-name="{{ $project->project_name }}"
+                                                data-progress="{{ $project->progress_percent }}"
+                                                data-developer-id="{{ $project->dev_id ?? ($project->developer_id ?? '') }}"
+                                                data-developer-name="{{ $project->developer->name ?? '' }}"
+                                                data-description="{{ $project->description ?? '' }}"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                                Update
                                             </button>
-                                        </td>
-                                        <td class="px-4 py-3 text-center">
-                                            <div class="flex justify-center items-center gap-2">
-                                                <button onclick="openEditModal(this)" data-id="{{ $project->id }}"
-                                                    data-code="{{ $project->project_code }}"
-                                                    data-name="{{ $project->project_name }}"
-                                                    data-progress="{{ $project->progress_percent }}"
-                                                    data-status="{{ $project->status_id }}"
-                                                    data-developer="{{ $project->developer_name ?? '' }}"
-                                                    data-memo="{{ $project->memo ?? '' }}"
-                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
-                                                    Update
-                                                </button>
 
-                                                <button onclick="openPendingModal({{ $project->id }})"
-                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white transition-colors">
-                                                    Pending
-                                                </button>
+                                            {{-- DONE --}}
+                                            <button onclick="openDoneModal(this)" data-id="{{ $project->id }}"
+                                                data-code="{{ $project->project_code }}"
+                                                data-name="{{ $project->project_name }}"
+                                                data-developer-id="{{ $project->dev_id ?? ($project->developer_id ?? '') }}"
+                                                data-developer-name="{{ $project->developer->name ?? '' }}"
+                                                data-description="{{ $project->description ?? '' }}"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 hover:bg-green-700 text-white transition-colors">
+                                                Done
+                                            </button>
 
-                                                <button onclick="openVoidModal({{ $project->id }})"
-                                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
-                                                    Void
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
+                                            {{-- PENDING --}}
+                                            <button onclick="openPendingModal({{ $project->id }})"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-600 hover:bg-orange-700 text-white transition-colors">
+                                                Pending
+                                            </button>
 
-                        </table>
-                    </div>
+                                            {{-- VOID --}}
+                                            <button onclick="openVoidModal({{ $project->id }})"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+                                                Void
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
                 </div>
             </div>
 
@@ -335,8 +345,7 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
-                                    </td>
+                                    <td class="{{ $td }}">{{ $project->priority->name ?? '-' }}</td>
                                     <td
                                         class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
@@ -353,7 +362,6 @@
                                             <form action="{{ route('project.updateProgress', $project->id) }}"
                                                 method="POST">
                                                 @csrf
-                                                <input type="hidden" name="status_id" value="2">
                                                 <button type="submit" onclick="return confirm('Apakah Anda Yakin?')"
                                                     class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
                                                     Pilih
@@ -394,7 +402,6 @@
                                 <th class="{{ $th }}">Start Date</th>
                                 <th class="{{ $th }}">End Date</th>
                                 <th class="{{ $th }}">History</th>
-                                <th class="{{ $th }} text-center">Action</th>
                             </tr>
                         </thead>
 
@@ -407,8 +414,7 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
-                                    </td>
+                                    <td class="{{ $td }}">{{ $project->priority->name ?? '-' }}</td>
                                     <td
                                         class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
@@ -421,18 +427,7 @@
                                             Lihat Detail
                                         </button>
                                     </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.updateStatus', $project->id) }}"
-                                            method="POST" class="inline">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="2">
-                                            <button
-                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors"
-                                                onclick="return confirm('Apakah Anda Yakin?')">
-                                                Cancel
-                                            </button>
-                                        </form>
-                                    </td>
+                                    
                                 </tr>
                             @endforeach
                         </tbody>
@@ -481,8 +476,7 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
-                                    </td>
+                                    <td class="{{ $td }}">{{ $project->priority->name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->progress_percent ?? '-' }}%</td>
                                     <td class="{{ $td }}">{{ $project->progress_date ?? '-' }}</td>
                                     <td
@@ -498,16 +492,10 @@
                                         </button>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('project.continueProgress', $project->id) }}"
-                                            method="POST" class="inline">
-                                            @csrf
-                                            <input type="hidden" name="status_id" value="2">
-                                            <button
-                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-                                                onclick="return confirm('Apakah Anda Yakin?')">
-                                                Continue
-                                            </button>
-                                        </form>
+                                        <button onclick="openContinueModal({{ $project->id }})"
+                                            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                            Continue
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -516,6 +504,59 @@
                     </table>
                 </div>
             </div>
+
+            <x-modal-form id="continueModal" title="Continue Project" size="max-w-md">
+                <form id="continueForm" method="POST">
+                    @csrf
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Developer yang Continue-in <span class="text-red-500">*</span>
+                        </label>
+                        <select name="developer_id" required class="{{ $input }}">
+                            <option value="" hidden>-- Pilih Developer --</option>
+                            @foreach ($developers as $dev)
+                                <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                            Pakai durasi manual?
+                        </label>
+                        <div class="flex items-center gap-4 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="use_override" value="0" checked
+                                    onclick="toggleOverride(false)">
+                                <span>Tidak (auto hitung)</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="use_override" value="1"
+                                    onclick="toggleOverride(true)">
+                                <span>Ya (manual)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4" id="overrideBox" style="display:none;">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Duration Override (menit)
+                        </label>
+                        <input type="number" min="0" name="duration_override" class="{{ $input }}"
+                            placeholder="cth: 30">
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button" onclick="closeModal('continueModal')"
+                            class="{{ $btnGhost }}">Cancel</button>
+                        <button type="submit" class="{{ $btnPrimary }}"
+                            onclick="return confirm('Yakin continue project ini?')">
+                            Continue
+                        </button>
+                    </div>
+                </form>
+            </x-modal-form>
 
             {{-- ================= VOID ================= --}}
             <div x-show="tab==='void'" x-cloak class="{{ $card }} p-4 sm:p-5">
@@ -554,8 +595,7 @@
                                     <td class="{{ $td }}">{{ $project->project_name ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->request_date ?? '-' }}</td>
                                     <td class="{{ $td }}">{{ $project->requestor->name ?? '-' }}</td>
-                                    <td class="{{ $td }}">{{ $project->priority->priority_name ?? '-' }}
-                                    </td>
+                                    <td class="{{ $td }}">{{ $project->priority->name ?? '-' }}</td>
                                     <td
                                         class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words whitespace-normal">
                                         {{ $project->description ?? '-' }}
@@ -596,9 +636,9 @@
     <x-modal-form id="projectModal" title="Create Project" size="max-w-4xl">
         <form action="{{ route('project.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+
             <input type="hidden" name="from" value="user">
 
-            {{-- Project Code --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Project Code <span class="text-red-500">*</span>
@@ -608,7 +648,6 @@
                            border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
-            {{-- Project Name --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Project Name <span class="text-red-500">*</span>
@@ -616,7 +655,6 @@
                 <input type="text" name="project_name" required class="{{ $input }}">
             </div>
 
-            {{-- User Search --}}
             <div class="mb-4 relative">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Pilih Requestor <span class="text-red-500">*</span>
@@ -631,13 +669,13 @@
                     @foreach ($users as $user)
                         <li class="px-3 py-2 cursor-pointer border-b border-light-eval-3 dark:border-dark-eval-2
                                    hover:bg-light-eval-2 dark:hover:bg-dark-eval-1 text-light-text dark:text-dark-text"
-                            data-id="{{ $user->id }}"> {{ $user->name }}
+                            data-id="{{ $user->id }}">
+                            {{ $user->name }}
                         </li>
                     @endforeach
                 </ul>
             </div>
 
-            {{-- Priority --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Priority <span class="text-red-500">*</span>
@@ -650,10 +688,9 @@
                 </select>
             </div>
 
-            {{-- Status hidden --}}
-            <input type="hidden" name="status_id" value="1">
+            {{-- optional: status hidden (tapi backend harus tetap set waiting biar aman) --}}
+            <input type="hidden" name="status_id" value="{{ $stWaiting }}">
 
-            {{-- Description --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Description <span class="text-red-500">*</span>
@@ -661,7 +698,6 @@
                 <input type="text" name="description" required class="{{ $input }}">
             </div>
 
-            {{-- Start & End --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="mb-4">
                     <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
@@ -685,7 +721,7 @@
         </form>
     </x-modal-form>
 
-    {{-- ========================================================= MODAL: EDIT PROGRESS ========================================================= --}}
+    {{-- ========================================================= MODAL: EDIT PROGRESS (IN PROGRESS) ========================================================= --}}
     <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
         <form id="editProgressForm" method="POST">
             @csrf
@@ -709,8 +745,7 @@
 
             {{-- Developer dropdown --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer
-                    Name</label>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer</label>
 
                 <div id="selected-developers"
                     class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
@@ -723,22 +758,23 @@
                     </svg>
                 </div>
 
-                <input type="hidden" name="developer_name" id="developer_name">
+                <input type="hidden" name="developer_id" id="developer_id">
 
                 <div id="developer-dropdown"
                     class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
                            bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
                     @foreach ($developers as $dev)
                         <label
-                            class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer
-                                      hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
-                            <input type="checkbox" value="{{ $dev->name }}" class="dev-checkbox">
+                            class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
+                            <input type="checkbox" value="{{ $dev->id }}" data-name="{{ $dev->name }}"
+                                class="dev-checkbox">
                             <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
+            {{-- progress date tetap ada (buat log detail) --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Progress
                     Date</label>
@@ -754,24 +790,13 @@
                     max="100" step="1" required class="{{ $input }}">
             </div>
 
+            {{-- ✅ memo dibuang -> pakai description --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Memo</label>
-                <textarea name="memo" id="modal_memo" rows="3" class="{{ $input }}"></textarea>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Description</label>
+                <textarea name="description" id="modal_description" rows="3" class="{{ $input }}"></textarea>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Status <span class="text-red-500">*</span>
-                </label>
-                <select name="status_id" id="modal_status_id" required class="{{ $input }}">
-                    <option value="">-- Pilih Status --</option>
-                    @foreach ($statuses as $status)
-                        @if (in_array($status->id, [2, 3]))
-                            <option value="{{ $status->id }}">{{ $status->status_name }}</option>
-                        @endif
-                    @endforeach
-                </select>
-            </div>
+            {{-- ✅ status dropdown dibuang (default in_progress by controller) --}}
 
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeModal('editProgressModal')"
@@ -781,18 +806,134 @@
         </form>
     </x-modal-form>
 
+    {{-- ========================================================= MODAL: DONE PROJECT ========================================================= --}}
+    <x-modal-form id="doneModal" title="Done Project" size="max-w-3xl">
+        <form id="doneForm" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
+                    Code</label>
+                <input type="text" id="done_project_code" readonly
+                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
+                    Name</label>
+                <input type="text" id="done_project_name" readonly
+                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+            </div>
+
+            {{-- Developer (id) --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer</label>
+
+                <div id="selected-developers-done"
+                    class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
+                           bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
+                           border-light-eval-3 dark:border-dark-eval-2">
+                    <span id="selected-text-done" class="truncate">Pilih Developer...</span>
+                    <svg id="dropdown-icon-done" class="w-4 h-4 transform transition-transform duration-200"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+
+                <input type="hidden" name="developer_id" id="developer_id_done">
+
+                <div id="developer-dropdown-done"
+                    class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
+                           bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+                    @foreach ($developers as $dev)
+                        <label
+                            class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
+                            <input type="checkbox" value="{{ $dev->id }}" data-name="{{ $dev->name }}"
+                                class="dev-checkbox-done">
+                            <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- ✅ tidak ada progress date, tidak ada status, progress auto 100% by controller --}}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Description</label>
+                <textarea name="description" id="done_description" rows="3" class="{{ $input }}"></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                    Tambahkan total pending duration ke Effective End Date?
+                </label>
+                <div class="flex items-center gap-4 text-sm">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="apply_pending_duration" value="1" checked>
+                        <span>YES</span>
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="apply_pending_duration" value="0">
+                        <span>NO</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeModal('doneModal')"
+                    class="{{ $btnGhost }}">Cancel</button>
+                <button type="submit"
+                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                           bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm"
+                    onclick="return confirm('Yakin set project ini DONE?')">
+                    Done
+                </button>
+            </div>
+        </form>
+    </x-modal-form>
+
     {{-- ========================================================= MODAL: PENDING ========================================================= --}}
     <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
         <form id="pendingForm" method="POST">
             @csrf
+
             <input type="hidden" name="id_project_header" id="pending_project_id">
 
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Reason <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="reason" required placeholder="Tulis alasan pending..."
-                    class="{{ $input }}">
+                <input type="text" name="reason" required class="{{ $input }}">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Developer yang Pending-in <span class="text-red-500">*</span>
+                </label>
+                <select name="developer_id" required class="{{ $input }}">
+                    <option value="" hidden>-- Pilih Developer --</option>
+                    @foreach ($developers as $dev)
+                        <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                    Tambahkan duration pending ke Effective End Date?
+                </label>
+                <div class="flex items-center gap-4 text-sm">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="count_to_effective" value="1" checked>
+                        <span>YES</span>
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="count_to_effective" value="0">
+                        <span>NO</span>
+                    </label>
+                </div>
             </div>
 
             <div class="flex justify-end gap-2">
@@ -807,7 +948,7 @@
     <x-modal-form id="voidModal" title="Void Project" size="max-w-md">
         <form id="voidForm" method="POST">
             @csrf
-            <input type="hidden" name="status_id" value="4">
+            <input type="hidden" name="status_id" value="{{ $stVoid }}">
 
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
@@ -861,14 +1002,13 @@
         }
     </script>
 
-    {{-- jQuery (kalau layout belum include) --}}
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
             // =========================
-            // DEV DROPDOWN (Edit Modal)
+            // DEV DROPDOWN (EDIT)
             // =========================
             $(document).on('click', '#selected-developers', function() {
                 $('#developer-dropdown').toggleClass('hidden');
@@ -882,12 +1022,39 @@
                 }
             });
 
-            // 1 pilihan saja (sesuai logic lama)
             $(document).on('change', '.dev-checkbox', function() {
                 $('.dev-checkbox').not(this).prop('checked', false);
-                const selected = $(this).is(':checked') ? $(this).val() : '';
-                $('#selected-text').text(selected || 'Pilih Developer...');
-                $('#developer_name').val(selected);
+
+                const selectedId = $(this).is(':checked') ? $(this).val() : '';
+                const selectedName = $(this).is(':checked') ? ($(this).data('name') || '') : '';
+
+                $('#selected-text').text(selectedName || 'Pilih Developer...');
+                $('#developer_id').val(selectedId);
+            });
+
+            // =========================
+            // DEV DROPDOWN (DONE)
+            // =========================
+            $(document).on('click', '#selected-developers-done', function() {
+                $('#developer-dropdown-done').toggleClass('hidden');
+                $('#dropdown-icon-done').toggleClass('rotate-180');
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#selected-developers-done, #developer-dropdown-done').length) {
+                    $('#developer-dropdown-done').addClass('hidden');
+                    $('#dropdown-icon-done').removeClass('rotate-180');
+                }
+            });
+
+            $(document).on('change', '.dev-checkbox-done', function() {
+                $('.dev-checkbox-done').not(this).prop('checked', false);
+
+                const selectedId = $(this).is(':checked') ? $(this).val() : '';
+                const selectedName = $(this).is(':checked') ? ($(this).data('name') || '') : '';
+
+                $('#selected-text-done').text(selectedName || 'Pilih Developer...');
+                $('#developer_id_done').val(selectedId);
             });
 
             // =========================
@@ -898,9 +1065,9 @@
                 const projectCode = $(button).data('code');
                 const projectName = $(button).data('name');
                 const progress = $(button).data('progress');
-                const statusId = $(button).data('status');
-                const developerName = $(button).data('developer');
-                const memo = $(button).data('memo');
+                const developerId = $(button).data('developer-id');
+                const developerName = $(button).data('developer-name');
+                const description = $(button).data('description');
 
                 const $form = $('#editProgressForm');
                 if (!$form.length) return;
@@ -910,32 +1077,70 @@
                 $('#dropdown-icon').removeClass('rotate-180');
                 $('#developer-dropdown').addClass('hidden');
 
-                // route update (PUT)
+                // route update (PUT) => /project/{project}
                 $form.attr('action', `/project/${projectId}`);
 
                 $('#modal_project_code').val(projectCode || '');
                 $('#modal_project_name').val(projectName || '');
                 $('#modal_progress_percent').val(progress ?? '');
-                $('#modal_status_id').val(statusId ?? '');
-                $('#modal_memo').val(memo ?? '');
+                $('#modal_description').val(description ?? '');
 
-                if (developerName) {
-                    developerName.split(' | ').forEach(dev => {
-                        $(`.dev-checkbox[value="${dev.trim()}"]`).prop('checked', true);
-                    });
-                    $('#selected-text').text(developerName);
-                    $('#developer_name').val(developerName);
+                if (developerId) {
+                    $(`.dev-checkbox[value="${developerId}"]`).prop('checked', true);
+                    $('#selected-text').text(developerName || 'Pilih Developer...');
+                    $('#developer_id').val(developerId);
                 } else {
                     $('#selected-text').text('Pilih Developer...');
-                    $('#developer_name').val('');
+                    $('#developer_id').val('');
                 }
 
+                // default progress date = now
                 const now = new Date();
                 const datetime =
                     `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
                 $('#modal_progress_date').val(datetime);
 
                 openModal('editProgressModal');
+            };
+
+            // =========================
+            // OPEN DONE MODAL
+            // =========================
+            window.openDoneModal = function(button) {
+                const projectId = $(button).data('id');
+                const projectCode = $(button).data('code');
+                const projectName = $(button).data('name');
+                const developerId = $(button).data('developer-id');
+                const developerName = $(button).data('developer-name');
+                const description = $(button).data('description');
+
+                const $form = $('#doneForm');
+                if (!$form.length) return;
+
+                $form[0].reset();
+                $('.dev-checkbox-done').prop('checked', false);
+                $('#dropdown-icon-done').removeClass('rotate-180');
+                $('#developer-dropdown-done').addClass('hidden');
+
+                // route done (PUT) => sesuai routes kamu:
+                // Route::put('/project/{project}/done', ...)->name('project.done');
+                // (group name kamu agak dobel, tapi kita pake URL biar aman)
+                $form.attr('action', `/project/${projectId}/done`);
+
+                $('#done_project_code').val(projectCode || '');
+                $('#done_project_name').val(projectName || '');
+                $('#done_description').val(description ?? '');
+
+                if (developerId) {
+                    $(`.dev-checkbox-done[value="${developerId}"]`).prop('checked', true);
+                    $('#selected-text-done').text(developerName || 'Pilih Developer...');
+                    $('#developer_id_done').val(developerId);
+                } else {
+                    $('#selected-text-done').text('Pilih Developer...');
+                    $('#developer_id_done').val('');
+                }
+
+                openModal('doneModal');
             };
 
             // =========================
@@ -1001,7 +1206,7 @@
             }
 
             // =========================
-            // DATATABLE THEME (dark/light) - optional
+            // DATATABLE THEME
             // =========================
             const applyDTTheme = () => {
                 const dark = document.documentElement.classList.contains('dark');
@@ -1041,6 +1246,23 @@
         });
     </script>
 
+    <script>
+        window.openContinueModal = function(projectId) {
+            const $form = $('#continueForm');
+            if (!$form.length) return;
+
+            $form[0].reset();
+            $('#overrideBox').hide();
+            $form.attr('action', `/project/${projectId}/continue`);
+            openModal('continueModal');
+        };
+
+        window.toggleOverride = function(show) {
+            if (show) $('#overrideBox').show();
+            else $('#overrideBox').hide();
+        };
+    </script>
+
     <style>
         [x-cloak] {
             display: none !important;
@@ -1059,10 +1281,7 @@
         .date-input::-webkit-calendar-picker-indicator:hover {
             opacity: 0.7;
         }
-    </style>
 
-    <style>
-        /* Biar control DT (Entries + Search) gak kepotong */
         .dt-layout-row {
             display: flex !important;
             flex-wrap: wrap !important;
@@ -1074,22 +1293,15 @@
         .dt-layout-cell {
             flex: 1 1 auto !important;
             min-width: 220px !important;
-            /* penting biar select entries ga ke-clip */
         }
 
-        /* Length select biar keliatan full */
         .dt-length select {
             min-width: 70px !important;
             border-radius: 0 !important;
         }
 
-
-        /* Search input biar enak */
         .dt-search input {
             min-width: 220px !important;
         }
     </style>
-
-
-
 </x-app-layout>

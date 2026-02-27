@@ -13,6 +13,8 @@
     $td = "px-4 py-3 text-sm $muted";
 
     $pillBase = "inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold";
+
+    $fmt = fn($dt, $format = 'd M Y H:i') => $dt ? \Carbon\Carbon::parse($dt)->format($format) : '-';
 @endphp
 
 {{-- ========================= DETAIL PROJECT ========================= --}}
@@ -50,6 +52,26 @@
 
             <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
                 @forelse ($details as $index => $d)
+                    @php
+                        // ✅ status name sinkron: pakai field "name"
+                        $statusName = $d->status->name ?? '-';
+                        $type = strtolower($d->status->type ?? '');
+
+                        $statusBadge = match ($type) {
+                            'waiting' => 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300',
+                            'in_progress' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
+                            'done' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
+                            'void' => 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300',
+                            'pending' => 'bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
+                            default => 'bg-light-eval-2 text-light-text dark:bg-dark-eval-2 dark:text-dark-text',
+                        };
+
+                        $pct = (int) ($d->progress_percent ?? 0);
+
+                        // ✅ developer sinkron: ambil dari relasi developer (developer_id)
+                        $devName = $d->developer->name ?? '-';
+                    @endphp
+
                     <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                         <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
                             {{ $index + 1 }}
@@ -57,45 +79,32 @@
 
                         <td class="{{ $td }}">
                             <div class="font-medium text-light-text dark:text-dark-text">
-                                {{ $d->developer_name ?? '-' }}
+                                {{ $devName }}
                             </div>
+                            @if (!empty($d->developer_id))
+                                <div class="text-xs {{ $muted2 }}">ID: {{ $d->developer_id }}</div>
+                            @endif
                         </td>
 
                         <td class="{{ $td }}">
-                            {{ $d->progress_date ?? '-' }}
+                            {{ $fmt($d->progress_date) }}
                         </td>
 
                         <td class="{{ $td }}">
-                            @php
-                                $statusName = $d->status->status_name ?? '-';
-
-                                $statusBadge = match (strtolower($statusName)) {
-                                    'waiting' => 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300',
-                                    'in progress', 'progress' => 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300',
-                                    'done' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
-                                    'void' => 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300',
-                                    'pending' => 'bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
-                                    default => 'bg-light-eval-2 text-light-text dark:bg-dark-eval-2 dark:text-dark-text',
-                                };
-                            @endphp
-
                             <span class="{{ $pillBase }} {{ $statusBadge }}">
                                 {{ $statusName }}
                             </span>
                         </td>
 
                         <td class="px-4 py-3 text-center">
-                            @php
-                                $pct = (int) ($d->progress_percent ?? 0);
-                            @endphp
-
                             <div class="flex flex-col items-center gap-1">
                                 <span class="text-sm font-semibold text-light-text dark:text-dark-text">
                                     {{ $pct }}%
                                 </span>
 
                                 <div class="w-28 h-2 rounded-full bg-light-eval-3 dark:bg-dark-eval-2 overflow-hidden">
-                                    <div class="h-full bg-blue-600 rounded-full" style="width: {{ max(0, min(100, $pct)) }}%"></div>
+                                    <div class="h-full bg-blue-600 rounded-full"
+                                        style="width: {{ max(0, min(100, $pct)) }}%"></div>
                                 </div>
                             </div>
                         </td>
@@ -150,18 +159,17 @@
 
             <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
                 @forelse ($pendings as $index => $p)
+                    @php
+                        $duration = (int) ($p->duration_minutes ?? 0);
+                    @endphp
+
                     <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                         <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
                             {{ $index + 1 }}
                         </td>
 
-                        <td class="{{ $td }}">
-                            {{ $p->pending_start ? \Carbon\Carbon::parse($p->pending_start)->format('d M Y H:i') : '-' }}
-                        </td>
-
-                        <td class="{{ $td }}">
-                            {{ $p->pending_end ? \Carbon\Carbon::parse($p->pending_end)->format('d M Y H:i') : '-' }}
-                        </td>
+                        <td class="{{ $td }}">{{ $fmt($p->pending_start) }}</td>
+                        <td class="{{ $td }}">{{ $fmt($p->pending_end) }}</td>
 
                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xl break-words whitespace-normal">
                             {{ $p->reason ?? '-' }}
@@ -169,7 +177,7 @@
 
                         <td class="px-4 py-3 text-center">
                             <span class="{{ $pillBase }} bg-orange-600/10 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300">
-                                {{ $p->duration_minutes ?? 0 }} min
+                                {{ $duration }} min
                             </span>
                         </td>
                     </tr>

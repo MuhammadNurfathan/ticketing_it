@@ -57,6 +57,17 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])
             ->name('DashboardTicketsAdmin.updateStatusDone');
+
+                    Route::prefix('project')->name('project.')->group(function () {
+            Route::post('/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('updateStatus');
+            Route::post('/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('updateProgress');
+            Route::post('/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
+            Route::post('/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('continueProgress');
+            Route::put('/{project}/done', [ProjectController::class, 'done'])->name('done');
+        });
+        
+
+        Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
     });
 
     // User Tickets (role_id = 1,2,3)
@@ -95,6 +106,7 @@ Route::middleware('auth')->group(function () {
             'assets'            => AssetsController::class,
         ]);
 
+
     });
 
     /*
@@ -103,15 +115,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware('role:2')->group(function () {
-        Route::prefix('project')->name('project.')->group(function () {
-            Route::post('/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('updateStatus');
-            Route::post('/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('updateProgress');
-            Route::post('/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
-            Route::post('/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('continueProgress');
-        });
-        
 
-        Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
 
         // Reports
         Route::prefix('reports')->name('reports.')->group(function () {

@@ -76,4 +76,9 @@ class User extends Authenticatable
     {
         $this->attributes['email'] = strtolower($value);
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
 }

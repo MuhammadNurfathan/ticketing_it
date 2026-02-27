@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\ProjectDetail;
 use App\Models\ProjectHeader;
+use App\Models\Status;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -13,11 +14,14 @@ class ProjectReportController extends Controller
 {
     public function ProjectQueue(Request $request)
     {
-        $year = $request->query('year', now()->year);
+        $year = (int) $request->query('year', now()->year);
+
+        // ✅ status waiting (project)
+        $waitingId = Status::where('context', 'project')->where('type', 'waiting')->value('id');
 
         $ProjectQueue = ProjectHeader::with(['priority', 'requestor', 'developer', 'status'])
             ->whereYear('start_date', $year)
-            ->where('status_id', 1)
+            ->when($waitingId, fn($q) => $q->where('status_id', $waitingId))
             ->get();
 
         return response()->json([
@@ -29,21 +33,22 @@ class ProjectReportController extends Controller
 
     public function gantChart(Request $request)
     {
-        $year = $request->query('year', now()->year);
+        $year = (int) $request->query('year', now()->year);
 
-        $startOfYear = "{$year}-01-01";
-        $endOfYear = "{$year}-12-31";
+        $startOfYear = Carbon::create($year, 1, 1)->startOfDay();
+        $endOfYear   = Carbon::create($year, 12, 31)->endOfDay();
 
-        $projects = ProjectHeader::select(
-            'id',
-            'project_name',
-            'start_date',
-            'end_date',
-            'effective_end_date',
-            'progress_percent',
-            'status_id',
-            'is_late',
-        )
+        $projects = ProjectHeader::with('status') // ✅ biar status->name bisa dipakai
+            ->select(
+                'id',
+                'project_name',
+                'start_date',
+                'end_date',
+                'effective_end_date',
+                'progress_percent',
+                'status_id',
+                'is_late',
+            )
             ->where(function ($query) use ($year) {
                 $query->whereYear('start_date', '<=', $year)
                     ->where(function ($sub) use ($year) {
@@ -57,33 +62,30 @@ class ProjectReportController extends Controller
             ->get();
 
         $data = $projects->map(function ($p) use ($startOfYear, $endOfYear) {
-            $start = $p->start_date;
-            $end = $p->effective_end_date ?? $p->end_date;
+            $start = Carbon::parse($p->start_date);
+            $end   = Carbon::parse($p->effective_end_date ?? $p->end_date);
 
-            if ($start < $startOfYear) {
-                $start = $startOfYear;
-            }
-            if ($end > $endOfYear) {
-                $end = $endOfYear;
-            }
+            if ($start->lt($startOfYear)) $start = $startOfYear->copy();
+            if ($end->gt($endOfYear))     $end   = $endOfYear->copy();
+
+            $statusName = $p->status->name ?? 'Unknown';
 
             return [
-                'id' => $p->id,
-                'name' => $p->project_name,
-                'start' => \Carbon\Carbon::parse($start)->format('Y-m-d'),
-                'end' => \Carbon\Carbon::parse($end)->format('Y-m-d'),
-                'year' => \Carbon\Carbon::parse($start)->format('Y'),
-                'month_start' => \Carbon\Carbon::parse($start)->format('m'),
-                'month_end' => \Carbon\Carbon::parse($end)->format('m'),
-                'day_start' => \Carbon\Carbon::parse($start)->format('d'),
-                'day_end' => \Carbon\Carbon::parse($end)->format('d'),
-                'progress' => intval($p->progress_percent),
-                'status_id' => $p->status_id,
-                'status_name' => $p->status->status_name ?? 'Unknown',
-                'is_late' => $p->status->status_name === 'Done'
-                    ? ($p->is_late == 1 ? 'Late' : 'On Time')
+                'id'          => $p->id,
+                'name'        => $p->project_name,
+                'start'       => $start->format('Y-m-d'),
+                'end'         => $end->format('Y-m-d'),
+                'year'        => $start->format('Y'),
+                'month_start' => $start->format('m'),
+                'month_end'   => $end->format('m'),
+                'day_start'   => $start->format('d'),
+                'day_end'     => $end->format('d'),
+                'progress'    => (int) $p->progress_percent,
+                'status_id'   => $p->status_id,
+                'status_name' => $statusName,
+                'is_late'     => $statusName === 'Done'
+                    ? ((int)$p->is_late === 1 ? 'Late' : 'On Time')
                     : '',
-
             ];
         });
 
@@ -92,7 +94,7 @@ class ProjectReportController extends Controller
 
     public function summary(Request $request)
     {
-        $year = $request->query('year', now()->year);
+        $year = (int) $request->query('year', now()->year);
         return response()->json(ProjectHeader::summary($year));
     }
 
@@ -100,39 +102,40 @@ class ProjectReportController extends Controller
     {
         $date = $request->query('date', now()->toDateString());
 
-        // 1. Ambil SEMUA developer_name unik
-        $developers = ProjectDetail::select('developer_name')
-            ->whereNotNull('developer_name')
-            ->where('developer_name', '!=', '')
+        // 1) ambil semua developer_id unik dari project_details
+        $developers = ProjectDetail::query()
+            ->whereNotNull('developer_id')
             ->distinct()
-            ->pluck('developer_name');
+            ->pluck('developer_id');
 
-        // 2. Ambil project sesuai tanggal
-        $projects = ProjectDetail::with([
-            'header:id,project_code,project_name',
-            'status:id,status_name'
-        ])
-            ->whereNotNull('progress_date') // ✅ Tambahin ini
+        // 2) ambil detail pada tanggal tsb + join relasi yang bener
+        $detailsByDev = ProjectDetail::with([
+                'header:id,project_code,project_name',
+                'status:id,name',
+                'developer:id,name',
+            ])
+            ->whereNotNull('progress_date')
             ->whereDate('progress_date', $date)
             ->get()
-            ->groupBy('developer_name');
+            ->groupBy('developer_id');
 
-        // 3. Gabungkan → developer kosong tetap tampil
-        $result = $developers->map(function ($devName) use ($projects) {
-            $items = $projects->get($devName, collect());
+        // 3) map hasilnya
+        $result = $developers->map(function ($devId) use ($detailsByDev) {
+            $items = $detailsByDev->get($devId, collect());
 
             return [
-                'developer_name' => $devName,
+                'developer_id'   => $devId,
+                'developer_name' => optional($items->first()?->developer)->name ?? null,
                 'projects' => $items->map(function ($d) {
                     return [
                         'project_code'  => optional($d->header)->project_code ?? '-',
                         'project_name'  => optional($d->header)->project_name ?? '-',
-                        'memo'          => $d->memo ?? '-',
-                        'progress'      => $d->progress_percent ?? 0,
-                        'status'        => optional($d->status)->status_name ?? '-',
-                        'progress_date' => $d->progress_date ? $d->progress_date->format('Y-m-d') : '-', // ✅ Fix ini
+                        'description'   => $d->description ?? '-', // ✅ ganti memo -> description
+                        'progress'      => (int) ($d->progress_percent ?? 0),
+                        'status'        => optional($d->status)->name ?? '-', // ✅ status_name -> name
+                        'progress_date' => $d->progress_date ? $d->progress_date->format('Y-m-d') : '-',
                     ];
-                })->values()
+                })->values(),
             ];
         });
 
@@ -143,27 +146,30 @@ class ProjectReportController extends Controller
             ],
         ]);
     }
+
     public function exportProject(Request $request): StreamedResponse
     {
-        $startDate = Carbon::parse($request->query('start_date'))->startOfDay();
-        $endDate   = Carbon::parse($request->query('end_date'))->endOfDay();
+        $startQ = $request->query('start_date');
+        $endQ   = $request->query('end_date');
 
-        if (!$startDate || !$endDate) {
-            abort(400, 'Tanggal wajib diisi');
-        }
+        if (!$startQ || !$endQ) abort(400, 'Tanggal wajib diisi');
+
+        $startDate = Carbon::parse($startQ)->startOfDay();
+        $endDate   = Carbon::parse($endQ)->endOfDay();
 
         $projects = ProjectDetail::with([
-            'header.requestor',
-            'header.priority',
-            'header.status',
-            'status'
-        ])
-            ->whereNotNull('progress_date') // ✅ Cegah null
+                'header.requestor',
+                'header.priority',
+                'header.status',
+                'status',
+                'developer',
+            ])
+            ->whereNotNull('progress_date')
             ->whereBetween('progress_date', [$startDate, $endDate])
             ->orderBy('progress_date', 'asc')
             ->get();
 
-        $filename = "Project_Report_{$startDate}_{$endDate}.csv";
+        $filename = "Project_Report_{$startDate->format('Ymd')}_{$endDate->format('Ymd')}.csv";
 
         $headers = [
             "Content-Type"        => "text/csv",
@@ -181,9 +187,9 @@ class ProjectReportController extends Controller
             'Project Status',
             'Developer Name',
             'Detail Status',
-            'Progress Date',    // ✅ Kolom ke-8
+            'Progress Date',
             'Progress (%)',
-            'Memo',
+            'Description',
             'Start Date',
             'End Date',
             'Is Late',
@@ -199,13 +205,14 @@ class ProjectReportController extends Controller
                     optional($p->header)->project_code ?? '-',
                     optional($p->header)->project_name ?? '-',
                     optional(optional($p->header)->requestor)->name ?? '-',
-                    optional(optional($p->header)->priority)->priority_name ?? '-',
-                    optional(optional($p->header)->status)->status_name ?? '-',
-                    $p->developer_name ?? '-',
-                    optional($p->status)->status_name ?? '-',
-                    $p->progress_date ? $p->progress_date->format('Y-m-d') : '-', // ✅ Progress date
-                    $p->progress_percent ?? 0,
-                    $p->memo ?? '-',
+                    // ✅ priority_name -> name (kalau kolom lu beda, ganti aja di sini)
+                    optional(optional($p->header)->priority)->name ?? '-',
+                    optional(optional($p->header)->status)->name ?? '-',
+                    optional($p->developer)->name ?? '-',      // ✅ developer_name -> relasi users
+                    optional($p->status)->name ?? '-',         // ✅ status_name -> name
+                    $p->progress_date ? $p->progress_date->format('Y-m-d') : '-',
+                    (int) ($p->progress_percent ?? 0),
+                    $p->description ?? '-',                    // ✅ memo -> description
                     optional($p->header)->start_date ? $p->header->start_date->format('Y-m-d') : '-',
                     optional($p->header)->end_date ? $p->header->end_date->format('Y-m-d') : '-',
                     optional($p->header)->is_late ? 'Yes' : 'No',
@@ -221,22 +228,24 @@ class ProjectReportController extends Controller
 
     public function previewProject(Request $request)
     {
-        $startDate = Carbon::parse($request->query('start_date'))->startOfDay();
-        $endDate   = Carbon::parse($request->query('end_date'))->endOfDay();
+        $startQ = $request->query('start_date');
+        $endQ   = $request->query('end_date');
 
-        if (!$startDate || !$endDate) {
-            return response()->json([
-                'error' => 'Tanggal mulai dan akhir wajib diisi'
-            ], 400);
+        if (!$startQ || !$endQ) {
+            return response()->json(['error' => 'Tanggal mulai dan akhir wajib diisi'], 400);
         }
 
+        $startDate = Carbon::parse($startQ)->startOfDay();
+        $endDate   = Carbon::parse($endQ)->endOfDay();
+
         $projects = ProjectDetail::with([
-            'header.requestor',
-            'header.priority',
-            'header.status',
-            'status'
-        ])
-            ->whereNotNull('progress_date') // ✅ Cegah null
+                'header.requestor',
+                'header.priority',
+                'header.status',
+                'status',
+                'developer',
+            ])
+            ->whereNotNull('progress_date')
             ->whereBetween('progress_date', [$startDate, $endDate])
             ->orderBy('progress_date', 'asc')
             ->limit(50)
@@ -246,13 +255,13 @@ class ProjectReportController extends Controller
                     'project_code'   => optional($p->header)->project_code ?? '-',
                     'project_name'   => optional($p->header)->project_name ?? '-',
                     'requestor'      => optional(optional($p->header)->requestor)->name ?? '-',
-                    'priority'       => optional(optional($p->header)->priority)->priority_name ?? '-',
-                    'project_status' => optional(optional($p->header)->status)->status_name ?? '-',
-                    'developer_name' => $p->developer_name ?? '-',
-                    'detail_status'  => optional($p->status)->status_name ?? '-',
-                    'progress_date'  => $p->progress_date ? $p->progress_date->format('Y-m-d') : '-', // ✅ FIX: hapus duplikat
-                    'progress'       => $p->progress_percent ?? 0,
-                    'memo'           => $p->memo ?? '-',
+                    'priority'       => optional(optional($p->header)->priority)->name ?? '-',
+                    'project_status' => optional(optional($p->header)->status)->name ?? '-',
+                    'developer_name' => optional($p->developer)->name ?? '-',
+                    'detail_status'  => optional($p->status)->name ?? '-',
+                    'progress_date'  => $p->progress_date ? $p->progress_date->format('Y-m-d') : '-',
+                    'progress'       => (int) ($p->progress_percent ?? 0),
+                    'description'    => $p->description ?? '-',
                     'start_date'     => optional($p->header)->start_date ? $p->header->start_date->format('Y-m-d') : '-',
                     'end_date'       => optional($p->header)->end_date ? $p->header->end_date->format('Y-m-d') : '-',
                     'is_late'        => optional($p->header)->is_late ? 'Yes' : 'No',
@@ -260,8 +269,6 @@ class ProjectReportController extends Controller
                 ];
             });
 
-        return response()->json([
-            'data' => $projects
-        ]);
+        return response()->json(['data' => $projects]);
     }
 }

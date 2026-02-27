@@ -15,13 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum', 'role:2'])->group(function () {
-
-    /*
-    |--------------------------------------------------------------------------
-    | Ticket Reports
-    |--------------------------------------------------------------------------
-    */
     Route::get('/reports/tickets-by-category', [TicketReportController::class, 'ticketsByCategory']);
     Route::get('/reports/tickets-done-per-month', [TicketReportController::class, 'ticketsDonePerMonth']);
     Route::get('/tickets/statistik', [TicketReportController::class, 'statistik']);
@@ -50,4 +43,3 @@ Route::middleware(['auth:sanctum', 'role:2'])->group(function () {
     Route::post('/project/{projectHeaderId}/pending', [ProjectReportController::class, 'storePending']);
     Route::post('/project/{projectHeaderId}/continue', [ProjectReportController::class, 'continueProgress']);
     Route::get('/projects/{project}/history', [ProjectReportController::class, 'history']);
-});

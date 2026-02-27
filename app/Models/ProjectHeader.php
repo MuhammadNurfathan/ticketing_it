@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 class ProjectHeader extends Model
 {
     use HasFactory;
@@ -16,10 +17,12 @@ class ProjectHeader extends Model
         'request_date',
         'description',
         'requestor_id',
-        'dev_id',
+        'dev_id',                 // optional: PIC dev header (kalau dipakai)
         'priority_id',
         'status_id',
         'progress_percent',
+        'progress_date',
+        'description',
         'start_date',
         'end_date',
         'actual_start_date',
@@ -27,17 +30,18 @@ class ProjectHeader extends Model
         'effective_end_date',
         'is_late',
         'total_pending_minutes',
-        'notes'
+        'notes',
     ];
 
     protected $casts = [
-        'request_date'         => 'datetime',
-        'start_date'           => 'datetime',
-        'end_date'             => 'datetime',
-        'actual_start_date'    => 'datetime',
-        'actual_end_date'      => 'datetime',
-        'effective_end_date'   => 'datetime',
-        'is_late'              => 'boolean',
+        'request_date'       => 'datetime',
+        'progress_date'      => 'datetime',
+        'start_date'         => 'datetime',
+        'end_date'           => 'datetime',
+        'actual_start_date'  => 'datetime',
+        'actual_end_date'    => 'datetime',
+        'effective_end_date' => 'datetime',
+        'is_late'            => 'boolean',
     ];
 
     /* =======================
@@ -49,6 +53,7 @@ class ProjectHeader extends Model
         return $this->belongsTo(User::class, 'requestor_id');
     }
 
+    // PIC developer header (opsional)
     public function developer()
     {
         return $this->belongsTo(User::class, 'dev_id');
@@ -61,7 +66,7 @@ class ProjectHeader extends Model
 
     public function status()
     {
-        return $this->belongsTo(Status::class)
+        return $this->belongsTo(Status::class, 'status_id')
             ->where('context', 'project');
     }
 
@@ -72,7 +77,7 @@ class ProjectHeader extends Model
 
     public function pendings()
     {
-        return $this->hasMany(Pending::class, 'id_project_header');
+        return $this->hasMany(Pending::class, 'project_header_id');
     }
 
     /* =======================
@@ -91,44 +96,19 @@ class ProjectHeader extends Model
         return $query;
     }
 
-    /* =======================
- | SCOPES STATUS PROJECT
- ======================= */
-
     public function scopeByStatusType($query, string $type)
     {
         return $query->whereHas(
             'status',
-            fn($q) =>
-            $q->where('type', $type)
-                ->where('context', 'project')
+            fn($q) => $q->where('type', $type)->where('context', 'project')
         );
     }
 
-    public function scopeWaiting($query)
-    {
-        return $this->scopeByStatusType($query, 'waiting');
-    }
-
-    public function scopeInProgress($query)
-    {
-        return $this->scopeByStatusType($query, 'in_progress');
-    }
-
-    public function scopeDone($query)
-    {
-        return $this->scopeByStatusType($query, 'done');
-    }
-
-    public function scopeVoid($query)
-    {
-        return $this->scopeByStatusType($query, 'void');
-    }
-
-    public function scopePending($query)
-    {
-        return $this->scopeByStatusType($query, 'pending');
-    }
+    public function scopeWaiting($q)    { return $q->byStatusType('waiting'); }
+    public function scopeInProgress($q) { return $q->byStatusType('in_progress'); }
+    public function scopeDone($q)       { return $q->byStatusType('done'); }
+    public function scopeVoid($q)       { return $q->byStatusType('void'); }
+    public function scopePending($q)    { return $q->byStatusType('pending'); }
 
     /* =======================
      | STATISTIK
@@ -137,11 +117,11 @@ class ProjectHeader extends Model
     public static function statistik($start = null, $end = null)
     {
         return [
-            'waiting'      => self::waiting()->betweenRequestDates($start, $end)->count(),
-            'in_progress'  => self::inProgress()->betweenRequestDates($start, $end)->count(),
-            'done'         => self::done()->betweenRequestDates($start, $end)->count(),
-            'void'         => self::void()->betweenRequestDates($start, $end)->count(),
-            'pending'      => self::pending()->betweenRequestDates($start, $end)->count(),
+            'waiting'     => self::waiting()->betweenRequestDates($start, $end)->count(),
+            'in_progress' => self::inProgress()->betweenRequestDates($start, $end)->count(),
+            'done'        => self::done()->betweenRequestDates($start, $end)->count(),
+            'void'        => self::void()->betweenRequestDates($start, $end)->count(),
+            'pending'     => self::pending()->betweenRequestDates($start, $end)->count(),
         ];
     }
 
@@ -159,7 +139,7 @@ class ProjectHeader extends Model
 
         return [
             'users'          => User::all(),
-            'statuses'       => Status::all(),
+            'statuses'       => Status::where('context', 'project')->get(), // ✅ only project
             'developers'     => User::where('role_id', 1)->get(),
             'priorities'     => Priority::all(),
             'generateticket' => "PRJ-{$number}",
@@ -167,7 +147,7 @@ class ProjectHeader extends Model
     }
 
     /* =======================
-     | SUMMARY DASHBOARD
+     | SUMMARY DASHBOARD (BALIKIN)
      ======================= */
 
     public static function summary($year = null)
@@ -178,25 +158,25 @@ class ProjectHeader extends Model
             $base->whereDate('start_date', '<=', "$year-12-31")
                 ->where(function ($q) use ($year) {
                     $q->whereNull('effective_end_date')
-                        ->orWhereDate('effective_end_date', '>=', "$year-01-01");
+                      ->orWhereDate('effective_end_date', '>=', "$year-01-01");
                 });
         }
 
-        $total = (clone $base)->where('status_id', '!=', 5)->count();
+        // hitung by type (AMAN, ga hardcode ID)
+        $total   = (clone $base)->count();
+        $active  = (clone $base)->inProgress()->count();
+        $waiting = (clone $base)->waiting()->count();
+        $pending = (clone $base)->pending()->count();
+        $void    = (clone $base)->void()->count();
 
-        $active  = (clone $base)->where('status_id', 2)->count();
-        $waiting = (clone $base)->where('status_id', 1)->count();
-        $pending = (clone $base)->where('status_id', 6)->count();
-        $void    = (clone $base)->where('status_id', 4)->count();
-
-        $closedQuery = self::query();
+        $closedQuery = (clone $base)->done();
         if ($year) {
             $closedQuery->whereYear('effective_end_date', $year);
         }
 
-        $closed        = (clone $closedQuery)->where('status_id', 3)->count();
-        $closedOnTime  = (clone $closedQuery)->where('status_id', 3)->where('is_late', false)->count();
-        $closedLate    = (clone $closedQuery)->where('status_id', 3)->where('is_late', true)->count();
+        $closed       = (clone $closedQuery)->count();
+        $closedOnTime = (clone $closedQuery)->where('is_late', false)->count();
+        $closedLate   = (clone $closedQuery)->where('is_late', true)->count();
 
         $sla = $closed > 0 ? round(($closedOnTime / $closed) * 100, 2) : 0;
 
