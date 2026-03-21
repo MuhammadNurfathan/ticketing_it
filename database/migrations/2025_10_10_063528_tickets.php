@@ -38,7 +38,8 @@ return new class extends Migration
             $table->foreignId('status_id')
                 ->nullable()
                 ->constrained('statuses')
-                ->nullOnDelete();
+                ->nullOnDelete()
+                ->default(1);
 
             $table->foreignId('priority_id')
                 ->nullable()

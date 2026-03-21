@@ -23,11 +23,10 @@ class TicketStoreRequest extends FormRequest
             'category_id' => ['required', 'exists:categories,id'],
             'assets_id'   => ['nullable', 'integer'],
 
-            // penting: status harus context=ticket
-            'status_id'   => [
-                'required',
-                Rule::exists('statuses', 'id')->where(fn ($q) => $q->where('context', 'ticket')),
-            ],
+            'status_id' => [
+    'nullable',
+    Rule::exists('statuses', 'id')->where(fn ($q) => $q->where('context', 'ticket')),
+],
 
             'problem'     => ['required', 'string'],
         ];

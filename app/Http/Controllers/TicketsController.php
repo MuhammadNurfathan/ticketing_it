@@ -157,7 +157,7 @@ class TicketsController extends Controller
         $validated['ticket_code']  = Ticket::generateTicketCode();
         $validated['request_date'] = now();
         $validated['waiting_hour'] = 0;
-
+        $validated['status_id'] = $data['status_id'] ?? 1;
         // set late kalau time_spent ada
         $validated['is_late'] = isset($validated['time_spent']) && (int)$validated['time_spent'] > 480;
 

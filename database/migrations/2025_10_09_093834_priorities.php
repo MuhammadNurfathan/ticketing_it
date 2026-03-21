@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('priorities', function(Blueprint $table){
             $table->id();
-            $table->string('priority_name', 50);
+            $table->string('name', 50);
             $table->timestamps();
         });
     }

@@ -11,11 +11,9 @@ return new class extends Migration
         Schema::create('statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');          // Waiting, In Progress, Done
-            $table->string('type');          // waiting, in_progress, done
+            $table->string('type');   
             $table->string('context');       // ticket, project
             $table->timestamps();
-
-            $table->unique(['type', 'context']);
         });
     }
 
