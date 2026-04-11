@@ -1,17 +1,26 @@
 <x-app-layout>
+
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Tambah Asset') }}
-        </h2>
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                Tambah Asset
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Tambahkan data asset baru ke dalam sistem
+            </p>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+    <div class="py-4">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
 
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
+
+                <div class="p-6">
+
+                    {{-- ERROR --}}
                     @if ($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
                             <ul class="list-disc list-inside">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -23,94 +32,166 @@
                     <form action="{{ route('assets.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Kode Asset</label>
-                            <input type="text" name="assets_code" value="{{ old('assets_code') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Contoh: AST-001" required>
+                        {{-- KODE ASSET --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Kode Asset</label>
+                            <input type="text" name="assets_code"
+                                   value="{{ old('assets_code') }}"
+                                   placeholder="Contoh: AST-001"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200
+                                   @error('assets_code') border-red-500 @enderror">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Nama Asset</label>
-                            <input type="text" name="assets_name" value="{{ old('assets_name') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Contoh: Laptop Lenovo ThinkPad" required>
+                        {{-- NAMA ASSET --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Nama Asset</label>
+                            <input type="text" name="assets_name"
+                                   value="{{ old('assets_name') }}"
+                                   placeholder="Contoh: Laptop Lenovo ThinkPad"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200
+                                   @error('assets_name') border-red-500 @enderror">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Kategori</label>
-                            <input type="text" name="category" value="{{ old('category') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: Laptop / PC" required>
+                        {{-- KATEGORI --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Kategori</label>
+                            <input type="text" name="category"
+                                   value="{{ old('category') }}"
+                                   placeholder="Contoh: Laptop / PC"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Status</label>
-                            <select name="status" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2" required>
-                                <option value="Available" {{ old('status') == 'Available' ? 'selected' : '' }}>Available</option>
-                                <option value="Checked Out" {{ old('status') == 'Checked Out' ? 'selected' : '' }}>Checked Out</option>
+                        {{-- STATUS --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Status</label>
+                            <select name="status"
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                    bg-gray-50 dark:bg-gray-700
+                                    focus:bg-white dark:focus:bg-gray-800
+                                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition duration-200">
+
+                                <option value="Available">Available</option>
+                                <option value="Checked Out">Checked Out</option>
                             </select>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Lokasi</label>
-                            <input type="text" name="location" value="{{ old('location') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: Ruang IT" required>
+                        {{-- LOKASI --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Lokasi</label>
+                            <input type="text" name="location"
+                                   value="{{ old('location') }}"
+                                   placeholder="Contoh: Ruang IT"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Model</label>
-                            <input type="text" name="model" value="{{ old('model') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: X1 Carbon Gen 9">
+                        {{-- MODEL --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Model</label>
+                            <input type="text" name="model"
+                                   value="{{ old('model') }}"
+                                   placeholder="Contoh: X1 Carbon Gen 9"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check In</label>
-                            <input type="text" name="check_in" value="{{ old('check_in') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: Admin IT">
+                        {{-- CHECK IN --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Check In</label>
+                            <input type="text" name="check_in"
+                                   value="{{ old('check_in') }}"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check Out</label>
-                            <input type="text" name="check_out" value="{{ old('check_out') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: -">
+                        {{-- CHECK OUT --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Check Out</label>
+                            <input type="text" name="check_out"
+                                   value="{{ old('check_out') }}"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Check Out To</label>
-                            <input type="text" name="check_out_to" value="{{ old('check_out_to') }}"
-                                class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2"
-                                placeholder="Contoh: Divisi Keuangan">
+                        {{-- CHECK OUT TO --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Check Out To</label>
+                            <input type="text" name="check_out_to"
+                                   value="{{ old('check_out_to') }}"
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-gray-50 dark:bg-gray-700
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Catatan</label>
-                            <textarea name="notes" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white rounded-md shadow-sm px-3 py-2" rows="3">{{ old('notes') }}</textarea>
+                        {{-- NOTES --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Catatan</label>
+                            <textarea name="notes" rows="3"
+                                      class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700
+                                      focus:bg-white dark:focus:bg-gray-800
+                                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                      transition duration-200">{{ old('notes') }}</textarea>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-white mb-2">Gambar</label>
-                             <input type="file" name="image" id="media" accept=".jpg,.jpeg,.png,.mp4" capture="environment"
-                                class="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600">
+                        {{-- IMAGE --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Gambar</label>
+                            <input type="file" name="image"
+                                   class="w-full text-sm text-gray-700 dark:text-gray-200">
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Simpan
-                            </button>
-                            <a href="{{ route('assets.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                        {{-- BUTTON --}}
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
+
+                            <a href="{{ route('assets.index') }}"
+                               class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300
+                               dark:bg-gray-700 dark:hover:bg-gray-600
+                               text-gray-800 dark:text-gray-200 transition">
                                 Kembali
                             </a>
+
+                            <button type="submit"
+                                    class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700
+                                    text-white font-medium shadow-sm transition">
+                                Simpan
+                            </button>
+
                         </div>
 
                     </form>
 
                 </div>
             </div>
+
         </div>
     </div>
+
 </x-app-layout>

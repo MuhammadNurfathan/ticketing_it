@@ -218,7 +218,7 @@
                                         <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
                                             {{ $ticket->ticket_code }}
                                         </td>
-                                        <td class="{{ $td }}">{{ $ticket->nama_pembuat ?? '-' }}</td>
+                                        <td class="{{ $td }}">{{ $ticket->user?->name ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->user?->department?->name ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->user?->department?->location?->name ?? '-' }}</td>
                                         <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
@@ -543,74 +543,100 @@
         .date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.7; }
     </style>
 
-    <script>
-        document.querySelectorAll('.doneBtn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const modal = this.nextElementSibling;
-                const modalContent = modal.querySelector('.modalContent');
-                const start = new Date(this.dataset.start);
-                const timeInput = modal.querySelector('.timeInput');
-                const solutionInput = modal.querySelector('.solutionInput');
-                const notesContainer = modal.querySelector('.notesContainer');
-                const notesInput = modal.querySelector('.notesInput');
-                const manualCheckbox = modal.querySelector('.manualCheckbox');
-                const form = modal.parentElement.querySelector('.doneForm');
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-                modal.classList.remove('hidden');
+    const doneButtons = document.querySelectorAll('.doneBtn');
+
+    doneButtons.forEach(btn => {
+
+        // 🔥 cegah double event (penting kalau re-render / tab switch)
+        const cleanBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(cleanBtn, btn);
+
+        cleanBtn.addEventListener('click', function () {
+
+            const modal = this.nextElementSibling;
+            const modalContent = modal.querySelector('.modalContent');
+
+            const start = new Date(this.dataset.start);
+
+            const timeInput = modal.querySelector('.timeInput');
+            const solutionInput = modal.querySelector('.solutionInput');
+            const notesContainer = modal.querySelector('.notesContainer');
+            const notesInput = modal.querySelector('.notesInput');
+            const manualCheckbox = modal.querySelector('.manualCheckbox');
+            const form = modal.querySelector('.doneForm');
+
+            // ================= OPEN MODAL =================
+            modal.classList.remove('hidden');
+
+            setTimeout(() => {
+                modal.classList.add('flex');
+                modalContent.classList.remove('opacity-0', 'scale-95');
+                modalContent.classList.add('opacity-100', 'scale-100');
+            }, 10);
+
+            // ================= AUTO TIME CALC =================
+            const calcAutoTime = () => {
+                if (!manualCheckbox.checked && start && !isNaN(start)) {
+                    const now = new Date();
+                    const diff = Math.floor((now - start) / (1000 * 60));
+                    timeInput.value = diff > 0 ? diff : 0;
+                }
+            };
+
+            calcAutoTime();
+
+            // ================= MANUAL TOGGLE =================
+            manualCheckbox.onchange = () => {
+                if (manualCheckbox.checked) {
+                    timeInput.removeAttribute('readonly');
+                    notesContainer.classList.remove('hidden');
+                } else {
+                    timeInput.setAttribute('readonly', true);
+                    notesContainer.classList.add('hidden');
+                    notesInput.value = '';
+                    calcAutoTime();
+                }
+            };
+
+            // ================= CANCEL =================
+            modal.querySelector('.cancelBtn').onclick = () => {
+
+                modalContent.classList.remove('opacity-100', 'scale-100');
+                modalContent.classList.add('opacity-0', 'scale-95');
+
                 setTimeout(() => {
-                    modal.classList.add('flex');
-                    modalContent.classList.remove('opacity-0', 'scale-95');
-                    modalContent.classList.add('opacity-100', 'scale-100');
-                }, 10);
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 150);
+            };
 
-                const calcAutoTime = () => {
-                    if (!manualCheckbox.checked && start && !isNaN(start)) {
-                        const now = new Date();
-                        const diff = Math.floor((now - start) / (1000 * 60));
-                        timeInput.value = diff > 0 ? diff : 0;
-                    }
-                };
-                calcAutoTime();
+            // ================= SAVE =================
+            modal.querySelector('.saveBtn').onclick = () => {
 
-                manualCheckbox.addEventListener('change', () => {
-                    if (manualCheckbox.checked) {
-                        timeInput.removeAttribute('readonly');
-                        notesContainer.classList.remove('hidden');
-                    } else {
-                        timeInput.setAttribute('readonly', true);
-                        notesContainer.classList.add('hidden');
-                        notesInput.value = '';
-                        calcAutoTime();
-                    }
-                });
+                if (!solutionInput.value.trim()) {
+                    alert('Kolom Solution wajib diisi!');
+                    solutionInput.focus();
+                    return;
+                }
 
-                modal.querySelector('.cancelBtn').onclick = () => {
-                    modalContent.classList.remove('opacity-100', 'scale-100');
-                    modalContent.classList.add('opacity-0', 'scale-95');
-                    setTimeout(() => {
-                        modal.classList.remove('flex');
-                        modal.classList.add('hidden');
-                    }, 150);
-                };
+                if (!notesContainer.classList.contains('hidden') && !notesInput.value.trim()) {
+                    alert('Kolom Notes wajib diisi saat manual!');
+                    notesInput.focus();
+                    return;
+                }
 
-                modal.querySelector('.saveBtn').onclick = () => {
-                    if (!solutionInput.value.trim()) {
-                        alert('Kolom Solution wajib diisi!');
-                        solutionInput.focus();
-                        return;
-                    }
-                    if (!notesContainer.classList.contains('hidden') && !notesInput.value.trim()) {
-                        alert('Kolom Notes wajib diisi saat manual!');
-                        notesInput.focus();
-                        return;
-                    }
+                form.querySelector('.hiddenTimeSpent').value = timeInput.value;
+                form.querySelector('.hiddenSolution').value = solutionInput.value;
+                form.querySelector('.hiddenNotes').value = notesInput.value;
 
-                    form.querySelector('.hiddenTimeSpent').value = timeInput.value;
-                    form.querySelector('.hiddenSolution').value = solutionInput.value;
-                    form.querySelector('.hiddenNotes').value = notesInput.value;
-                    form.submit();
-                };
-            });
+                form.submit();
+            };
         });
-    </script>
+    });
+
+});
+</script>
 </x-app-layout>

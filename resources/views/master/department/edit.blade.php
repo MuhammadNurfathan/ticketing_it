@@ -1,17 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Department') }}
-        </h2>
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                Edit Department
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Perbarui data department yang sudah ada
+            </p>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+    <div class="py-4">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
 
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
+
+                <div class="p-6">
+
+                    {{-- Success Alert --}}
                     @if (session('success'))
-                        <div class="p-3 mb-4 text-green-700 dark:text-green-800 bg-green-100 dark:bg-green-200 rounded">
+                        <div class="mb-6 p-4 rounded-lg bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
                             {{ session('success') }}
                         </div>
                     @endif
@@ -20,55 +28,77 @@
                         @csrf
                         @method('PUT')
 
-                        <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{-- Nama Department --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">
                                 Nama Department
                             </label>
                             <input type="text" 
-                                   name="name" 
-                                   id="name" 
+                                   name="name"
                                    value="{{ old('name', $department->name) }}"
-                                   class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('name') border-red-500 dark:border-red-600 @enderror"
-                                   placeholder="Contoh: Marketing"
-                                   required>
+                                   class="w-full rounded-lg border border-gray-300 dark:border-gray-600 
+                                   bg-gray-50 dark:bg-gray-700 
+                                   focus:bg-white dark:focus:bg-gray-800
+                                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                   transition duration-200
+                                   @error('name') border-red-500 @enderror"
+                                   placeholder="Contoh: Marketing">
+
                             @error('name')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="mb-4">
-                            <label for="location_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {{-- Location --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">
                                 Pilih Location
                             </label>
-                            <select name="location_id" id="location_id"
-                                    class="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 @error('location_id') border-red-500 dark:border-red-600 @enderror"
-                                    required>
+                            <select name="location_id"
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 
+                                    bg-gray-50 dark:bg-gray-700 
+                                    focus:bg-white dark:focus:bg-gray-800
+                                    focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition duration-200
+                                    @error('location_id') border-red-500 @enderror">
+
                                 <option value="">-- Pilih Location --</option>
+
                                 @foreach ($locations as $location)
-                                    <option value="{{ $location->id }}" {{ old('location_id', $department->location_id) == $location->id ? 'selected' : '' }}>
+                                    <option value="{{ $location->id }}" 
+                                        {{ old('location_id', $department->location_id) == $location->id ? 'selected' : '' }}>
                                         {{ $location->location_name }}
                                     </option>
                                 @endforeach
                             </select>
+
                             @error('location_id')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="flex items-center justify-between">
-                            <a href="{{ route('departments.index') }}" 
-                               class="bg-gray-500 hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                        {{-- Button --}}
+                        <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('departments.index') }}"
+                               class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 
+                               dark:bg-gray-700 dark:hover:bg-gray-600 
+                               text-gray-800 dark:text-gray-200 transition">
                                 Kembali
                             </a>
-                            <button type="submit" 
-                                    class="bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+
+                            <button type="submit"
+                                    class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 
+                                    text-white font-medium shadow-sm transition">
                                 Update
                             </button>
                         </div>
+
                     </form>
 
                 </div>
+
             </div>
+
         </div>
     </div>
 </x-app-layout>

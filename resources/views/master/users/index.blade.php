@@ -1,70 +1,92 @@
+@php
+    $page = 'min-h-screen';
+    $wrap = 'w-full px-4 sm:px-6 lg:px-8 py-2 space-y-6';
+
+    $card = 'rounded-2xl border bg-white dark:bg-gray-800
+             border-gray-200 dark:border-gray-700 shadow-sm';
+
+    $thead = 'bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700';
+
+    $th = 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider
+           text-gray-500 dark:text-gray-400';
+
+    $tr = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition';
+
+    $td = 'px-4 py-3 text-sm text-gray-700 dark:text-gray-200';
+
+    $btnPrimary = 'inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
+                   bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition';
+
+    $btnSecondary = 'px-3 py-1.5 text-xs font-semibold rounded-lg
+                     border border-gray-300 dark:border-gray-600
+                     text-gray-700 dark:text-gray-200
+                     bg-white dark:bg-gray-700
+                     hover:bg-gray-100 dark:hover:bg-gray-600 transition';
+
+    $btnDanger = 'px-3 py-1.5 text-xs font-semibold rounded-lg
+                  border border-red-300 dark:border-red-700
+                  text-red-600 dark:text-red-400
+                  bg-white dark:bg-gray-700
+                  hover:bg-red-100 dark:hover:bg-red-900 transition';
+
+    $alertSuccess = 'rounded-xl border px-4 py-3
+                     bg-green-100 text-green-700
+                     dark:bg-green-900 dark:text-green-300';
+
+    $alertError = 'rounded-xl border px-4 py-3
+                   bg-red-100 text-red-700
+                   dark:bg-red-900 dark:text-red-300';
+
+    $pill = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold';
+@endphp
+
 <x-app-layout>
+
+    {{-- HEADER --}}
     <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center justify-between">
             <div>
-                <h2 class="font-semibold text-xl leading-tight text-light-text dark:text-dark-text">
-                    {{ __('Kelola Users') }}
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                    Users
                 </h2>
-                <p class="text-xs mt-1 text-light-text-secondary dark:text-dark-text-secondary">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
                     Kelola user, email, dan role akses
                 </p>
             </div>
 
-            <a href="{{ route('users.create') }}"
-                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
-                       bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
-                <span class="text-base">＋</span>
-                <span>Tambah User</span>
+            <a href="{{ route('users.create') }}" class="{{ $btnPrimary }}">
+                <span>＋</span>
+                <span>Tambah</span>
             </a>
         </div>
     </x-slot>
 
-    @php
-        $page = 'min-h-screen bg-light-bg dark:bg-dark-bg';
-        $wrap = 'w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6';
-
-        $card = "rounded-2xl border shadow-sm overflow-hidden
-                 bg-light-eval-1 dark:bg-dark-eval-1
-                 border-light-eval-3 dark:border-dark-eval-2";
-
-        $thead = "bg-light-eval-2 dark:bg-dark-eval-2 border-b
-                  border-light-eval-3 dark:border-dark-eval-2";
-
-        $th = "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider whitespace-nowrap
-               text-light-text-secondary dark:text-dark-text-secondary";
-
-        $td = 'px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary';
-
-        $pill = 'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold';
-    @endphp
-
     <div class="{{ $page }}">
         <div class="{{ $wrap }}">
 
-            {{-- Alert Success --}}
+            {{-- ALERT --}}
             @if (session('success'))
-                <div class="rounded-xl border px-4 py-3 bg-green-600/10 dark:bg-green-400/10 border-green-600/20 dark:border-green-400/20">
-                    <div class="text-sm font-medium text-green-700 dark:text-green-300">
-                        {{ session('success') }}
-                    </div>
+                <div class="{{ $alertSuccess }}">
+                    {{ session('success') }}
                 </div>
             @endif
 
-            {{-- Alert Error --}}
             @if (session('error'))
-                <div class="rounded-xl border px-4 py-3 bg-red-600/10 dark:bg-red-400/10 border-red-600/20 dark:border-red-400/20">
-                    <div class="text-sm font-medium text-red-700 dark:text-red-300">
-                        {{ session('error') }}
-                    </div>
+                <div class="{{ $alertError }}">
+                    {{ session('error') }}
                 </div>
             @endif
 
+            {{-- CARD --}}
             <div class="{{ $card }}">
-                <x-datatable-wrapper title="List Users" subtitle="Data user & role akses" :count="$users->count()">
-                    <table class="datatable w-full min-w-[900px] text-sm">
+
+                <x-datatable-wrapper>
+
+                    <table class="datatable w-full text-sm min-w-[900px]">
+
                         <thead class="{{ $thead }}">
                             <tr>
-                                <th class="{{ $th }} w-14 text-center">No</th>
+                                <th class="{{ $th }} text-center w-14">No</th>
                                 <th class="{{ $th }}">Username</th>
                                 <th class="{{ $th }}">Email</th>
                                 <th class="{{ $th }}">Phone</th>
@@ -75,34 +97,35 @@
                             </tr>
                         </thead>
 
-                        {{-- IMPORTANT: kalau kosong, jangan render row @empty --}}
-                        <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2 bg-light-bg dark:bg-dark-eval-2">
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                             @foreach ($users as $index => $user)
+
                                 @php
                                     $roleName = $user->role?->name ?? '-';
                                     $r = strtolower($roleName);
 
                                     if (str_contains($r, 'admin')) {
-                                        $roleBadge = 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300';
+                                        $roleBadge = 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
                                     } elseif (str_contains($r, 'user')) {
-                                        $roleBadge = 'bg-blue-600/10 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300';
+                                        $roleBadge = 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
                                     } elseif (str_contains($r, 'manager') || str_contains($r, 'lead')) {
-                                        $roleBadge = 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-400/10 dark:text-yellow-300';
+                                        $roleBadge = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
                                     } else {
-                                        $roleBadge = 'bg-light-eval-2 text-light-text-secondary dark:bg-dark-eval-1 dark:text-dark-text-secondary';
+                                        $roleBadge = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
                                     }
 
                                     $deptName = $user->department?->department_name ?? $user->department?->name ?? '-';
                                     $locName  = $user->department?->location?->location_name ?? $user->department?->location?->name ?? '-';
                                 @endphp
 
-                                <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
-                                    <td class="px-4 py-3 text-center text-sm font-semibold text-light-text dark:text-dark-text">
+                                <tr class="{{ $tr }}">
+
+                                    <td class="{{ $td }} text-center font-semibold">
                                         {{ $index + 1 }}
                                     </td>
 
-                                    <td class="px-4 py-3">
-                                        <div class="text-sm font-semibold text-light-text dark:text-dark-text">
+                                    <td class="{{ $td }}">
+                                        <div class="font-medium">
                                             {{ $user->username ?? $user->name ?? '-' }}
                                         </div>
                                     </td>
@@ -123,65 +146,44 @@
                                         {{ $locName }}
                                     </td>
 
-                                    <td class="px-4 py-3">
+                                    <td class="{{ $td }}">
                                         <span class="{{ $pill }} {{ $roleBadge }}">
                                             {{ $roleName }}
                                         </span>
                                     </td>
 
-                                    <td class="px-4 py-3">
-                                        <div class="flex justify-end gap-2">
+                                    <td class="{{ $td }}">
+                                        <div class="flex justify-start gap-2">
+
                                             <a href="{{ route('users.edit', $user) }}"
-                                                class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold
-                                                       border border-light-eval-3 dark:border-dark-eval-2
-                                                       bg-light-bg dark:bg-dark-eval-1
-                                                       text-light-text-secondary dark:text-dark-text-secondary
-                                                       hover:bg-light-eval-2 dark:hover:bg-dark-eval-2 transition-colors">
+                                               class="{{ $btnSecondary }}">
                                                 Edit
                                             </a>
 
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST"
-                                                  onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                            <form method="POST"
+                                                  action="{{ route('users.destroy', $user) }}"
+                                                  onsubmit="return confirm('Yakin hapus data ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
-                                                    class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-semibold
-                                                           border border-red-600/25 dark:border-red-400/25
-                                                           text-red-600 dark:text-red-300
-                                                           hover:bg-red-600/10 dark:hover:bg-red-400/10 transition-colors">
+
+                                                <button type="submit" class="{{ $btnDanger }}">
                                                     Delete
                                                 </button>
                                             </form>
+
                                         </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
+
                     </table>
+
                 </x-datatable-wrapper>
             </div>
 
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll(".datatable").forEach((table) => {
-                new DataTable(table, {
-                    responsive: false,
-                    pageLength: 10,
-                    layout: {
-                        topStart: "pageLength",
-                        topEnd: "search",
-                        bottomStart: "info",
-                        bottomEnd: "paging"
-                    },
-                    language: {
-                        emptyTable: "Tidak ada data Users",
-                        zeroRecords: "Tidak ada data Users"
-                    }
-                });
-            });
-        });
-    </script>
 </x-app-layout>

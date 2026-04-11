@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -49,8 +49,7 @@
 
 
                 <!-- Page Content -->
-                <main class="flex-1" >
-                    {{-- Content container full-width, tapi tetap rapi --}}
+                <main class="flex-1">
                     <div class="w-full">
                         {{ $slot }}
                     </div>

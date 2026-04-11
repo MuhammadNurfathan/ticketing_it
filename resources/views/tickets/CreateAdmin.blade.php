@@ -5,11 +5,12 @@
         </h2>
     </x-slot>
 
-    <div
-        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+     <div class="py-4">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
+
+                <div class="p-6">
+
 
                     {{-- Error Alert --}}
                     @if ($errors->any())
@@ -97,8 +98,8 @@
                                 class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
                                 @foreach ($assets as $ass)
                                     <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $ass->id }}">{{ $ass->assets_name }} -
-                                        {{ $ass->assets_code }} - {{ $ass->check_out_to }}</li>
+                                        data-id="{{ $ass->id }}">{{ $ass->name }} -
+                                        {{ $ass->code }} - {{ $ass->check_out_to }}</li>
                                 @endforeach
                             </ul>
                         </div>
@@ -241,346 +242,330 @@
         </div>
     </div>
 
-    {{-- Scripts --}}
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+{{-- jQuery (tetap dipakai untuk search dropdown) --}}
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-    <script>
-        {{-- Status Field Logic dengan Validasi --}}
-        document.addEventListener("DOMContentLoaded", function() {
-            const statusSelect = document.getElementById("status-select");
-            const startContainer = document.getElementById("start-date-container");
-            const endContainer = document.getElementById("end-date-container");
-            const timeContainer = document.getElementById("time-spent-container");
-            const solutionContainer = document.getElementById("solution-container");
-            const notesContainer = document.getElementById("notes-container");
-            const startInput = document.getElementById("start_datetime");
-            const endInput = document.getElementById("end_datetime");
-            const timeInput = document.getElementById("time_spent");
-            const solutionField = document.getElementById("solution-field");
-            const notesField = document.getElementById("notes");
-            const manualCheckbox = document.getElementById("manual_time");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-            // Restore old status jika ada error
-            @if (old('status_id'))
-                statusSelect.value = "{{ old('status_id') }}";
-                // Trigger change untuk munculkan field yang sesuai
-                const event = new Event('change');
-                statusSelect.dispatchEvent(event);
-            @endif
+    // =========================
+    // 🔥 DATA TABLE (SAFE INIT)
+    // =========================
+    let dataTableInstance = null;
 
-            statusSelect.addEventListener("change", function() {
-                const status = this.options[this.selectedIndex].getAttribute("data-name");
+    function initDataTable() {
+        const table = document.querySelector(".datatable");
+        if (!table) return;
 
-                // Reset semua field
-                startContainer.classList.add("hidden");
-                endContainer.classList.add("hidden");
-                timeContainer.classList.add("hidden");
-                solutionContainer.classList.add("hidden");
-                notesContainer.classList.add("hidden");
+        // kalau sudah pernah init → destroy dulu
+        if ($.fn.dataTable.isDataTable(table)) {
+            $(table).DataTable().destroy();
+        }
 
-                // Reset required attributes
-                startInput.removeAttribute("required");
-                endInput.removeAttribute("required");
-                timeInput.removeAttribute("required");
-                solutionField.removeAttribute("required");
-                notesField.removeAttribute("required");
+        dataTableInstance = new DataTable(table);
+    }
 
-                // Clear values
-                startInput.value = "";
-                endInput.value = "";
-                timeInput.value = "";
+    if (window.innerWidth >= 1024) {
+        initDataTable();
+    }
 
-                if (status === "waiting") {
-                    // Waiting: Tidak perlu field tambahan
-                } else if (status === "in progress") {
-                    // In Progress: Start Date + Solution wajib
-                    startContainer.classList.remove("hidden");
-                    startInput.setAttribute("required", "required");
-                } else if (status === "done") {
-                    // Done: Start Date, End Date, Time Spent, Solution wajib
-                    startContainer.classList.remove("hidden");
-                    endContainer.classList.remove("hidden");
-                    timeContainer.classList.remove("hidden");
-                    solutionContainer.classList.remove("hidden");
-                    startInput.setAttribute("required", "required");
-                    endInput.setAttribute("required", "required");
-                    timeInput.setAttribute("required", "required");
-                    solutionField.setAttribute("required", "required");
-                }
-            });
+    // =========================
+    // 🔥 STATUS FIELD LOGIC
+    // =========================
+    const statusSelect = document.getElementById("status-select");
+    if (statusSelect) {
 
-            // Batasi end date
-            function updateEndDateMin() {
-                if (startInput.value) {
-                    endInput.min = startInput.value;
-                    if (endInput.value && endInput.value < startInput.value) {
-                        endInput.value = '';
-                        timeInput.value = '';
-                    }
-                } else {
-                    endInput.removeAttribute('min');
-                }
+        const startContainer = document.getElementById("start-date-container");
+        const endContainer = document.getElementById("end-date-container");
+        const timeContainer = document.getElementById("time-spent-container");
+        const solutionContainer = document.getElementById("solution-container");
+        const notesContainer = document.getElementById("notes-container");
+
+        const startInput = document.getElementById("start_datetime");
+        const endInput = document.getElementById("end_datetime");
+        const timeInput = document.getElementById("time_spent");
+        const solutionField = document.getElementById("solution-field");
+        const notesField = document.getElementById("notes");
+        const manualCheckbox = document.getElementById("manual_time");
+
+        // restore old status
+        @if (old('status_id'))
+            statusSelect.value = "{{ old('status_id') }}";
+            statusSelect.dispatchEvent(new Event('change'));
+        @endif
+
+        function resetFields() {
+            startContainer?.classList.add("hidden");
+            endContainer?.classList.add("hidden");
+            timeContainer?.classList.add("hidden");
+            solutionContainer?.classList.add("hidden");
+            notesContainer?.classList.add("hidden");
+
+            startInput?.removeAttribute("required");
+            endInput?.removeAttribute("required");
+            timeInput?.removeAttribute("required");
+            solutionField?.removeAttribute("required");
+            notesField?.removeAttribute("required");
+
+            if (startInput) startInput.value = "";
+            if (endInput) endInput.value = "";
+            if (timeInput) timeInput.value = "";
+        }
+
+        statusSelect.addEventListener("change", function () {
+            const status = this.options[this.selectedIndex].dataset.name;
+
+            resetFields();
+
+            if (status === "in progress") {
+                startContainer?.classList.remove("hidden");
+                startInput?.setAttribute("required", "required");
             }
 
-            startInput.addEventListener('change', updateEndDateMin);
-            startInput.addEventListener('input', updateEndDateMin);
+            if (status === "done") {
+                startContainer?.classList.remove("hidden");
+                endContainer?.classList.remove("hidden");
+                timeContainer?.classList.remove("hidden");
+                solutionContainer?.classList.remove("hidden");
 
-            // Hitung time spent otomatis
-            function hitungTimeSpent() {
-                if (manualCheckbox.checked) return;
-                const start = new Date(startInput.value);
-                const end = new Date(endInput.value);
-                if (!isNaN(start) && !isNaN(end) && end > start) {
-                    timeInput.value = Math.floor((end - start) / 60000);
-                } else {
-                    timeInput.value = "";
-                }
+                startInput?.setAttribute("required", "required");
+                endInput?.setAttribute("required", "required");
+                timeInput?.setAttribute("required", "required");
+                solutionField?.setAttribute("required", "required");
             }
-
-            endInput.addEventListener("change", hitungTimeSpent);
-            startInput.addEventListener("change", hitungTimeSpent);
-
-            // Manual time checkbox
-            // Manual time checkbox
-            manualCheckbox.addEventListener("change", function() {
-                if (this.checked) {
-                    timeInput.removeAttribute("readonly");
-
-                    // Ganti kelas bg sesuai tema tapi tetap editable
-                    timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-                    timeInput.classList.add("bg-gray-50", "dark:bg-gray-800");
-
-                    notesContainer.classList.remove("hidden");
-                    notesField.setAttribute("required", "required");
-                } else {
-                    timeInput.setAttribute("readonly", true);
-
-                    // Kembalikan bg default readonly
-                    timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
-                    timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
-
-                    hitungTimeSpent();
-                    notesContainer.classList.add("hidden");
-                    notesField.removeAttribute("required");
-                }
-            });
-
-
-            // Form validation sebelum submit
-            document.getElementById('ticket-form').addEventListener('submit', function(e) {
-                const userIdField = document.getElementById('user-id');
-                const assetsIdField = document.getElementById('assets-id');
-
-                if (!userIdField.value) {
-                    e.preventDefault();
-                    alert('⚠️ Pilih Requestor terlebih dahulu!');
-                    document.getElementById('user-search').focus();
-                    return false;
-                }
-            });
-
-            // Restore old values untuk search fields
-            @if (old('user_id'))
-                const userId = "{{ old('user_id') }}";
-                const userSearch = document.getElementById('user-search');
-                const userResults = document.querySelectorAll('#search-results li');
-                userResults.forEach(li => {
-                    if (li.getAttribute('data-id') == userId) {
-                        userSearch.value = li.textContent;
-                    }
-                });
-            @endif
-
-            @if (old('asset_id'))
-                const assetsId = "{{ old('asset_id') }}";
-                const assetsSearch = document.getElementById('assets-search');
-                const assetsResults = document.querySelectorAll('#assets-results li');
-                assetsResults.forEach(li => {
-                    if (li.getAttribute('data-id') == assetsId) {
-                        assetsSearch.value = li.textContent;
-                    }
-                });
-            @endif
         });
-    </script>
 
-    {{-- User Search --}}
-    <script>
-        $(function() {
-            const $input = $('#user-search');
-            const $results = $('#search-results');
-            const $hidden = $('#user-id');
+        // =========================
+        // TIME CALC
+        // =========================
+        function hitungTimeSpent() {
+            if (manualCheckbox?.checked) return;
 
-            $input.on('focus', () => $results.show());
-            $input.on('input', function() {
-                const val = $(this).val().toLowerCase();
-                let visible = false;
+            const start = new Date(startInput?.value);
+            const end = new Date(endInput?.value);
 
-                $results.children('li').each(function() {
-                    const match = $(this).text().toLowerCase().includes(val);
-                    $(this).toggle(match);
-                    if (match) visible = true;
-                });
-                $results.toggle(visible);
-            });
-
-            $results.on('click', 'li', function() {
-                $input.val($(this).text());
-                $hidden.val($(this).data('id'));
-                $results.hide();
-            });
-
-            $(document).on('click', (e) => {
-                if (!$(e.target).closest('#user-search, #search-results').length) {
-                    $results.hide();
-                }
-            });
-        });
-    </script>
-
-    {{-- Assets Search --}}
-    <script>
-        $(function() {
-            const $input = $('#assets-search');
-            const $results = $('#assets-results');
-            const $hidden = $('#assets-id');
-
-            // Tampilkan list saat focus
-            $input.on('focus', () => {
-                $results.removeClass('hidden');
-            });
-
-            // Filter list saat ketik
-            $input.on('input', function() {
-                const val = $(this).val().toLowerCase();
-                let hasVisible = false;
-
-                $results.children('li').each(function() {
-                    const text = $(this).text().toLowerCase();
-                    const match = text.includes(val);
-                    $(this).toggleClass('hidden', !match);
-                    if (match) hasVisible = true;
-                });
-
-                // Tampilkan atau sembunyikan dropdown
-                $results.toggleClass('hidden', !hasVisible);
-            });
-
-            // Pilih item
-            $results.on('click', 'li', function() {
-                $input.val($(this).text());
-                $hidden.val($(this).data('id'));
-                $results.addClass('hidden');
-            });
-
-            // Klik di luar → sembunyikan list
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('#assets-search, #assets-results').length) {
-                    $results.addClass('hidden');
-                }
-            });
-        });
-    </script>
-
-    {{-- Media Preview & Validation (FIXED) --}}
-    <script>
-        const mediaInput = document.getElementById("media");
-        const previewContainer = document.getElementById("preview-container");
-        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
-
-        mediaInput.addEventListener("change", function(e) {
-            previewContainer.innerHTML = "";
-
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validasi ukuran
-            if (file.size > MAX_SIZE) {
-                alert("❌ File terlalu besar! Maksimal 10MB");
-                mediaInput.value = "";
-                return;
-            }
-
-            // Validasi tipe
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
-            if (!validTypes.includes(file.type)) {
-                alert("❌ Format tidak valid! Hanya JPG, PNG, atau MP4");
-                mediaInput.value = "";
-                return;
-            }
-
-            // Tampilkan preview
-            const preview = document.createElement("div");
-            preview.className = "relative inline-block";
-
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement("img");
-                img.src = URL.createObjectURL(file);
-                img.className = "h-40 rounded border border-gray-300 dark:border-gray-600";
-                img.onload = () => URL.revokeObjectURL(img.src);
-                preview.appendChild(img);
+            if (!isNaN(start) && !isNaN(end) && end > start) {
+                timeInput.value = Math.floor((end - start) / 60000);
             } else {
-                const video = document.createElement("video");
-                video.src = URL.createObjectURL(file);
-                video.controls = true;
-                video.className = "h-40 rounded border border-gray-300 dark:border-gray-600";
-                preview.appendChild(video);
+                timeInput.value = "";
             }
+        }
 
-            // Tombol hapus
-            const btnRemove = document.createElement("button");
-            btnRemove.innerHTML = "✖";
-            btnRemove.type = "button";
-            btnRemove.className = "absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full hover:bg-red-600";
-            btnRemove.onclick = function() {
-                mediaInput.value = "";
-                previewContainer.innerHTML = "";
-            };
+        startInput?.addEventListener("change", hitungTimeSpent);
+        endInput?.addEventListener("change", hitungTimeSpent);
 
-            preview.appendChild(btnRemove);
-            previewContainer.appendChild(preview);
+        // =========================
+        // MANUAL TIME
+        // =========================
+        manualCheckbox?.addEventListener("change", function () {
+
+            if (this.checked) {
+                timeInput.removeAttribute("readonly");
+                timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+                timeInput.classList.add("bg-gray-50", "dark:bg-gray-800");
+
+                notesContainer?.classList.remove("hidden");
+                notesField?.setAttribute("required", "required");
+            } else {
+                timeInput.setAttribute("readonly", true);
+                timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
+                timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+
+                hitungTimeSpent();
+
+                notesContainer?.classList.add("hidden");
+                notesField?.removeAttribute("required");
+            }
         });
-    </script>
 
-    <style>
-        /* Styling untuk date input di light mode */
-        .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(0);
-            cursor: pointer;
+        // =========================
+        // FORM VALIDATION
+        // =========================
+        const form = document.getElementById("ticket-form");
+        form?.addEventListener("submit", function (e) {
+            const userId = document.getElementById("user-id");
+            if (!userId?.value) {
+                e.preventDefault();
+                alert("⚠️ Pilih Requestor terlebih dahulu!");
+                document.getElementById("user-search")?.focus();
+            }
+        });
+    }
+
+    // =========================
+    // 🔥 USER SEARCH (JQUERY)
+    // =========================
+    $(function () {
+        const $input = $('#user-search');
+        const $results = $('#search-results');
+        const $hidden = $('#user-id');
+
+        if (!$input.length) return;
+
+        $input.on('focus', () => $results.show());
+
+        $input.on('input', function () {
+            const val = $(this).val().toLowerCase();
+            let visible = false;
+
+            $results.children('li').each(function () {
+                const match = $(this).text().toLowerCase().includes(val);
+                $(this).toggle(match);
+                if (match) visible = true;
+            });
+
+            $results.toggle(visible);
+        });
+
+        $results.on('click', 'li', function () {
+            $input.val($(this).text());
+            $hidden.val($(this).data('id'));
+            $results.hide();
+        });
+
+        $(document).on('click', (e) => {
+            if (!$(e.target).closest('#user-search, #search-results').length) {
+                $results.hide();
+            }
+        });
+    });
+
+    // =========================
+    // 🔥 ASSETS SEARCH (JQUERY)
+    // =========================
+    $(function () {
+        const $input = $('#assets-search');
+        const $results = $('#assets-results');
+        const $hidden = $('#assets-id');
+
+        if (!$input.length) return;
+
+        $input.on('focus', () => $results.removeClass('hidden'));
+
+        $input.on('input', function () {
+            const val = $(this).val().toLowerCase();
+            let hasVisible = false;
+
+            $results.children('li').each(function () {
+                const match = $(this).text().toLowerCase().includes(val);
+                $(this).toggleClass('hidden', !match);
+                if (match) hasVisible = true;
+            });
+
+            $results.toggleClass('hidden', !hasVisible);
+        });
+
+        $results.on('click', 'li', function () {
+            $input.val($(this).text());
+            $hidden.val($(this).data('id'));
+            $results.addClass('hidden');
+        });
+
+        $(document).on('click', (e) => {
+            if (!$(e.target).closest('#assets-search, #assets-results').length) {
+                $results.addClass('hidden');
+            }
+        });
+    });
+
+    // =========================
+    // 🔥 MEDIA PREVIEW
+    // =========================
+    const mediaInput = document.getElementById("media");
+    const previewContainer = document.getElementById("preview-container");
+
+    mediaInput?.addEventListener("change", function (e) {
+        if (!previewContainer) return;
+
+        previewContainer.innerHTML = "";
+
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const MAX_SIZE = 10 * 1024 * 1024;
+
+        if (file.size > MAX_SIZE) {
+            alert("❌ File terlalu besar! Maksimal 10MB");
+            mediaInput.value = "";
+            return;
         }
 
-        /* Styling untuk date input di dark mode */
-        .dark .date-input::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
+
+        if (!validTypes.includes(file.type)) {
+            alert("❌ Format tidak valid!");
+            mediaInput.value = "";
+            return;
         }
 
-        /* Opsional: ubah opacity saat hover */
-        .date-input::-webkit-calendar-picker-indicator:hover {
-            opacity: 0.7;
-        }
-    </style>
-    <style>
-        #search-results::-webkit-scrollbar,
-        #assets-results::-webkit-scrollbar {
-            width: 8px;
+        const preview = document.createElement("div");
+        preview.className = "relative inline-block";
+
+        if (file.type.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+            img.className = "h-40 rounded border";
+            preview.appendChild(img);
+        } else {
+            const video = document.createElement("video");
+            video.src = URL.createObjectURL(file);
+            video.controls = true;
+            video.className = "h-40 rounded border";
+            preview.appendChild(video);
         }
 
-        #search-results::-webkit-scrollbar-track,
-        #assets-results::-webkit-scrollbar-track {
-            background: #374151;
-        }
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.innerHTML = "✖";
+        btn.className = "absolute top-0 right-0 bg-red-500 text-white px-2 rounded";
 
-        #search-results::-webkit-scrollbar-thumb,
-        #assets-results::-webkit-scrollbar-thumb {
-            background: #6b7280;
-            border-radius: 4px;
-        }
+        btn.onclick = () => {
+            mediaInput.value = "";
+            previewContainer.innerHTML = "";
+        };
 
-        #search-results::-webkit-scrollbar-thumb:hover,
-        #assets-results::-webkit-scrollbar-thumb:hover {
-            background: #9ca3af;
-        }
-    </style>
+        preview.appendChild(btn);
+        previewContainer.appendChild(preview);
+    });
+
+});
+</script>
+
+{{-- STYLE FIX --}}
+<style>
+.date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0);
+    cursor: pointer;
+}
+
+.dark .date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 0.7;
+}
+
+#search-results::-webkit-scrollbar,
+#assets-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+#search-results::-webkit-scrollbar-track,
+#assets-results::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+#search-results::-webkit-scrollbar-thumb,
+#assets-results::-webkit-scrollbar-thumb {
+    background: #6b7280;
+    border-radius: 4px;
+}
+
+#search-results::-webkit-scrollbar-thumb:hover,
+#assets-results::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+</style>
 
 </x-app-layout>

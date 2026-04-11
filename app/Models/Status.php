@@ -27,5 +27,10 @@ class Status extends Model
     {
         return $query->where('context', $context);
     }
-
+public static function getId($type)
+{
+    return self::where('context','project')
+        ->where('type',$type)
+        ->value('id');
+}
 }

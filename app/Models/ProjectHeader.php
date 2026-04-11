@@ -104,11 +104,26 @@ class ProjectHeader extends Model
         );
     }
 
-    public function scopeWaiting($q)    { return $q->byStatusType('waiting'); }
-    public function scopeInProgress($q) { return $q->byStatusType('in_progress'); }
-    public function scopeDone($q)       { return $q->byStatusType('done'); }
-    public function scopeVoid($q)       { return $q->byStatusType('void'); }
-    public function scopePending($q)    { return $q->byStatusType('pending'); }
+    public function scopeWaiting($q)
+    {
+        return $q->byStatusType('waiting');
+    }
+    public function scopeInProgress($q)
+    {
+        return $q->byStatusType('in_progress');
+    }
+    public function scopeDone($q)
+    {
+        return $q->byStatusType('done');
+    }
+    public function scopeVoid($q)
+    {
+        return $q->byStatusType('void');
+    }
+    public function scopePending($q)
+    {
+        return $q->byStatusType('pending');
+    }
 
     /* =======================
      | STATISTIK
@@ -158,7 +173,7 @@ class ProjectHeader extends Model
             $base->whereDate('start_date', '<=', "$year-12-31")
                 ->where(function ($q) use ($year) {
                     $q->whereNull('effective_end_date')
-                      ->orWhereDate('effective_end_date', '>=', "$year-01-01");
+                        ->orWhereDate('effective_end_date', '>=', "$year-01-01");
                 });
         }
 
@@ -192,4 +207,64 @@ class ProjectHeader extends Model
             'sla'
         );
     }
+
+    public static function createProject($data)
+{
+    return self::create([
+        ...$data,
+        'request_date' => now(),
+        'status_id' => \App\Models\Status::getId('waiting'),
+        'progress_percent' => 0,
+    ]);
+}
+
+    public function appliedPendingMinutes(): int
+{
+    return (int) $this->pendings()
+        ->whereNotNull('duration_minutes')
+        ->where('count_to_effective', true)
+        ->sum('duration_minutes');
+}
+
+public function getTotalPendingMinutes()
+{
+    return (int) $this->pendings()
+        ->whereNotNull('duration_minutes')
+        ->sum('duration_minutes');
+}
+
+public function getAppliedPendingMinutes()
+{
+    return (int) $this->pendings()
+        ->whereNotNull('duration_minutes')
+        ->where('count_to_effective', true)
+        ->sum('duration_minutes');
+}
+
+public function calculateEffectiveEnd($minutes)
+{
+    return $this->end_date
+        ? \Carbon\Carbon::parse($this->end_date)->addMinutes($minutes)
+        : null;
+}
+
+public function updateProgressData($data, $statusId, $pendingMinutes)
+{
+    $this->update([
+        'progress_percent' => $data['progress_percent'],
+        'status_id' => $statusId,
+        'progress_date' => $data['progress_date'],
+        'description' => $data['description'] ?? $this->description,
+        'total_pending_minutes' => $pendingMinutes,
+        'effective_end_date' => $this->calculateEffectiveEnd($pendingMinutes),
+    ]);
+}
+
+public function updateStatusData($data)
+{
+    $this->update([
+        'status_id' => $data['status_id'],
+        'notes' => $data['notes'] ?? null,
+    ]);
+}
 }

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model; 
+use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
@@ -22,10 +22,10 @@ class Ticket extends Model
         'solution',
         'notes',
         'request_date',
-        'waiting_hour',
+        'waiting_minutes',
         'start_date',
         'end_date',
-        'time_spent',
+        'time_spent_minutes',
         'is_late',
         'nama_pembuat',
     ];
@@ -191,13 +191,13 @@ class Ticket extends Model
 
         $totalValid = $waiting + $inProgress + $done;
 
-        $avgWaiting   = round((clone $query)->avg('waiting_hour'), 2);
-        $avgTimeSpent = round((clone $query)->avg('time_spent'), 2);
-        $sumTimeSpent = (clone $query)->sum('time_spent');
+        $avgWaiting   = round((clone $query)->avg('waiting_minutes'), 2);
+        $avgTimeSpent = round((clone $query)->avg('time_spent_minutes'), 2);
+        $sumTimeSpent = (clone $query)->sum('time_spent_minutes');
 
         $solvedInSLA = (clone $query)
             ->done()
-            ->where('time_spent', '<=', $SLA_MINUTES)
+            ->where('time_spent_minutes', '<=', $SLA_MINUTES)
             ->count();
 
         $sla = $totalValid > 0
@@ -206,9 +206,29 @@ class Ticket extends Model
 
         return [
             'avg_waiting'    => $avgWaiting,
-            'avg_time_spent' => $avgTimeSpent,
-            'sum_time_spent' => $sumTimeSpent,
+            'avg_time_spent_minutes' => $avgTimeSpent,
+            'sum_time_spent_minutes' => $sumTimeSpent,
             'sla'            => $sla,
         ];
+    }
+
+    public static function getUserTickets($userId)
+    {
+        return self::where('user_id', $userId)
+            ->orderByDesc('request_date')
+            ->get();
+    }
+
+    public static function hasDoneWithoutFeedback($userId)
+    {
+        return self::where('user_id', $userId)
+            ->where('status_id', 3)
+            ->doesntHave('feedback')
+            ->exists();
+    }
+
+    public function scopeWithAll($q)
+    {
+        return $q->with(['user', 'support', 'category', 'asset', 'priority', 'status']);
     }
 }

@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Route;
 | Guest Routes
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('guest')->group(function () {
-    Route::get('/', fn () => redirect()->route('login'));
+    Route::get('/', fn() => redirect()->route('login'));
 });
 
 /*
@@ -58,25 +59,29 @@ Route::middleware('auth')->group(function () {
         Route::post('/DashboardTicketsAdmin/{ticket}/updateStatusDone', [TicketsController::class, 'updatestatusDone'])
             ->name('DashboardTicketsAdmin.updateStatusDone');
 
-                    Route::prefix('project')->name('project.')->group(function () {
+        Route::prefix('project')->name('project.')->group(function () {
             Route::post('/{project}/updateStatus', [ProjectController::class, 'updateStatus'])->name('updateStatus');
             Route::post('/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('updateProgress');
             Route::post('/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
             Route::post('/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('continueProgress');
             Route::put('/{project}/done', [ProjectController::class, 'done'])->name('done');
         });
-        
+
 
         Route::get('/projects/{project}/history', [ProjectController::class, 'history'])->name('projects.history');
     });
 
-    // User Tickets (role_id = 1,2,3)
-    Route::middleware('role:1,2,3')->prefix('DashboardTicketsUser')->name('DashboardTicketsUser.')->group(function () {
-        Route::get('/', [TicketsController::class, 'indexUser'])->name('index');
-        Route::get('/create', [TicketsController::class, 'createUser'])->name('create');
-        Route::get('/{ticket_id}', [TicketsController::class, 'editUser'])->whereNumber('ticket_id')->name('edit');
-        Route::put('/update/{id}', [TicketsController::class, 'updateUser'])->name('update');
-    });
+    Route::middleware('role:1,2,3')
+        ->prefix('DashboardTicketsUser')
+        ->name('DashboardTicketsUser.')
+        ->group(function () {
+
+            Route::get('/', [TicketsController::class, 'indexUser'])->name('index');
+            Route::get('/create', [TicketsController::class, 'createUser'])->name('create');
+            Route::post('/store', [TicketsController::class, 'store'])->name('store'); // 🔥 INI PENTING
+            Route::get('/{ticket_id}', [TicketsController::class, 'editUser'])->whereNumber('ticket_id')->name('edit');
+            Route::put('/update/{id}', [TicketsController::class, 'updateUser'])->name('update');
+        });
 
     // Feedback (akses semua user login)
     Route::middleware('role:1,2,3')->group(function () {
@@ -105,8 +110,6 @@ Route::middleware('auth')->group(function () {
             'priority'          => PriorityController::class,
             'assets'            => AssetsController::class,
         ]);
-
-
     });
 
     /*
