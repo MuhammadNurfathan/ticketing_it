@@ -210,8 +210,8 @@
                                     Manual Input
                                 </label>
                             </div>
-                            <input type="number" id="time_spent" name="time_spent"
-                                value="{{ old('time_spent', $ticket->time_spent) }}" readonly min="1"
+                            <input type="number" id="time_spent_minutes" name="time_spent_minutes"
+                                value="{{ old('time_spent_minutes', $ticket->time_spent_minutes) }}" readonly min="1"
                                 placeholder="Masukkan Waktu Pengerjaan (Menit)"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
@@ -340,7 +340,7 @@
 
             const startInput = document.getElementById("start_datetime");
             const endInput = document.getElementById("end_datetime");
-            const timeInput = document.getElementById("time_spent");
+            const timeInput = document.getElementById("time_spent_minutes");
             const solutionField = document.getElementById("solution");
             const notesField = document.getElementById("notes");
             const manualCheckbox = document.getElementById("manual_time");

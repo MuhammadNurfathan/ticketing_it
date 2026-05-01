@@ -20,7 +20,7 @@ class TicketStatusRequest extends FormRequest
                 Rule::exists('statuses', 'id')->where(fn ($q) => $q->where('context', 'ticket')),
             ],
             'notes'     => ['nullable', 'string', 'min:5'],
-            'time_spent'=> ['nullable', 'integer', 'min:0'],
+            'time_spent_minutes'=> ['nullable', 'integer', 'min:0'],
             'solution'  => ['nullable', 'string'],
         ];
     }

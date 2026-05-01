@@ -1,13 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Create Ticket') }}
-        </h2>
+        <x-slot name="header">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                    Buat Ticket
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Tambahkan ticket baru untuk melaporkan masalah
+                </p>
+            </div>
+        </x-slot>
     </x-slot>
 
-     <div class="py-4">
+    <div class="py-4">
         <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
-             <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
 
                 <div class="p-6">
 
@@ -25,8 +32,8 @@
                     @endif
 
                     {{-- Form Ticket --}}
-                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST" enctype="multipart/form-data"
-                        id="ticket-form">
+                    <form action="{{ route('DashboardTicketsAdmin.store') }}" method="POST"
+                        enctype="multipart/form-data" id="ticket-form">
                         @csrf
                         <input type="hidden" name="from" value="admin">
 
@@ -140,10 +147,9 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="" hidden>-- Choose Status --</option>
                                 @foreach ($statuses as $stat)
-                                        <option value="{{ $stat->id }}"
-                                            data-name="{{ strtolower($stat->name) }}">
-                                            {{ $stat->name }}
-                                        </option>
+                                    <option value="{{ $stat->id }}" data-name="{{ strtolower($stat->name) }}">
+                                        {{ $stat->name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -197,7 +203,7 @@
                                     Manual Input
                                 </label>
                             </div>
-                            <input type="number" id="time_spent" name="time_spent" readonly min="1"
+                            <input type="number" id="time_spent_minutes" name="time_spent_minutes" readonly min="1"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
@@ -242,330 +248,330 @@
         </div>
     </div>
 
-{{-- jQuery (tetap dipakai untuk search dropdown) --}}
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    {{-- jQuery (tetap dipakai untuk search dropdown) --}}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-    // =========================
-    // 🔥 DATA TABLE (SAFE INIT)
-    // =========================
-    let dataTableInstance = null;
+            // =========================
+            // 🔥 DATA TABLE (SAFE INIT)
+            // =========================
+            let dataTableInstance = null;
 
-    function initDataTable() {
-        const table = document.querySelector(".datatable");
-        if (!table) return;
+            function initDataTable() {
+                const table = document.querySelector(".datatable");
+                if (!table) return;
 
-        // kalau sudah pernah init → destroy dulu
-        if ($.fn.dataTable.isDataTable(table)) {
-            $(table).DataTable().destroy();
-        }
+                // kalau sudah pernah init → destroy dulu
+                if ($.fn.dataTable.isDataTable(table)) {
+                    $(table).DataTable().destroy();
+                }
 
-        dataTableInstance = new DataTable(table);
-    }
-
-    if (window.innerWidth >= 1024) {
-        initDataTable();
-    }
-
-    // =========================
-    // 🔥 STATUS FIELD LOGIC
-    // =========================
-    const statusSelect = document.getElementById("status-select");
-    if (statusSelect) {
-
-        const startContainer = document.getElementById("start-date-container");
-        const endContainer = document.getElementById("end-date-container");
-        const timeContainer = document.getElementById("time-spent-container");
-        const solutionContainer = document.getElementById("solution-container");
-        const notesContainer = document.getElementById("notes-container");
-
-        const startInput = document.getElementById("start_datetime");
-        const endInput = document.getElementById("end_datetime");
-        const timeInput = document.getElementById("time_spent");
-        const solutionField = document.getElementById("solution-field");
-        const notesField = document.getElementById("notes");
-        const manualCheckbox = document.getElementById("manual_time");
-
-        // restore old status
-        @if (old('status_id'))
-            statusSelect.value = "{{ old('status_id') }}";
-            statusSelect.dispatchEvent(new Event('change'));
-        @endif
-
-        function resetFields() {
-            startContainer?.classList.add("hidden");
-            endContainer?.classList.add("hidden");
-            timeContainer?.classList.add("hidden");
-            solutionContainer?.classList.add("hidden");
-            notesContainer?.classList.add("hidden");
-
-            startInput?.removeAttribute("required");
-            endInput?.removeAttribute("required");
-            timeInput?.removeAttribute("required");
-            solutionField?.removeAttribute("required");
-            notesField?.removeAttribute("required");
-
-            if (startInput) startInput.value = "";
-            if (endInput) endInput.value = "";
-            if (timeInput) timeInput.value = "";
-        }
-
-        statusSelect.addEventListener("change", function () {
-            const status = this.options[this.selectedIndex].dataset.name;
-
-            resetFields();
-
-            if (status === "in progress") {
-                startContainer?.classList.remove("hidden");
-                startInput?.setAttribute("required", "required");
+                dataTableInstance = new DataTable(table);
             }
 
-            if (status === "done") {
-                startContainer?.classList.remove("hidden");
-                endContainer?.classList.remove("hidden");
-                timeContainer?.classList.remove("hidden");
-                solutionContainer?.classList.remove("hidden");
-
-                startInput?.setAttribute("required", "required");
-                endInput?.setAttribute("required", "required");
-                timeInput?.setAttribute("required", "required");
-                solutionField?.setAttribute("required", "required");
+            if (window.innerWidth >= 1024) {
+                initDataTable();
             }
-        });
 
-        // =========================
-        // TIME CALC
-        // =========================
-        function hitungTimeSpent() {
-            if (manualCheckbox?.checked) return;
+            // =========================
+            // 🔥 STATUS FIELD LOGIC
+            // =========================
+            const statusSelect = document.getElementById("status-select");
+            if (statusSelect) {
 
-            const start = new Date(startInput?.value);
-            const end = new Date(endInput?.value);
+                const startContainer = document.getElementById("start-date-container");
+                const endContainer = document.getElementById("end-date-container");
+                const timeContainer = document.getElementById("time-spent-container");
+                const solutionContainer = document.getElementById("solution-container");
+                const notesContainer = document.getElementById("notes-container");
 
-            if (!isNaN(start) && !isNaN(end) && end > start) {
-                timeInput.value = Math.floor((end - start) / 60000);
-            } else {
-                timeInput.value = "";
+                const startInput = document.getElementById("start_datetime");
+                const endInput = document.getElementById("end_datetime");
+                const timeInput = document.getElementById("time_spent_minutes");
+                const solutionField = document.getElementById("solution-field");
+                const notesField = document.getElementById("notes");
+                const manualCheckbox = document.getElementById("manual_time");
+
+                // restore old status
+                @if (old('status_id'))
+                    statusSelect.value = "{{ old('status_id') }}";
+                    statusSelect.dispatchEvent(new Event('change'));
+                @endif
+
+                function resetFields() {
+                    startContainer?.classList.add("hidden");
+                    endContainer?.classList.add("hidden");
+                    timeContainer?.classList.add("hidden");
+                    solutionContainer?.classList.add("hidden");
+                    notesContainer?.classList.add("hidden");
+
+                    startInput?.removeAttribute("required");
+                    endInput?.removeAttribute("required");
+                    timeInput?.removeAttribute("required");
+                    solutionField?.removeAttribute("required");
+                    notesField?.removeAttribute("required");
+
+                    if (startInput) startInput.value = "";
+                    if (endInput) endInput.value = "";
+                    if (timeInput) timeInput.value = "";
+                }
+
+                statusSelect.addEventListener("change", function() {
+                    const status = this.options[this.selectedIndex].dataset.name;
+
+                    resetFields();
+
+                    if (status === "in progress") {
+                        startContainer?.classList.remove("hidden");
+                        startInput?.setAttribute("required", "required");
+                    }
+
+                    if (status === "done") {
+                        startContainer?.classList.remove("hidden");
+                        endContainer?.classList.remove("hidden");
+                        timeContainer?.classList.remove("hidden");
+                        solutionContainer?.classList.remove("hidden");
+
+                        startInput?.setAttribute("required", "required");
+                        endInput?.setAttribute("required", "required");
+                        timeInput?.setAttribute("required", "required");
+                        solutionField?.setAttribute("required", "required");
+                    }
+                });
+
+                // =========================
+                // TIME CALC
+                // =========================
+                function hitungTimeSpent() {
+                    if (manualCheckbox?.checked) return;
+
+                    const start = new Date(startInput?.value);
+                    const end = new Date(endInput?.value);
+
+                    if (!isNaN(start) && !isNaN(end) && end > start) {
+                        timeInput.value = Math.floor((end - start) / 60000);
+                    } else {
+                        timeInput.value = "";
+                    }
+                }
+
+                startInput?.addEventListener("change", hitungTimeSpent);
+                endInput?.addEventListener("change", hitungTimeSpent);
+
+                // =========================
+                // MANUAL TIME
+                // =========================
+                manualCheckbox?.addEventListener("change", function() {
+
+                    if (this.checked) {
+                        timeInput.removeAttribute("readonly");
+                        timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
+                        timeInput.classList.add("bg-gray-50", "dark:bg-gray-800");
+
+                        notesContainer?.classList.remove("hidden");
+                        notesField?.setAttribute("required", "required");
+                    } else {
+                        timeInput.setAttribute("readonly", true);
+                        timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
+                        timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+
+                        hitungTimeSpent();
+
+                        notesContainer?.classList.add("hidden");
+                        notesField?.removeAttribute("required");
+                    }
+                });
+
+                // =========================
+                // FORM VALIDATION
+                // =========================
+                const form = document.getElementById("ticket-form");
+                form?.addEventListener("submit", function(e) {
+                    const userId = document.getElementById("user-id");
+                    if (!userId?.value) {
+                        e.preventDefault();
+                        alert("⚠️ Pilih Requestor terlebih dahulu!");
+                        document.getElementById("user-search")?.focus();
+                    }
+                });
             }
-        }
 
-        startInput?.addEventListener("change", hitungTimeSpent);
-        endInput?.addEventListener("change", hitungTimeSpent);
+            // =========================
+            // 🔥 USER SEARCH (JQUERY)
+            // =========================
+            $(function() {
+                const $input = $('#user-search');
+                const $results = $('#search-results');
+                const $hidden = $('#user-id');
 
-        // =========================
-        // MANUAL TIME
-        // =========================
-        manualCheckbox?.addEventListener("change", function () {
+                if (!$input.length) return;
 
-            if (this.checked) {
-                timeInput.removeAttribute("readonly");
-                timeInput.classList.remove("bg-gray-100", "dark:bg-gray-700");
-                timeInput.classList.add("bg-gray-50", "dark:bg-gray-800");
+                $input.on('focus', () => $results.show());
 
-                notesContainer?.classList.remove("hidden");
-                notesField?.setAttribute("required", "required");
-            } else {
-                timeInput.setAttribute("readonly", true);
-                timeInput.classList.remove("bg-gray-50", "dark:bg-gray-800");
-                timeInput.classList.add("bg-gray-100", "dark:bg-gray-700");
+                $input.on('input', function() {
+                    const val = $(this).val().toLowerCase();
+                    let visible = false;
 
-                hitungTimeSpent();
+                    $results.children('li').each(function() {
+                        const match = $(this).text().toLowerCase().includes(val);
+                        $(this).toggle(match);
+                        if (match) visible = true;
+                    });
 
-                notesContainer?.classList.add("hidden");
-                notesField?.removeAttribute("required");
-            }
-        });
+                    $results.toggle(visible);
+                });
 
-        // =========================
-        // FORM VALIDATION
-        // =========================
-        const form = document.getElementById("ticket-form");
-        form?.addEventListener("submit", function (e) {
-            const userId = document.getElementById("user-id");
-            if (!userId?.value) {
-                e.preventDefault();
-                alert("⚠️ Pilih Requestor terlebih dahulu!");
-                document.getElementById("user-search")?.focus();
-            }
-        });
-    }
+                $results.on('click', 'li', function() {
+                    $input.val($(this).text());
+                    $hidden.val($(this).data('id'));
+                    $results.hide();
+                });
 
-    // =========================
-    // 🔥 USER SEARCH (JQUERY)
-    // =========================
-    $(function () {
-        const $input = $('#user-search');
-        const $results = $('#search-results');
-        const $hidden = $('#user-id');
-
-        if (!$input.length) return;
-
-        $input.on('focus', () => $results.show());
-
-        $input.on('input', function () {
-            const val = $(this).val().toLowerCase();
-            let visible = false;
-
-            $results.children('li').each(function () {
-                const match = $(this).text().toLowerCase().includes(val);
-                $(this).toggle(match);
-                if (match) visible = true;
+                $(document).on('click', (e) => {
+                    if (!$(e.target).closest('#user-search, #search-results').length) {
+                        $results.hide();
+                    }
+                });
             });
 
-            $results.toggle(visible);
-        });
+            // =========================
+            // 🔥 ASSETS SEARCH (JQUERY)
+            // =========================
+            $(function() {
+                const $input = $('#assets-search');
+                const $results = $('#assets-results');
+                const $hidden = $('#assets-id');
 
-        $results.on('click', 'li', function () {
-            $input.val($(this).text());
-            $hidden.val($(this).data('id'));
-            $results.hide();
-        });
+                if (!$input.length) return;
 
-        $(document).on('click', (e) => {
-            if (!$(e.target).closest('#user-search, #search-results').length) {
-                $results.hide();
-            }
-        });
-    });
+                $input.on('focus', () => $results.removeClass('hidden'));
 
-    // =========================
-    // 🔥 ASSETS SEARCH (JQUERY)
-    // =========================
-    $(function () {
-        const $input = $('#assets-search');
-        const $results = $('#assets-results');
-        const $hidden = $('#assets-id');
+                $input.on('input', function() {
+                    const val = $(this).val().toLowerCase();
+                    let hasVisible = false;
 
-        if (!$input.length) return;
+                    $results.children('li').each(function() {
+                        const match = $(this).text().toLowerCase().includes(val);
+                        $(this).toggleClass('hidden', !match);
+                        if (match) hasVisible = true;
+                    });
 
-        $input.on('focus', () => $results.removeClass('hidden'));
+                    $results.toggleClass('hidden', !hasVisible);
+                });
 
-        $input.on('input', function () {
-            const val = $(this).val().toLowerCase();
-            let hasVisible = false;
+                $results.on('click', 'li', function() {
+                    $input.val($(this).text());
+                    $hidden.val($(this).data('id'));
+                    $results.addClass('hidden');
+                });
 
-            $results.children('li').each(function () {
-                const match = $(this).text().toLowerCase().includes(val);
-                $(this).toggleClass('hidden', !match);
-                if (match) hasVisible = true;
+                $(document).on('click', (e) => {
+                    if (!$(e.target).closest('#assets-search, #assets-results').length) {
+                        $results.addClass('hidden');
+                    }
+                });
             });
 
-            $results.toggleClass('hidden', !hasVisible);
+            // =========================
+            // 🔥 MEDIA PREVIEW
+            // =========================
+            const mediaInput = document.getElementById("media");
+            const previewContainer = document.getElementById("preview-container");
+
+            mediaInput?.addEventListener("change", function(e) {
+                if (!previewContainer) return;
+
+                previewContainer.innerHTML = "";
+
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const MAX_SIZE = 10 * 1024 * 1024;
+
+                if (file.size > MAX_SIZE) {
+                    alert("❌ File terlalu besar! Maksimal 10MB");
+                    mediaInput.value = "";
+                    return;
+                }
+
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
+
+                if (!validTypes.includes(file.type)) {
+                    alert("❌ Format tidak valid!");
+                    mediaInput.value = "";
+                    return;
+                }
+
+                const preview = document.createElement("div");
+                preview.className = "relative inline-block";
+
+                if (file.type.startsWith("image/")) {
+                    const img = document.createElement("img");
+                    img.src = URL.createObjectURL(file);
+                    img.className = "h-40 rounded border";
+                    preview.appendChild(img);
+                } else {
+                    const video = document.createElement("video");
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    video.className = "h-40 rounded border";
+                    preview.appendChild(video);
+                }
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.innerHTML = "✖";
+                btn.className = "absolute top-0 right-0 bg-red-500 text-white px-2 rounded";
+
+                btn.onclick = () => {
+                    mediaInput.value = "";
+                    previewContainer.innerHTML = "";
+                };
+
+                preview.appendChild(btn);
+                previewContainer.appendChild(preview);
+            });
+
         });
+    </script>
 
-        $results.on('click', 'li', function () {
-            $input.val($(this).text());
-            $hidden.val($(this).data('id'));
-            $results.addClass('hidden');
-        });
-
-        $(document).on('click', (e) => {
-            if (!$(e.target).closest('#assets-search, #assets-results').length) {
-                $results.addClass('hidden');
-            }
-        });
-    });
-
-    // =========================
-    // 🔥 MEDIA PREVIEW
-    // =========================
-    const mediaInput = document.getElementById("media");
-    const previewContainer = document.getElementById("preview-container");
-
-    mediaInput?.addEventListener("change", function (e) {
-        if (!previewContainer) return;
-
-        previewContainer.innerHTML = "";
-
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const MAX_SIZE = 10 * 1024 * 1024;
-
-        if (file.size > MAX_SIZE) {
-            alert("❌ File terlalu besar! Maksimal 10MB");
-            mediaInput.value = "";
-            return;
+    {{-- STYLE FIX --}}
+    <style>
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
         }
 
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'video/mp4'];
-
-        if (!validTypes.includes(file.type)) {
-            alert("❌ Format tidak valid!");
-            mediaInput.value = "";
-            return;
+        .dark .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
         }
 
-        const preview = document.createElement("div");
-        preview.className = "relative inline-block";
-
-        if (file.type.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
-            img.className = "h-40 rounded border";
-            preview.appendChild(img);
-        } else {
-            const video = document.createElement("video");
-            video.src = URL.createObjectURL(file);
-            video.controls = true;
-            video.className = "h-40 rounded border";
-            preview.appendChild(video);
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 0.7;
         }
 
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.innerHTML = "✖";
-        btn.className = "absolute top-0 right-0 bg-red-500 text-white px-2 rounded";
+        #search-results::-webkit-scrollbar,
+        #assets-results::-webkit-scrollbar {
+            width: 8px;
+        }
 
-        btn.onclick = () => {
-            mediaInput.value = "";
-            previewContainer.innerHTML = "";
-        };
+        #search-results::-webkit-scrollbar-track,
+        #assets-results::-webkit-scrollbar-track {
+            background: #374151;
+        }
 
-        preview.appendChild(btn);
-        previewContainer.appendChild(preview);
-    });
+        #search-results::-webkit-scrollbar-thumb,
+        #assets-results::-webkit-scrollbar-thumb {
+            background: #6b7280;
+            border-radius: 4px;
+        }
 
-});
-</script>
-
-{{-- STYLE FIX --}}
-<style>
-.date-input::-webkit-calendar-picker-indicator {
-    filter: invert(0);
-    cursor: pointer;
-}
-
-.dark .date-input::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-}
-
-.date-input::-webkit-calendar-picker-indicator:hover {
-    opacity: 0.7;
-}
-
-#search-results::-webkit-scrollbar,
-#assets-results::-webkit-scrollbar {
-    width: 8px;
-}
-
-#search-results::-webkit-scrollbar-track,
-#assets-results::-webkit-scrollbar-track {
-    background: #374151;
-}
-
-#search-results::-webkit-scrollbar-thumb,
-#assets-results::-webkit-scrollbar-thumb {
-    background: #6b7280;
-    border-radius: 4px;
-}
-
-#search-results::-webkit-scrollbar-thumb:hover,
-#assets-results::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-}
-</style>
+        #search-results::-webkit-scrollbar-thumb:hover,
+        #assets-results::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
 
 </x-app-layout>

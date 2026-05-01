@@ -169,11 +169,11 @@ class TicketReportController extends Controller
                 $query->where('end_date', '<=', $endDate);
             }
 
-            $avgMinutes  = (float) ($query->avg('time_spent') ?: 0);
-            $fullMinutes = (int) ($query->sum('time_spent') ?: 0);
+            $avgMinutes  = (float) ($query->avg('time_spent_minutes') ?: 0);
+            $fullMinutes = (int) ($query->sum('time_spent_minutes') ?: 0);
 
             $totalCompleted = (int) $query->count();
-            $metSLA = (int) (clone $query)->where('time_spent', '<=', 8 * 60)->count();
+            $metSLA = (int) (clone $query)->where('time_spent_minutes', '<=', 8 * 60)->count();
             $slaPercentage = $totalCompleted > 0 ? round(($metSLA / $totalCompleted) * 100, 2) : 0;
 
             $convertToHourMinute = function ($minutes) {
@@ -260,7 +260,7 @@ class TicketReportController extends Controller
         $doneIds = $this->doneStatusIds();
 
         $q = Ticket::query()
-            ->selectRaw('support_id, MONTH(end_date) as month, SUM(time_spent) as total_minutes')
+            ->selectRaw('support_id, MONTH(end_date) as month, SUM(time_spent_minutes) as total_minutes')
             ->whereNotNull('end_date')
             ->whereYear('end_date', $year)
             ->groupBy('support_id', 'month');
@@ -312,7 +312,7 @@ class TicketReportController extends Controller
             ->selectRaw('
                 departments.id as department_id,
                 MONTH(tickets.end_date) as month,
-                COALESCE(SUM(tickets.time_spent), 0) as total_minutes
+                COALESCE(SUM(tickets.time_spent_minutes), 0) as total_minutes
             ')
             ->join('users', 'tickets.user_id', '=', 'users.id')
             ->join('departments', 'users.department_id', '=', 'departments.id')
@@ -345,7 +345,7 @@ class TicketReportController extends Controller
 
             $datasets[] = [
                 'label' => $department->name
-                    . ($department->location ? ' - ' . $department->location->location_name : ''),
+    . ($department->location ? ' - ' . $department->location->name : ''),
                 'data' => $data,
             ];
         }
@@ -477,7 +477,7 @@ class TicketReportController extends Controller
                 'notes',
                 'start_date',
                 'end_date',
-                'time_spent',
+                'time_spent_minutes',
                 'is_late',
                 'created_at',
             ]);
@@ -528,7 +528,7 @@ class TicketReportController extends Controller
                     optional($t->status)->name ?? '-',       // ✅ status_name -> name
                     $t->start_date ? Carbon::parse($t->start_date)->format('Y-m-d H:i') : '-',
                     $t->end_date ? Carbon::parse($t->end_date)->format('Y-m-d H:i') : '-',
-                    (int) ($t->time_spent ?? 0),
+                    (int) ($t->time_spent_minutes ?? 0),
                     $t->is_late ? 'Yes' : 'No',
                     $t->created_at ? $t->created_at->format('Y-m-d H:i') : '-',
                 ]);
@@ -566,7 +566,7 @@ class TicketReportController extends Controller
                 'status_id',
                 'start_date',
                 'end_date',
-                'time_spent',
+                'time_spent_minutes',
                 'is_late',
                 'created_at',
             ])
@@ -581,7 +581,7 @@ class TicketReportController extends Controller
                     'status'          => optional($t->status)->name ?? '-', // ✅ status_name -> name
                     'start_date'      => $t->start_date ? Carbon::parse($t->start_date)->format('Y-m-d H:i') : '-',
                     'end_date'        => $t->end_date ? Carbon::parse($t->end_date)->format('Y-m-d H:i') : '-',
-                    'time_spent'      => (int) ($t->time_spent ?? 0),
+                    'time_spent_minutes'      => (int) ($t->time_spent_minutes ?? 0),
                     'is_late'         => $t->is_late ? 'Yes' : 'No',
                     'created_at'      => $t->created_at ? $t->created_at->format('Y-m-d H:i') : '-',
                 ];

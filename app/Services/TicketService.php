@@ -112,11 +112,11 @@ class TicketService
         }
 
         if ($ticket->request_date) {
-            $data['waiting_hour'] = $ticket->request_date->diffInMinutes(now());
+            $data['waiting_minutes'] = $ticket->request_date->diffInMinutes(now());
         }
 
-        if (isset($data['time_spent'])) {
-            $data['is_late'] = $data['time_spent'] > 480;
+        if (isset($data['time_spent_minutes'])) {
+            $data['is_late'] = $data['time_spent_minutes'] > 480;
         }
 
         $ticket->update($data);
@@ -139,8 +139,8 @@ class TicketService
     {
         $ticket->update([
             'status_id' => $data['status_id'],
-            'time_spent' => $data['time_spent'] ?? 0,
-            'is_late' => ($data['time_spent'] ?? 0) > 480,
+            'time_spent_minutes' => $data['time_spent_minutes'] ?? 0,
+            'is_late' => ($data['time_spent_minutes'] ?? 0) > 480,
             'solution' => $data['solution'] ?? null,
             'notes' => $data['notes'] ?? null,
             'end_date' => now(),

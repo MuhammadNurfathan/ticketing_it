@@ -48,7 +48,7 @@ class TicketStoreRequest extends FormRequest
         if ($statusId === 3) {
             $rules['start_date'] = ['required', 'date'];
             $rules['end_date']   = ['required', 'date', 'after:start_date'];
-            $rules['time_spent'] = ['required', 'integer', 'min:1'];
+            $rules['time_spent_minutes'] = ['required', 'integer', 'min:1'];
             $rules['solution']   = ['required', 'string'];
         }
 
@@ -76,8 +76,8 @@ class TicketStoreRequest extends FormRequest
             'start_date.required'  => 'Start Date wajib diisi',
             'end_date.required'    => 'End Date wajib diisi',
             'end_date.after'       => 'End Date harus setelah Start Date',
-            'time_spent.required'  => 'Time Spent wajib diisi',
-            'time_spent.min'       => 'Time Spent minimal 1 menit',
+            'time_spent_minutes.required'  => 'Time Spent wajib diisi',
+            'time_spent_minutes.min'       => 'Time Spent minimal 1 menit',
             'solution.required'    => 'Solution wajib diisi',
 
             'notes.min'            => 'Notes minimal 5 karakter',

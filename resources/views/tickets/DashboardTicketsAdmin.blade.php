@@ -10,7 +10,7 @@
                     <a href="{{ route('DashboardTicketsAdmin.create') }}"
                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
                               bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm">
-                        Create Ticket
+                        Tambah Ticket
                     </a>
                 </div>
             @endif
@@ -414,7 +414,7 @@
                                                         method="POST">
                                                         @csrf
                                                         <input type="hidden" name="status_id" value="3">
-                                                        <input type="hidden" name="time_spent" class="hiddenTimeSpent">
+                                                        <input type="hidden" name="time_spent_minutes" class="hiddenTimeSpent">
                                                         <input type="hidden" name="solution" class="hiddenSolution">
                                                         <input type="hidden" name="notes" class="hiddenNotes">
                                                     </form>
@@ -470,7 +470,7 @@
                                         <td class="{{ $td }}">{{ $ticket->category?->name ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">{{ $ticket->problem }}</td>
                                         <td class="{{ $td }}">{{ $ticket->request_date?->format('Y-m-d') ?? '-' }}</td>
-                                        <td class="{{ $td }}">{{ $ticket->time_spent ?? '-' }} menit</td>
+                                        <td class="{{ $td }}">{{ $ticket->time_spent_minutes ?? '-' }} menit</td>
                                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xs break-words">
                                             {{ $ticket->feedback?->comment ?? '-' }}
                                         </td>
@@ -566,7 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const notesContainer = modal.querySelector('.notesContainer');
             const notesInput = modal.querySelector('.notesInput');
             const manualCheckbox = modal.querySelector('.manualCheckbox');
-            const form = modal.querySelector('.doneForm');
+            const form = modal.nextElementSibling;
 
             // ================= OPEN MODAL =================
             modal.classList.remove('hidden');
