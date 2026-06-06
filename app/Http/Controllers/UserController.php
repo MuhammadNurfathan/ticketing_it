@@ -2,73 +2,77 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Notifications\Notifiable;
-use App\Models\Role;
-use App\Models\Department;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\User\UserStoreRequest;
+use App\Http\Requests\User\UserUpdateRequest;
 
 class UserController extends Controller
 {
-    use Notifiable;
-    public function index(){
-        $users = User::latest()->with('role')->get();
+    public function index()
+    {
+        $users = User::getUser();
+
         return view('master/users.index', compact('users'));
     }
 
-    public function create(){
-        $roles = Role::all();
-        $departments = Department::all();
-        return view('master/users.create', compact('departments', 'roles'));
-    }
+    public function create()
+    {
+        $data = User::getRolesAndDepartments();
 
-    public function edit(User $user){
-        $roles = role::all();
-        $departments = Department::all();
-        return view('master/users.edit', compact('user', 'departments', 'roles'));
-    }
-
-    public function store(Request $request){
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'department_id' => 'nullable|exists:departments,id',
-            'email' => 'nullable|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'role_id' => 'required|string',
+        return view('master/users.create', [
+            'roles' => $data['roles'],
+            'departments' => $data['departments'],
         ]);
-
-        User::create($request->only('name', 'username', 'department_id', 'role_id', 'email', 'password'));
-        return redirect()->route('users.index')->with('success', 'User berhasil dibuat');
     }
 
-    public function update(Request $request, User $user){
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255',
-            'department_id' => 'nullable|exists:departments,id',
-            'email' => 'nullable|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6|confirmed',
-            'role_id' => 'nullable|string',
-        ]);
+    public function edit(User $user)
+    {
+        $data = User::getRolesAndDepartments();
 
-        $data = $request->only('name', 'username', 'department_id', 'role_id', 'email');
-        if ($request->password) {
-            $data['password'] = $request->password;
+        return view('master/users.edit', [
+            'user' => $user,
+            'roles' => $data['roles'],
+            'departments' => $data['departments'],
+        ]);
+    }
+
+    public function store(UserStoreRequest $request)
+    {
+        $data = $request->validated();
+
+        $data['password'] = Hash::make($data['password']);
+
+        User::create($data);
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User berhasil dibuat');
+    }
+
+    public function update(UserUpdateRequest $request, User $user)
+    {
+        $data = $request->validated();
+
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
         }
 
         $user->update($data);
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui');
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User berhasil diperbarui');
     }
-    
-    public function destroy(User $user){
-        try {
-            $user->delete();
-            return redirect()->route('users.index')
-                ->with('success', 'User berhasil dihapus!');
-        } catch (\Exception $e) {
-            return redirect()->route('users.index')
-                ->with('error', 'Users tidak dapat dihapus karena masih digunakan!');
-        }
+
+    public function destroy(User $user)
+    {
+        $user->delete($user);
+
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User berhasil dihapus');
     }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
             $table->string('name', 150);
             $table->string('username', 100)->unique();
             $table->foreignId('department_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
-            $table->foreignId('role_id')->nullable()->constrained()->restrictOnDelete()->cascadeOnUpdate();
-            $table->string('email', 150)->nullable()->unique();
-            $table->string('password');
+            $table->foreignId('role_id')->require()->constrained()->restrictOnDelete()->cascadeOnUpdate();
+            $table->string('email', 150)->require()->unique();
+            $table->string('password')->require();
             $table->string('phone', 20)->nullable();
             $table->string('job_position', 100)->nullable();
-            $table->string('status', 50)->default('aktif');
+            $table->enum('status', ['Aktif','Non Aktif'])->default('Aktif');
             $table->rememberToken();
             $table->timestamps();
         });

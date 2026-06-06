@@ -55,8 +55,8 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('end_date')->nullable();
 
-            $table->integer('waiting_hour')->nullable();
-            $table->integer('time_spent')->nullable();
+            $table->integer('waiting_minutes')->nullable();
+            $table->integer('time_spent_minutes')->nullable();
 
             $table->boolean('is_late')->default(false)
                 ->comment('false = On Time, true = Late');

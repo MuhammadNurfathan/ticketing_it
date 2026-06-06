@@ -87,7 +87,7 @@ class TicketService
     {
         return array_merge(
             ['ticket' => Ticket::withAll()->findOrFail($id)],
-            Ticket::formData()
+            Ticket::formDataEdit()
         );
     }
 

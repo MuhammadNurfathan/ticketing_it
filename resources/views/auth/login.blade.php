@@ -51,21 +51,15 @@
 
 
 
-                <!-- Remember Me -->
                 <div class="flex items-center justify-between">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox"
-                            class="text-blue-500 border-gray-300 rounded focus:border-blue-300 focus:ring focus:ring-blue-500 dark:border-gray-600 dark:bg-dark-eval-1 dark:focus:ring-offset-dark-eval-1"
-                            name="remember">
-                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-                    </label>
+                  
 
-                    {{-- @if (Route::has('password.request'))
+                    @if (Route::has('password.request'))
                     <a class="text-sm text-blue-500 hover:underline" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
+                        {{ __('Forgot password?') }}
                     </a>
-                    @endif --}}
-                </div>
+                    @endif
+                </div   >
 
                 <div>
                     <x-button class="justify-center w-full gap-2">
@@ -74,14 +68,6 @@
                     </x-button>
                 </div>
 
-                {{-- @if (Route::has('register'))
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Don’t have an account?') }}
-                    <a href="{{ route('register') }}" class="text-blue-500 hover:underline">
-                        {{ __('Register') }}
-                    </a>
-                </p>
-                @endif --}}
             </div>
         </form>
     </x-auth-card>

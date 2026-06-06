@@ -17,4 +17,7 @@ class Role extends Model
     {
         return $this->hasMany(User::class, 'role_id');
     }
+public function getAllRole() {
+    return self::All();
+}
 }

@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Ticket') }}
+            {{ __('Execute Ticket') }}
         </h2>
     </x-slot>
 
-    <div
-        class="py-12 bg-light-eval-1 dark:bg-dark-eval-1 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
+      <div class="py-4">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl">
+
+                <div class="p-6">
 
                     {{-- Error Alert --}}
                     @if ($errors->any())
@@ -158,13 +158,11 @@
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="" hidden>-- Pilih Status --</option>
                                 @foreach ($statuses as $stat)
-                                    @if (!in_array($stat->id, [4, 5, 6]))
                                         <option value="{{ $stat->id }}"
                                             data-name="{{ strtolower($stat->name) }}"
                                             {{ old('status_id', $ticket->status_id) == $stat->id ? 'selected' : '' }}>
                                             {{ $stat->name }}
                                         </option>
-                                    @endif
                                 @endforeach
                             </select>
                         </div>

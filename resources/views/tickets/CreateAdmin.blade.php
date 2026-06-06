@@ -145,7 +145,7 @@
                             </label>
                             <select name="status_id" id="status-select" required
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" hidden>-- Choose Status --</option>
+                                <option value="1" hidden>Waiting</option>
                                 @foreach ($statuses as $stat)
                                     <option value="{{ $stat->id }}" data-name="{{ strtolower($stat->name) }}">
                                         {{ $stat->name }}

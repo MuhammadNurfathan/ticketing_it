@@ -23,10 +23,6 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->fill($request->validated());
 
-        if ($user->isDirty('username')) {
-            $user->username_verified_at = null;
-        }
-
         $user->save();
 
         return Redirect::route('profile.edit')

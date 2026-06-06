@@ -35,7 +35,7 @@
 
                         {{-- NAME --}}
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Name</label>
+                            <label class="block text-sm font-medium mb-2">Name <span style="color: red;">*</span></label>
                             <input type="text" name="name"
                                 value="{{ old('name', $user->name) }}"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
@@ -47,7 +47,7 @@
 
                         {{-- USERNAME --}}
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Username</label>
+                            <label class="block text-sm font-medium mb-2">Username <span style="color: red;">*</span></label>
                             <input type="text" name="username"
                                 value="{{ old('username', $user->username) }}"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
@@ -59,25 +59,23 @@
 
                         {{-- EMAIL --}}
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <label class="block text-sm font-medium mb-2">Email <span style="color: red;">*</span></label>
                             <input type="email" name="email"
                                 value="{{ old('email', $user->email) }}"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
                                 bg-gray-50 dark:bg-gray-700
                                 focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
 
                         {{-- ROLE --}}
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Role</label>
+                            <label class="block text-sm font-medium mb-2">Role <span style="color: red;">*</span></label>
                             <select name="role_id"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
                                 bg-gray-50 dark:bg-gray-700
                                 focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
-                                <option value="">-- Pilih Role --</option>
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 @foreach($roles as $role)
                                     <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>
                                         {{ $role->name }}
@@ -88,14 +86,12 @@
 
                         {{-- DEPARTMENT --}}
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Department</label>
+                            <label class="block text-sm font-medium mb-2">Department <span style="color: red;">*</span></label>
                             <select name="department_id"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
                                 bg-gray-50 dark:bg-gray-700
                                 focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-
-                                <option value="">-- Pilih Department --</option>
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 @foreach($departments as $dept)
                                     <option value="{{ $dept->id }}" {{ old('department_id', $user->department_id) == $dept->id ? 'selected' : '' }}>
                                         {{ $dept->name }} - {{ $dept->location->name }}
@@ -139,7 +135,7 @@
                             <button type="submit"
                                     class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700
                                     text-white font-medium shadow-sm transition">
-                                Update
+                                Simpan
                             </button>
 
                         </div>

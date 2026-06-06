@@ -1,4 +1,7 @@
 import "./bootstrap";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+
 
 /* ======================
    LIBRARIES
@@ -49,7 +52,7 @@ window.renderPieChart = renderPieChart;
 window.LineChart = LineChart;
 window.renderLineChart = renderLineChart;
 window.initBarChart = initBarChart;
-
+window.flatpickr = flatpickr;
 /* ======================
    INIT GLOBAL FUNCTION
 ====================== */

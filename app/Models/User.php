@@ -41,7 +41,22 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+    public static function getUser()
+    {
+        return self::with('role')->get();
+    }
 
+    public static function getRolesAndDepartments()
+    {
+        $roles = (new Role())->getAllRole();
+        $departments = (new Department())->getAllDepartment();
+
+        return [
+            'roles' => $roles,
+            'departments' => $departments
+        ];
+    }
+    
     public function requestedTickets()
     {
         return $this->hasMany(Ticket::class, 'user_id');

@@ -21,7 +21,7 @@
             Pastikan akunmu memiliki role yang sesuai atau hubungi administrator.
         </p>
         
-        <a href="{{ url('/dashboard') }}"
+        <a href="{{ url('/DashboardTicketsUser') }}"
            class="inline-block bg-red-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:bg-red-700 transform hover:-translate-y-1 transition-all duration-300">
             Kembali ke Beranda
         </a>

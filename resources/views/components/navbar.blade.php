@@ -105,10 +105,6 @@
                     {{ __('Profile') }}
                 </x-dropdown-link>
 
-                <!-- Settings (Optional) -->
-                <x-dropdown-link href="#">
-                    {{ __('Settings') }}
-                </x-dropdown-link>
 
                 <div class="border-t dark:border-gray-700"></div>
 
