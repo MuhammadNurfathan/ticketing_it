@@ -6,6 +6,7 @@ use App\Http\Requests\Roles\RoleStoreRequest;
 use App\Http\Requests\Roles\RoleUpdateRequest;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 
 class RoleController extends Controller
 {
@@ -45,24 +46,34 @@ class RoleController extends Controller
             ->with('success', 'Role berhasil diperbarui.');
     }
 
-    public function destroy(Role $role)
-    {
-        try {
-            if ($role->users()->count() > 0) {
-                return redirect()
-                    ->route('roles.index')
-                    ->with('error', 'Role tidak dapat dihapus karena masih digunakan oleh user.');
-            }
 
-            $role->delete();
-
+public function destroy(Role $role)
+{
+    try {
+        if ($role->users()->count() > 0) {
             return redirect()
                 ->route('roles.index')
-                ->with('success', 'Role berhasil dihapus.');
-        } catch (\Throwable $e) {
-            return redirect()
-                ->route('roles.index')
-                ->with('error', 'Gagal menghapus role: ' . $e->getMessage());
+                ->with('error', 'Role tidak dapat dihapus karena masih digunakan oleh user.');
         }
+
+        $role->delete();
+
+        return redirect()
+            ->route('roles.index')
+            ->with('success', 'Role berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('roles.index')
+            ->with('error', 'Role tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('roles.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus role.');
+
     }
+}
 }

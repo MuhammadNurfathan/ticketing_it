@@ -28,23 +28,27 @@ return new class extends Migration
             $table->foreignId('category_id')
                 ->nullable()
                 ->constrained('categories')
-                ->nullOnDelete();
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
 
             $table->foreignId('asset_id')
                 ->nullable()
                 ->constrained('assets')
-                ->nullOnDelete();
+                ->restrictOnDelete()
+                ->cascadeOnUpdate();
 
             $table->foreignId('status_id')
                 ->nullable()
                 ->constrained('statuses')
-                ->nullOnDelete()
+                ->restrictOnDelete()
+                ->cascadeOnUpdate()
                 ->default(1);
 
             $table->foreignId('priority_id')
                 ->nullable()
                 ->constrained('priorities')
-                ->nullOnDelete();
+               ->restrictOnDelete()
+                ->cascadeOnUpdate();
 
             $table->text('problem')->nullable();
             $table->string('image', 255)->nullable();

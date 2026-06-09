@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/{project}/updateProgress', [ProjectController::class, 'updateProgress'])->name('updateProgress');
             Route::post('/{projectHeaderId}/pending', [ProjectController::class, 'storePending'])->name('pending.store');
             Route::post('/{projectHeaderId}/continue', [ProjectController::class, 'continueProgress'])->name('continueProgress');
-            Route::put('/{project}/done', [ProjectController::class, 'done'])->name('done');
+            Route::put('/{project}/resolved', [ProjectController::class, 'resolved'])->name('resolved');
         });
 
 

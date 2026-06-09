@@ -21,7 +21,7 @@ class ProjectService
             'waitingProject'    => (clone $filter)->waiting()->get(),
             'inProgressProject' => (clone $filter)->inProgress()->get(),
             'voidProject'       => (clone $filter)->void()->get(),
-            'doneProject'       => (clone $filter)->done()->get(),
+            'resolvedProject'       => (clone $filter)->resolved()->get(),
             'pendingProject'    => (clone $filter)->pending()->get(),
         ];
 
@@ -67,11 +67,11 @@ class ProjectService
         ProjectDetail::logProgress($project, $data, $statusId);
     }
 
-    public function done($project, $data)
+    public function resolved($project, $data)
     {
-        $statusId = Status::getId('done');
+        $statusId = Status::getId('resolved');
 
-        if (!$statusId) throw new \Exception('Status done tidak ada');
+        if (!$statusId) throw new \Exception('Status resolved tidak ada');
 
         $apply = (int)$data['apply_pending_duration'] === 1;
         $pendingMinutes = $apply ? $project->getAppliedPendingMinutes() : 0;
@@ -90,7 +90,7 @@ class ProjectService
             'is_late' => $effectiveEnd && $actualEnd->gt($effectiveEnd),
         ]);
 
-        ProjectDetail::logDone($project, $data, $statusId, $apply);
+        ProjectDetail::logresolved($project, $data, $statusId, $apply);
     }
 
     public function startProject($project)

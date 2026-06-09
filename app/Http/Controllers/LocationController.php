@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Locations\LocationStoreRequest;
 use App\Http\Requests\Locations\LocationUpdateRequest;
 use App\Models\Location;
+use Illuminate\Database\QueryException;
 
 class LocationController extends Controller
 {
@@ -49,18 +50,28 @@ class LocationController extends Controller
             ->with('success', 'Location berhasil diperbarui.');
     }
 
-    public function destroy(Location $location)
-    {
-        try {
-            $location->delete();
 
-            return redirect()
-                ->route('locations.index')
-                ->with('success', 'Location berhasil dihapus.');
-        } catch (\Throwable $e) {
-            return redirect()
-                ->route('locations.index')
-                ->with('error', 'Location tidak dapat dihapus: ' . $e->getMessage());
-        }
+public function destroy(Location $location)
+{
+    try {
+        $location->delete();
+
+        return redirect()
+            ->route('locations.index')
+            ->with('success', 'Location berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('locations.index')
+            ->with('error', 'Location tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('locations.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus location.');
+
     }
+}
 }

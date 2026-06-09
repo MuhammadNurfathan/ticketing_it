@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Status\StatusStoreRequest;
 use App\Http\Requests\Status\StatusUpdateRequest;
 use App\Models\Status;
-
+ use Illuminate\Database\QueryException;
 class StatusController extends Controller
 {
     public function index()
@@ -44,18 +44,29 @@ class StatusController extends Controller
             ->with('success', 'Status berhasil diperbarui.');
     }
 
-    public function destroy(Status $status)
-    {
-        try {
-            $status->delete();
 
-            return redirect()
-                ->route('status.index')
-                ->with('success', 'Status berhasil dihapus.');
-        } catch (\Throwable $e) {
-            return redirect()
-                ->route('status.index')
-                ->with('error', 'Gagal menghapus status: ' . $e->getMessage());
-        }
+
+public function destroy(Status $status)
+{
+    try {
+        $status->delete();
+
+        return redirect()
+            ->route('status.index')
+            ->with('success', 'Status berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('status.index')
+            ->with('error', 'Status tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('status.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus status.');
+
     }
+}
 }

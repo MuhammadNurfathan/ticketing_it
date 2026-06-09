@@ -15,20 +15,61 @@ use Carbon\Carbon;
 class TicketReportController extends Controller
 {
     /**
-     * Helper: ambil status done IDs untuk context ticket
-     * (lebih aman daripada hardcode [3,5])
+     * Ambil status IDs yang dianggap "selesai" untuk context ticket.
      */
     private function doneStatusIds(): array
     {
-        // Kalau lu punya 1 done: type='done'
-        // Kalau lu punya 2 done: misalnya type in ('done','closed') -> tambah di sini
         return Status::where('context', 'ticket')
-            ->whereIn('type', ['done'])
+            ->whereIn('type', ['done', 'feedback'])
             ->pluck('id')
-            ->map(fn($v) => (int)$v)
+            ->map(fn($v) => (int) $v)
             ->values()
             ->all();
     }
+
+    /**
+     * Apply filter done status ke query.
+     */
+    private function applyDoneFilter($query, array $doneIds, string $prefix = ''): void
+    {
+        $col = $prefix ? "{$prefix}.status_id" : 'status_id';
+        if (!empty($doneIds)) {
+            $query->whereIn($col, $doneIds);
+        } elseif (method_exists(Ticket::class, 'scopeDone')) {
+            $query->done();
+        }
+    }
+
+    /**
+     * Apply filter tanggal (end_date) ke query.
+     */
+    private function applyDateFilter($query, ?string $startDate, ?string $endDate, string $col = 'end_date'): void
+    {
+        if ($startDate) {
+            $query->where($col, '>=', Carbon::parse($startDate)->startOfDay());
+        }
+        if ($endDate) {
+            $query->where($col, '<=', Carbon::parse($endDate)->endOfDay());
+        }
+    }
+
+    /**
+     * Konversi menit ke format "X jam Y menit".
+     */
+    private function formatMinutes(int|float $minutes): string
+    {
+        $minutes = (int) round($minutes);
+        $h = intdiv($minutes, 60);
+        $m = $minutes % 60;
+
+        if ($h <= 0) return "{$minutes} menit";
+        if ($m <= 0) return "{$h} jam";
+        return "{$h} jam {$m} menit";
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Endpoints
+    // ─────────────────────────────────────────────────────────────
 
     public function ticketsByCategory(Request $request)
     {
@@ -42,33 +83,17 @@ class TicketReportController extends Controller
 
             $query = Ticket::query()
                 ->select('category_id', DB::raw('COUNT(*) as total'))
-                ->with('category:id,name') // ✅ pastikan relasi Ticket::category() dan kolom categories.name
+                ->with('category:id,name')
                 ->whereNotNull('end_date');
 
-            // filter done
-            if (!empty($doneIds)) {
-                $query->whereIn('status_id', $doneIds);
-            } elseif (method_exists(Ticket::class, 'scopeDone')) {
-                $query->done();
-            }
+            $this->applyDoneFilter($query, $doneIds);
+            $this->applyDateFilter($query, $request->start_date, $request->end_date);
 
-            if ($request->start_date) {
-                $start = Carbon::parse($request->start_date)->startOfDay();
-                $query->where('end_date', '>=', $start);
-            }
-            if ($request->end_date) {
-                $end = Carbon::parse($request->end_date)->endOfDay();
-                $query->where('end_date', '<=', $end);
-            }
-
-            $tickets = $query->groupBy('category_id')->get();
-
-            $data = $tickets->map(function ($row) {
-                return [
+            $data = $query->groupBy('category_id')->get()
+                ->map(fn($row) => [
                     'category' => optional($row->category)->name ?? 'Unknown',
                     'total'    => (int) $row->total,
-                ];
-            });
+                ]);
 
             return response()->json([
                 'success' => true,
@@ -79,10 +104,7 @@ class TicketReportController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -93,40 +115,28 @@ class TicketReportController extends Controller
                 'year' => 'nullable|integer|min:2020|max:2100',
             ]);
 
-            $year = (int) ($request->year ?? now()->year);
+            $year    = (int) ($request->year ?? now()->year);
             $doneIds = $this->doneStatusIds();
 
-            $q = Ticket::query()
-                ->select(
-                    DB::raw('MONTH(end_date) as month'),
-                    DB::raw('COUNT(*) as total')
-                )
+            $query = Ticket::query()
+                ->select(DB::raw('MONTH(end_date) as month'), DB::raw('COUNT(*) as total'))
                 ->whereNotNull('end_date')
                 ->whereYear('end_date', $year);
 
-            if (!empty($doneIds)) {
-                $q->whereIn('status_id', $doneIds);
-            } elseif (method_exists(Ticket::class, 'scopeDone')) {
-                $q->done();
-            }
+            $this->applyDoneFilter($query, $doneIds);
 
-            $tickets = $q->groupBy(DB::raw('MONTH(end_date)'))
-                ->orderBy('month')
-                ->get();
+            $tickets = $query->groupBy(DB::raw('MONTH(end_date)'))->orderBy('month')->get();
 
             $monthlyData = collect(range(1, 12))->mapWithKeys(fn($m) => [$m => 0]);
-
             foreach ($tickets as $t) {
-                $monthlyData[(int)$t->month] = (int)$t->total;
+                $monthlyData[(int) $t->month] = (int) $t->total;
             }
 
-            $data = $monthlyData->map(function ($total, $month) use ($year) {
-                return [
-                    'month'        => Carbon::create($year, $month, 1)->format('F'),
-                    'month_number' => (int) $month,
-                    'total'        => (int) $total,
-                ];
-            })->values();
+            $data = $monthlyData->map(fn($total, $month) => [
+                'month'        => Carbon::create($year, $month, 1)->format('F'),
+                'month_number' => (int) $month,
+                'total'        => (int) $total,
+            ])->values();
 
             return response()->json([
                 'success' => true,
@@ -134,10 +144,7 @@ class TicketReportController extends Controller
                 'filters' => ['year' => $year],
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -152,297 +159,208 @@ class TicketReportController extends Controller
             $doneIds = $this->doneStatusIds();
 
             $query = Ticket::query()->whereNotNull('end_date');
-
-            if (!empty($doneIds)) {
-                $query->whereIn('status_id', $doneIds);
-            } elseif (method_exists(Ticket::class, 'scopeDone')) {
-                $query->done();
-            }
-
-            if ($request->start_date) {
-                $startDate = Carbon::parse($request->start_date)->startOfDay();
-                $query->where('end_date', '>=', $startDate);
-            }
-
-            if ($request->end_date) {
-                $endDate = Carbon::parse($request->end_date)->endOfDay();
-                $query->where('end_date', '<=', $endDate);
-            }
+            $this->applyDoneFilter($query, $doneIds);
+            $this->applyDateFilter($query, $request->start_date, $request->end_date);
 
             $avgMinutes  = (float) ($query->avg('time_spent_minutes') ?: 0);
             $fullMinutes = (int) ($query->sum('time_spent_minutes') ?: 0);
 
             $totalCompleted = (int) $query->count();
-            $metSLA = (int) (clone $query)->where('time_spent_minutes', '<=', 8 * 60)->count();
-            $slaPercentage = $totalCompleted > 0 ? round(($metSLA / $totalCompleted) * 100, 2) : 0;
-
-            $convertToHourMinute = function ($minutes) {
-                $minutes = (int) round($minutes);
-                $h = intdiv($minutes, 60);
-                $m = $minutes % 60;
-
-                if ($h <= 0) return "{$minutes} menit";
-                if ($m <= 0) return "{$h} jam";
-                return "{$h} jam {$m} menit";
-            };
+            $metSLA         = (int) (clone $query)->where('time_spent_minutes', '<=', 8 * 60)->count();
+            $slaPercentage  = $totalCompleted > 0 ? round(($metSLA / $totalCompleted) * 100, 2) : 0;
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'fullResolutionTime' => $convertToHourMinute($fullMinutes),
-                    'avgResolutionTime'  => $convertToHourMinute($avgMinutes),
+                'data'    => [
+                    'fullResolutionTime' => $this->formatMinutes($fullMinutes),
+                    'avgResolutionTime'  => $this->formatMinutes($avgMinutes),
                     'slaPercentage'      => $slaPercentage,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
     public function chartTicketsByDev(Request $request)
     {
-        $year = (int) $request->input('year', now()->year);
+        $year    = (int) $request->input('year', now()->year);
         $doneIds = $this->doneStatusIds();
 
-        $q = Ticket::query()
+        $query = Ticket::query()
             ->selectRaw('support_id, MONTH(end_date) as month, COUNT(*) as total')
             ->whereNotNull('end_date')
             ->whereYear('end_date', $year)
-            ->groupBy('support_id', 'month');
+            ->groupBy('support_id', DB::raw('MONTH(end_date)'));
 
-        if (!empty($doneIds)) {
-            $q->whereIn('status_id', $doneIds);
-        } elseif (method_exists(Ticket::class, 'scopeDone')) {
-            $q->done();
-        }
+        $this->applyDoneFilter($query, $doneIds);
 
-        $tickets = $q->get();
+        $tickets  = $query->get();
+        $supports = User::where('role_id', 1)->select('id', 'name')->get();
+        $months   = range(1, 12);
 
-        $months = range(1, 12);
-
-        // ✅ developer/support ambil role_id=1 sesuai project lu
-        $supports = User::query()
-            ->where('role_id', 1)
-            ->select('id', 'name')
-            ->get();
-
-        $datasets = [];
-        foreach ($supports as $support) {
-            $data = [];
-            foreach ($months as $m) {
-                $count = (int) $tickets->where('support_id', $support->id)
-                    ->where('month', $m)
-                    ->sum('total');
-                $data[] = $count;
-            }
-
-            $datasets[] = [
-                'label' => $support->name,
-                'data'  => $data,
-            ];
-        }
+        $datasets = $supports->map(fn($support) => [
+            'label' => $support->name,
+            'data'  => collect($months)->map(
+                fn($m) => (int) $tickets->where('support_id', $support->id)->where('month', $m)->sum('total')
+            )->values()->all(),
+        ])->values()->all();
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'labels'   => ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-                'datasets' => $datasets
-            ]
+            'data'    => [
+                'labels'   => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                'datasets' => $datasets,
+            ],
         ]);
     }
 
     public function chartTimeSpentByDev(Request $request)
     {
-        $year = (int) $request->input('year', now()->year);
+        $year    = (int) $request->input('year', now()->year);
         $doneIds = $this->doneStatusIds();
 
-        $q = Ticket::query()
+        // ✅ Hitung SUM time_spent_minutes per support_id per bulan
+        // Tidak ada JOIN ke tabel lain → tidak ada risiko baris dobel
+        $query = Ticket::query()
             ->selectRaw('support_id, MONTH(end_date) as month, SUM(time_spent_minutes) as total_minutes')
             ->whereNotNull('end_date')
+            ->whereNotNull('support_id')
             ->whereYear('end_date', $year)
-            ->groupBy('support_id', 'month');
+            ->groupBy('support_id', DB::raw('MONTH(end_date)'));
 
-        if (!empty($doneIds)) {
-            $q->whereIn('status_id', $doneIds);
-        } elseif (method_exists(Ticket::class, 'scopeDone')) {
-            $q->done();
-        }
+        $this->applyDoneFilter($query, $doneIds);
 
-        $tickets = $q->get();
+        $tickets  = $query->get();
+        $supports = User::where('role_id', 1)->select('id', 'name')->get();
+        $months   = range(1, 12);
 
-        $months = range(1, 12);
-        $supports = User::query()
-            ->where('role_id', 1)
-            ->select('id', 'name')
-            ->get();
-
-        $datasets = [];
-        foreach ($supports as $support) {
-            $data = [];
-            foreach ($months as $m) {
-                $minutes = (int) $tickets->where('support_id', $support->id)
-                    ->where('month', $m)
-                    ->sum('total_minutes');
-                $data[] = $minutes;
-            }
-            $datasets[] = [
-                'label' => $support->name,
-                'data'  => $data,
-            ];
-        }
+        $datasets = $supports->map(fn($support) => [
+            'label' => $support->name,
+            'data'  => collect($months)->map(
+                fn($m) => (int) $tickets->where('support_id', $support->id)->where('month', $m)->sum('total_minutes')
+            )->values()->all(),
+        ])->values()->all();
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'labels'   => ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-                'datasets' => $datasets
-            ]
+            'data'    => [
+                'labels'   => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                'datasets' => $datasets,
+            ],
         ]);
     }
 
     public function chartTimeSpentByDepartment(Request $request)
     {
-        $year = (int) $request->input('year', now()->year);
+        $year    = (int) $request->input('year', now()->year);
         $doneIds = $this->doneStatusIds();
 
-        $q = Ticket::query()
-            ->selectRaw('
-                departments.id as department_id,
-                MONTH(tickets.end_date) as month,
-                COALESCE(SUM(tickets.time_spent_minutes), 0) as total_minutes
-            ')
-            ->join('users', 'tickets.user_id', '=', 'users.id')
-            ->join('departments', 'users.department_id', '=', 'departments.id')
-            ->whereNotNull('tickets.end_date')
-            ->whereYear('tickets.end_date', $year)
-            ->groupBy('departments.id', 'month');
+        // ✅ FIX: Subquery dulu untuk hindari baris dobel akibat JOIN multi-tabel.
+        //
+        // Pola lama:  tickets JOIN users JOIN departments → groupBy dept + month
+        // Masalahnya: kalau ada relasi 1-to-many di tengah (misal user punya banyak dept,
+        //             atau eager load lain), bisa muncul baris dobel dan SUM jadi kembung.
+        //
+        // Pola baru:  tickets groupBy(user_id, month) dulu → hasilnya di-join ke users
+        //             → baru groupBy(dept_id, month).
+        //             Dengan begini setiap ticket hanya dihitung 1x.
 
-        if (!empty($doneIds)) {
-            $q->whereIn('tickets.status_id', $doneIds);
-        } elseif (method_exists(Ticket::class, 'scopeDone')) {
-            $q->done();
-        }
+        $subQuery = Ticket::query()
+            ->selectRaw('user_id, MONTH(end_date) as month, SUM(time_spent_minutes) as total_minutes')
+            ->whereNotNull('end_date')
+            ->whereNotNull('user_id')
+            ->whereYear('end_date', $year);
 
-        $tickets = $q->get();
-        $months = range(1, 12);
+        $this->applyDoneFilter($subQuery, $doneIds);
+
+        $subQuery->groupBy('user_id', DB::raw('MONTH(end_date)'));
+
+        // Wrap sebagai subquery lalu join ke users untuk dapat department_id
+        $rows = DB::table(DB::raw("({$subQuery->toSql()}) as t"))
+            ->mergeBindings($subQuery->getQuery())
+            ->join('users', 't.user_id', '=', 'users.id')
+            ->selectRaw('users.department_id, t.month, SUM(t.total_minutes) as total_minutes')
+            ->whereNotNull('users.department_id')
+            ->groupBy('users.department_id', 't.month')
+            ->get();
 
         $departments = Department::with('location')->get();
+        $months      = range(1, 12);
 
-        $datasets = [];
-        foreach ($departments as $department) {
-            $data = [];
-            foreach ($months as $m) {
-                $minutes = (int) $tickets
-                    ->where('department_id', $department->id)
-                    ->where('month', $m)
-                    ->sum('total_minutes');
-
-                $data[] = $minutes;
-            }
-
-            $datasets[] = [
-                'label' => $department->name
-    . ($department->location ? ' - ' . $department->location->name : ''),
-                'data' => $data,
+        $datasets = $departments->map(function ($dept) use ($rows, $months) {
+            return [
+                'label' => $dept->name . ($dept->location ? ' - ' . $dept->location->name : ''),
+                'data'  => collect($months)->map(
+                    fn($m) => (int) $rows->where('department_id', $dept->id)->where('month', $m)->sum('total_minutes')
+                )->values()->all(),
             ];
-        }
+        })->values()->all();
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'labels'   => ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-                'datasets' => $datasets
-            ]
+            'data'    => [
+                'labels'   => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                'datasets' => $datasets,
+            ],
         ]);
     }
 
     public function ticketsBySupport(Request $request)
-{
-    $date = $request->query('date', now()->toDateString());
+    {
+        $date        = $request->query('date', now()->toDateString());
+        $doneStatusIds = Status::where('context', 'ticket')
+            ->where('type', 'done')
+            ->pluck('id')
+            ->all();
 
-    // Ambil id status DONE untuk context ticket (lebih aman dari hardcode)
-    $doneStatusIds = \App\Models\Status::where('context', 'ticket')
-        ->where('type', 'done')
-        ->pluck('id')
-        ->all();
-
-    $supports = \App\Models\User::query()
-        ->where('role_id', 1)
-        ->select('id', 'name')
-        ->with([
-            // ✅ PAKAI handledTickets (support_id), bukan tickets (user_id)
-            'handledTickets' => function ($q) use ($date, $doneStatusIds) {
-                $q->select('id', 'ticket_code', 'problem', 'solution', 'support_id', 'status_id', 'end_date')
-                  ->with(['status:id,name,type,context', 'feedback:id,ticket_id,created_at'])
-
-                  // ✅ kondisi: (DONE) OR (punya feedback)
-                  ->where(function ($qq) use ($doneStatusIds) {
-                      // DONE
-                      if (!empty($doneStatusIds)) {
-                          $qq->whereIn('status_id', $doneStatusIds);
-                      } else {
-                          // fallback kalau doneStatusIds kosong
-                          $qq->whereHas('status', fn($s) => $s->where('context','ticket')->where('type','done'));
-                      }
-
-                      // OR punya feedback
-                      $qq->orWhereHas('feedback');
-                  })
-
-                  // ✅ filter tanggal:
-                  // - DONE pakai end_date
-                  // - feedback-only pakai feedback.created_at
-                  ->where(function ($qd) use ($date, $doneStatusIds) {
-                      // DONE part by end_date
-                      $qd->where(function ($a) use ($date, $doneStatusIds) {
-                          $a->whereNotNull('end_date')
-                            ->whereDate('end_date', $date);
-
+        $supports = User::where('role_id', 1)
+            ->select('id', 'name')
+            ->with([
+                'handledTickets' => function ($q) use ($date, $doneStatusIds) {
+                    $q->select('id', 'ticket_code', 'problem', 'solution', 'support_id', 'status_id', 'end_date')
+                      ->with(['status:id,name,type,context', 'feedback:id,ticket_id,created_at'])
+                      ->where(function ($qq) use ($doneStatusIds) {
                           if (!empty($doneStatusIds)) {
-                              $a->whereIn('status_id', $doneStatusIds);
+                              $qq->whereIn('status_id', $doneStatusIds);
                           } else {
-                              $a->whereHas('status', fn($s) => $s->where('context','ticket')->where('type','done'));
+                              $qq->whereHas('status', fn($s) => $s->where('context', 'ticket')->where('type', 'done'));
                           }
+                          $qq->orWhereHas('feedback');
                       })
-
-                      // feedback-only part by feedback date
-                      ->orWhere(function ($b) use ($date, $doneStatusIds) {
-                          // yang ini khusus ticket yg punya feedback
-                          $b->whereHas('feedback', fn($f) => $f->whereDate('created_at', $date));
-
-                          // optional: kalau lu mau pastiin yang ini bukan done (biar gak double logic), boleh:
-                          // if (!empty($doneStatusIds)) $b->whereNotIn('status_id', $doneStatusIds);
+                      ->where(function ($qd) use ($date, $doneStatusIds) {
+                          $qd->where(function ($a) use ($date, $doneStatusIds) {
+                              $a->whereNotNull('end_date')->whereDate('end_date', $date);
+                              if (!empty($doneStatusIds)) {
+                                  $a->whereIn('status_id', $doneStatusIds);
+                              } else {
+                                  $a->whereHas('status', fn($s) => $s->where('context', 'ticket')->where('type', 'done'));
+                              }
+                          })
+                          ->orWhere(fn($b) => $b->whereHas('feedback', fn($f) => $f->whereDate('created_at', $date)));
                       });
-                  });
-            }
-        ])
-        ->get();
+                },
+            ])
+            ->get();
 
-    $result = $supports->map(function ($support) {
-        return [
+        $result = $supports->map(fn($support) => [
             'support_id'   => $support->id,
             'support_name' => $support->name,
-            'tickets'      => $support->handledTickets->map(function ($t) {
-                return [
-                    'ticket_code'    => $t->ticket_code,
-                    'problem'        => $t->problem,
-                    'solution'       => $t->solution,
-                    'status'         => optional($t->status)->name ?? '-',
-                    'end_date'       => $t->end_date ? $t->end_date->format('Y-m-d H:i') : '-',
-                    'feedback_date'  => optional($t->feedback)->created_at?->format('Y-m-d H:i') ?? '-',
-                ];
-            })->values(),
-        ];
-    });
+            'tickets'      => $support->handledTickets->map(fn($t) => [
+                'ticket_code'   => $t->ticket_code,
+                'problem'       => $t->problem,
+                'solution'      => $t->solution,
+                'status'        => optional($t->status)->name ?? '-',
+                'end_date'      => $t->end_date ? $t->end_date->format('Y-m-d H:i') : '-',
+                'feedback_date' => optional($t->feedback)->created_at?->format('Y-m-d H:i') ?? '-',
+            ])->values(),
+        ]);
 
-    return response()->json([
-        'data' => $result,
-        'filter' => ['date' => $date],
-    ]);
-}
+        return response()->json([
+            'data'   => $result,
+            'filter' => ['date' => $date],
+        ]);
+    }
 
     public function export(Request $request): StreamedResponse
     {
@@ -454,60 +372,21 @@ class TicketReportController extends Controller
         $startDate = Carbon::parse($startQ)->startOfDay();
         $endDate   = Carbon::parse($endQ)->endOfDay();
 
-        // ✅ report lebih masuk akal pakai created_at range
-        // kalau lu maunya DONE range, ganti created_at -> end_date
-        $tickets = Ticket::with([
-                'user.department',
-                'support',
-                'status',
-                'assets',
-                'category',
-            ])
+        $tickets = Ticket::with(['user.department', 'support', 'status', 'assets', 'category'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'asc')
             ->get([
-                'ticket_code',
-                'user_id',
-                'support_id',
-                'category_id',
-                'assets_id',
-                'status_id',
-                'problem',
-                'solution',
-                'notes',
-                'start_date',
-                'end_date',
-                'time_spent_minutes',
-                'is_late',
-                'created_at',
+                'ticket_code', 'user_id', 'support_id', 'category_id', 'assets_id', 'status_id',
+                'problem', 'solution', 'notes', 'start_date', 'end_date',
+                'time_spent_minutes', 'is_late', 'created_at',
             ]);
 
         $filename = "Data_Ticket_{$startDate->format('Ymd')}_{$endDate->format('Ymd')}.csv";
 
-        $headers = [
-            "Content-Type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename={$filename}",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
-        ];
-
         $columns = [
-            'Ticket Code',
-            'Requestor Name',
-            'Requestor Division',
-            'Support Name',
-            'Category',
-            'Asset',
-            'Problem',
-            'Solution',
-            'Notes',
-            'Status',
-            'Start Date',
-            'End Date',
-            'Time Spent (Minutes)',
-            'Is Late',
-            'Created At',
+            'Ticket Code', 'Requestor Name', 'Requestor Division', 'Support Name',
+            'Category', 'Asset', 'Problem', 'Solution', 'Notes', 'Status',
+            'Start Date', 'End Date', 'Time Spent (Minutes)', 'Is Late', 'Created At',
         ];
 
         $callback = function () use ($tickets, $columns) {
@@ -520,12 +399,12 @@ class TicketReportController extends Controller
                     optional($t->user)->name ?? '-',
                     optional(optional($t->user)->department)->name ?? '-',
                     optional($t->support)->name ?? '-',
-                    optional($t->category)->name ?? '-',     // ✅ problemCategory -> category, name
-                    optional($t->assets)->name ?? '-',       // ✅ assets_name -> name
+                    optional($t->category)->name ?? '-',
+                    optional($t->assets)->name ?? '-',
                     $t->problem ?? '-',
                     $t->solution ?? '-',
                     $t->notes ?? '-',
-                    optional($t->status)->name ?? '-',       // ✅ status_name -> name
+                    optional($t->status)->name ?? '-',
                     $t->start_date ? Carbon::parse($t->start_date)->format('Y-m-d H:i') : '-',
                     $t->end_date ? Carbon::parse($t->end_date)->format('Y-m-d H:i') : '-',
                     (int) ($t->time_spent_minutes ?? 0),
@@ -537,7 +416,13 @@ class TicketReportController extends Controller
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers);
+        return response()->stream($callback, 200, [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$filename}",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ]);
     }
 
     public function preview(Request $request)
@@ -557,35 +442,24 @@ class TicketReportController extends Controller
             ->orderBy('created_at', 'asc')
             ->limit(50)
             ->get([
-                'ticket_code',
-                'user_id',
-                'support_id',
-                'problem',
-                'solution',
-                'notes',
-                'status_id',
-                'start_date',
-                'end_date',
-                'time_spent_minutes',
-                'is_late',
-                'created_at',
+                'ticket_code', 'user_id', 'support_id', 'problem', 'solution',
+                'notes', 'status_id', 'start_date', 'end_date',
+                'time_spent_minutes', 'is_late', 'created_at',
             ])
-            ->map(function ($t) {
-                return [
-                    'ticket_code'     => $t->ticket_code,
-                    'requestor_name'  => optional($t->user)->name ?? '-',
-                    'support_name'    => optional($t->support)->name ?? '-',
-                    'problem'         => $t->problem ?? '-',
-                    'solution'        => $t->solution ?? '-',
-                    'notes'           => $t->notes ?? '-',
-                    'status'          => optional($t->status)->name ?? '-', // ✅ status_name -> name
-                    'start_date'      => $t->start_date ? Carbon::parse($t->start_date)->format('Y-m-d H:i') : '-',
-                    'end_date'        => $t->end_date ? Carbon::parse($t->end_date)->format('Y-m-d H:i') : '-',
-                    'time_spent_minutes'      => (int) ($t->time_spent_minutes ?? 0),
-                    'is_late'         => $t->is_late ? 'Yes' : 'No',
-                    'created_at'      => $t->created_at ? $t->created_at->format('Y-m-d H:i') : '-',
-                ];
-            });
+            ->map(fn($t) => [
+                'ticket_code'        => $t->ticket_code,
+                'requestor_name'     => optional($t->user)->name ?? '-',
+                'support_name'       => optional($t->support)->name ?? '-',
+                'problem'            => $t->problem ?? '-',
+                'solution'           => $t->solution ?? '-',
+                'notes'              => $t->notes ?? '-',
+                'status'             => optional($t->status)->name ?? '-',
+                'start_date'         => $t->start_date ? Carbon::parse($t->start_date)->format('Y-m-d H:i') : '-',
+                'end_date'           => $t->end_date ? Carbon::parse($t->end_date)->format('Y-m-d H:i') : '-',
+                'time_spent_minutes' => (int) ($t->time_spent_minutes ?? 0),
+                'is_late'            => $t->is_late ? 'Yes' : 'No',
+                'created_at'         => $t->created_at ? $t->created_at->format('Y-m-d H:i') : '-',
+            ]);
 
         return response()->json(['data' => $tickets]);
     }

@@ -6,6 +6,8 @@ use App\Http\Requests\Priority\PriorityStoreRequest;
 use App\Http\Requests\Priority\PriorityUpdateRequest;
 use App\Models\Priority;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+
 
 class PriorityController extends Controller
 {
@@ -45,18 +47,28 @@ class PriorityController extends Controller
             ->with('success', 'Priority berhasil diperbarui.');
     }
 
-    public function destroy(Priority $priority)
-    {
-        try {
-            $priority->delete();
 
-            return redirect()
-                ->route('priority.index')
-                ->with('success', 'Priority berhasil dihapus.');
-        } catch (\Throwable $e) {
-            return redirect()
-                ->route('priority.index')
-                ->with('error', 'Priority tidak dapat dihapus karena masih digunakan!');
-        }
+public function destroy(Priority $priority)
+{
+    try {
+        $priority->delete();
+
+        return redirect()
+            ->route('priority.index')
+            ->with('success', 'Priority berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('priority.index')
+            ->with('error', 'Priority tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('priority.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus priority.');
+
     }
+}
 }

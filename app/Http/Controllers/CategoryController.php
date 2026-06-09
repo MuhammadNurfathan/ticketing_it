@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Category\CategoryStoreRequest;
 use App\Http\Requests\Category\CategoryUpdateRequest;
 use App\Models\Category;
+use Illuminate\Database\QueryException;
 
 class CategoryController extends Controller
 {
@@ -49,17 +50,28 @@ class CategoryController extends Controller
             ->with('success', 'Problem Category berhasil diupdate.');
     }
 
-    public function destroy(Category $category)
-    {
-        try {
-            $category->delete();
-            return redirect()
-                ->route('categories.index')
-                ->with('success', 'Problem Category berhasil dihapus.');
-        } catch (\Exception $e) {
-            return redirect()
-                ->route('categories.index')
-                ->with('error', 'Problem Category tidak dapat dihapus: ' . $e->getMessage());
-        }
+
+public function destroy(Category $category)
+{
+    try {
+        $category->delete();
+
+        return redirect()
+            ->route('categories.index')
+            ->with('success', 'Problem Category berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('categories.index')
+            ->with('error', 'Problem Category tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('categories.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus Problem Category.');
+
     }
+}
 }

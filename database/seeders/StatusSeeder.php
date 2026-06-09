@@ -58,6 +58,11 @@ class StatusSeeder extends Seeder
                 'type' => 'pending',
                 'context' => 'project',
             ],
+            [
+                'name' => 'Void',
+                'type' => 'void',
+                'context' => 'project',
+            ],
         ]);
     }
 }

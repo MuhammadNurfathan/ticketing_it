@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
-
+ use Illuminate\Database\QueryException;
 class UserController extends Controller
 {
     public function index()
@@ -67,12 +67,30 @@ class UserController extends Controller
             ->with('success', 'User berhasil diperbarui');
     }
 
-    public function destroy(User $user)
-    {
-        $user->delete($user);
+ 
+
+public function destroy(User $user)
+{
+    try {
+
+        $user->delete();
 
         return redirect()
             ->route('users.index')
-            ->with('success', 'User berhasil dihapus');
+            ->with('success', 'User berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('users.index')
+            ->with('error', 'User tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Exception $e) {
+
+        return redirect()
+            ->route('users.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus user.');
+
     }
+}
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Project\StoreProjectRequest;
 use App\Http\Requests\Project\UpdateProgressRequest;
-use App\Http\Requests\Project\DoneProjectRequest;
+use App\Http\Requests\Project\ResolvedProjectRequest;
 use App\Http\Requests\Project\PendingRequest;
 use App\Http\Requests\Project\ContinueRequest;
 use App\Services\ProjectService;
@@ -39,9 +39,9 @@ class ProjectController extends Controller
         return back()->with('success', 'Progress berhasil diupdate.');
     }
 
-    public function done(DoneProjectRequest $request, ProjectHeader $project)
+    public function resolved(ResolvedProjectRequest $request, ProjectHeader $project)
     {
-        $this->service->done($project, $request->validated());
+        $this->service->resolved($project, $request->validated());
 
         return back()->with('success', 'Project selesai.');
     }
@@ -67,12 +67,15 @@ class ProjectController extends Controller
         return back()->with('success', 'Project dilanjutkan.');
     }
 
-    public function updateStatus(Request $request, ProjectHeader $project)
-    {
-        $this->service->updateStatus($project, $request->all());
+public function updateStatus(Request $request, ProjectHeader $project)
+{
+ 
+    $this->service->updateStatus($project, $request->all());
 
-        return back()->with('success', 'Status diupdate.');
-    }
+    
+
+    return back()->with('success', 'Status diupdate.');
+}
 
     public function history(ProjectHeader $project)
     {

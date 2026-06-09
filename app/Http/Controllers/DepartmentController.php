@@ -6,6 +6,7 @@ use App\Http\Requests\Departments\DepartmentStoreRequest;
 use App\Http\Requests\Departments\DepartmentUpdateRequest;
 use App\Models\Department;
 use App\Models\Location;
+use Illuminate\Database\QueryException;
 
 class DepartmentController extends Controller
 {
@@ -47,17 +48,28 @@ class DepartmentController extends Controller
             ->with('success', 'Data Department berhasil diperbarui.');
     }
 
-    public function destroy(Department $department)
-    {
-        try {
-            $department->delete();
-            return redirect()
-                ->route('departments.index')
-                ->with('success', 'Department berhasil dihapus.');
-        } catch (\Throwable $e) {
-            return redirect()
-                ->route('departments.index')
-                ->with('error', 'Department tidak dapat dihapus: ' . $e->getMessage());
-        }
+
+public function destroy(Department $department)
+{
+    try {
+        $department->delete();
+
+        return redirect()
+            ->route('departments.index')
+            ->with('success', 'Department berhasil dihapus.');
+
+    } catch (QueryException $e) {
+
+        return redirect()
+            ->route('departments.index')
+            ->with('error', 'Department tidak dapat dihapus karena masih digunakan pada data lain.');
+
+    } catch (\Throwable $e) {
+
+        return redirect()
+            ->route('departments.index')
+            ->with('error', 'Terjadi kesalahan saat menghapus department.');
+
     }
+}
 }

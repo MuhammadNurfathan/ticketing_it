@@ -52,14 +52,14 @@ class ProjectDetail extends Model
         ]);
     }
 
-    public static function logDone($project, $data, $statusId, $apply)
+    public static function logresolved($project, $data, $statusId, $apply)
     {
         self::create([
             'project_header_id' => $project->id,
             'progress_date' => now(),
             'progress_percent' => 100,
             'status_id' => $statusId,
-            'description' => 'DONE. Applied=' . ($apply ? 'YES' : 'NO'),
+            'description' => 'resolved. Applied=' . ($apply ? 'YES' : 'NO'),
             'developer_id' => $data['developer_id'] ?? auth()->id,
         ]);
     }

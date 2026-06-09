@@ -27,7 +27,7 @@ class AssetUpdateRequest extends FormRequest
             ],
             'name'     => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
-            'image'    => ['nullable', 'image', 'max:2048'],
+            'status'    => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -38,7 +38,7 @@ class AssetUpdateRequest extends FormRequest
             'code.unique'   => 'Kode asset sudah digunakan',
             'name.required' => 'Nama asset wajib diisi',
             'category.required' => 'Kategori asset wajib diisi',
-            'image.image'   => 'File harus berupa gambar',
+            'status.required' => 'Status asset wajib diisi',
         ];
     }
 }

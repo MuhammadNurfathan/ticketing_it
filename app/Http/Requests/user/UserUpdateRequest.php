@@ -29,13 +29,18 @@ class UserUpdateRequest extends FormRequest
     }
 
     public function messages(): array
-    {
-        return [
-            'department_id.required' => 'Department harus dipilih.',
-            'role_id.required' => 'Role harus dipilih.',
-            'email.unique' => 'Email sudah digunakan.',
-            'username.unique' => 'Username sudah digunakan.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ];
-    }
+{
+    return [
+        'name.required' => 'Nama wajib diisi.',
+        'username.required' => 'Username wajib diisi.',
+        'username.unique' => 'Username sudah digunakan.',
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Format email tidak valid.',
+        'email.unique' => 'Email sudah digunakan.',
+        'department_id.required' => 'Department harus dipilih.',
+        'role_id.required' => 'Role harus dipilih.',
+        'password.min' => 'Password minimal 6 karakter.',
+        'password.confirmed' => 'Konfirmasi password tidak cocok.',
+    ];
+}
 }

@@ -34,10 +34,8 @@
                         <th class="p-3 text-left">No</th>
                         <th class="p-3 text-left">Kode Assets</th>
                         <th class="p-3 text-left">Nama Assets</th>
-                        <th class="p-3 text-left">User</th>
                         <th class="p-3 text-left">Kategori</th>
                         <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Lokasi</th>
                         <th class="p-3 text-left">Aksi</th>
                     </tr>
                 </thead>
@@ -52,17 +50,14 @@
                             </td>
 
                             <td class="p-3 text-gray-700 dark:text-gray-200">
-                                {{ $a->assets_code ?? '-' }}
+                                {{ $a->code ?? '-' }}
                             </td>
 
                             <td class="p-3 text-gray-700 dark:text-gray-200">
-                                {{ $a->assets_name ?? '-' }}
+                                {{ $a->name ?? '-' }}
                             </td>
 
-                            <td class="p-3 text-gray-700 dark:text-gray-200">
-                                {{ $a->check_out_to ?? '-' }}
-                            </td>
-
+                        
                             <td class="p-3 text-gray-700 dark:text-gray-200">
                                 {{ $a->category ?? '-' }}
                             </td>
@@ -72,10 +67,7 @@
                                     {{ $a->status ?? '-' }}
                                 </span>
                             </td>
-
-                            <td class="p-3 text-gray-700 dark:text-gray-200">
-                                {{ $a->location ?? '-' }}
-                            </td>
+                            
 
                             <td class="p-3 flex gap-2">
 

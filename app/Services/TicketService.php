@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\TicketDoneNotification;
-
+use App\Models\Category;
 class TicketService
 {
     public function getAdminDashboard($request)
@@ -91,12 +91,14 @@ class TicketService
         );
     }
 
-    public function editUser($id)
-    {
-        return [
-            'ticket' => Ticket::withAll()->findOrFail($id),
-        ];
-    }
+
+public function editUser($id)
+{
+    return [
+        'ticket' => Ticket::withAll()->findOrFail($id),
+        'categories' => Category::all(),
+    ];
+}
 
     public function updateUser($id, $data)
     {

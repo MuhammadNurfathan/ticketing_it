@@ -32,43 +32,60 @@
                     <form action="{{ route('users.update', $user) }}" method="POST">
                         @csrf
                         @method('PUT')
-
                         {{-- NAME --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Name <span style="color: red;">*</span></label>
-                            <input type="text" name="name"
-                                value="{{ old('name', $user->name) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required>
+                            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
-
                         {{-- USERNAME --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Username <span style="color: red;">*</span></label>
-                            <input type="text" name="username"
-                                value="{{ old('username', $user->username) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                required>
+                            <input type="text" name="username" value="{{ old('username', $user->username) }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
-
                         {{-- EMAIL --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Email <span style="color: red;">*</span></label>
-                            <input type="email" name="email"
-                                value="{{ old('email', $user->email) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
+                        {{-- HANDPHONE --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Handphone</label>
+                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        {{-- JOB POSITION --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Posisi</label>
+                            <input type="text" name="job_position" value="{{ old('job_position', $user->job_position) }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                      @php
+    $selectedStatus = old('status', $user->status);
+@endphp
 
-                        {{-- ROLE --}}
+{{-- STATUS --}}
+<div class="mb-6">
+    <label class="block text-sm font-medium mb-2">
+        Status <span class="text-red-500">*</span>
+    </label>
+
+    <select
+        name="status"
+        class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+               bg-gray-50 dark:bg-gray-700
+               focus:bg-white dark:focus:bg-gray-800
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        required
+    >
+        <option value="">-- Pilih Status --</option>
+        <option value="Active" {{ $selectedStatus == 'Aktif' ? 'selected' : '' }}>
+            Aktif
+        </option>
+        <option value="Inactive" {{ $selectedStatus == 'Non Aktif' ? 'selected' : '' }}>
+            Non Aktif
+        </option>
+    </select>
+</div>
+
+                {{-- ROLE --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Role <span style="color: red;">*</span></label>
                             <select name="role_id"

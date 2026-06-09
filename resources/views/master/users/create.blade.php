@@ -50,6 +50,28 @@
                             <label class="block text-sm font-medium mb-2">Email <span style="color: red;">*</span></label>
                             <input type="email" name="email" required value="{{ old('email') }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
+                         {{-- HANDPHONE --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Handphone</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                         {{-- JOB POSITION --}}
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Posisi</label>
+                            <input type="text" name="job_position" value="{{ old('job_position') }}" class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Status <span style="color: red">*</span></label>
+                            <select name="status"
+                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                                bg-gray-50 dark:bg-gray-700
+                                focus:bg-white dark:focus:bg-gray-800
+                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+
+                                <option value="Active" {{ old('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="Inactive" {{ old('status') == 'Non Aktif' ? 'selected' : '' }}>Non Aktif</option>
+                            </select>
+                        </div>
 
                         {{-- ROLE --}}
                         <div class="mb-6">
@@ -68,7 +90,7 @@
                                 @endforeach
                             </select>
                         </div>
-
+                        
                         {{-- DEPARTMENT --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Department <span style="color: red">*</span></label>

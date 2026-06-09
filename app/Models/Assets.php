@@ -16,6 +16,7 @@ class Assets extends Model
         'name',
         'image',
         'category',
+        'status',
     ];
 
     public function tickets()

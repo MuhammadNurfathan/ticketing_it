@@ -36,8 +36,8 @@
                         {{-- KODE --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Kode Asset</label>
-                            <input type="text" name="assets_code"
-                                value="{{ old('assets_code', $asset->assets_code) }}"
+                            <input type="text" name="code"
+                                value="{{ old('code', $asset->code) }}"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
                                 bg-gray-50 dark:bg-gray-700
                                 focus:bg-white dark:focus:bg-gray-800
@@ -49,8 +49,8 @@
                         {{-- NAMA --}}
                         <div class="mb-6">
                             <label class="block text-sm font-medium mb-2">Nama Asset</label>
-                            <input type="text" name="assets_name"
-                                value="{{ old('assets_name', $asset->assets_name) }}"
+                            <input type="text" name="name"
+                                value="{{ old('name', $asset->name) }}"
                                 class="w-full rounded-lg border border-gray-300 dark:border-gray-600
                                 bg-gray-50 dark:bg-gray-700
                                 focus:bg-white dark:focus:bg-gray-800
@@ -91,85 +91,6 @@
                             </select>
                         </div>
 
-                        {{-- LOKASI --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Lokasi</label>
-                            <input type="text" name="location"
-                                value="{{ old('location', $asset->location) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200"
-                                placeholder="Contoh: Ruang IT" required>
-                        </div>
-
-                        {{-- MODEL --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Model</label>
-                            <input type="text" name="model"
-                                value="{{ old('model', $asset->model) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200"
-                                placeholder="Contoh: X1 Carbon Gen 9">
-                        </div>
-
-                        {{-- CHECK IN --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Check In</label>
-                            <input type="text" name="check_in"
-                                value="{{ old('check_in', $asset->check_in) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200">
-                        </div>
-
-                        {{-- CHECK OUT --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Check Out</label>
-                            <input type="text" name="check_out"
-                                value="{{ old('check_out', $asset->check_out) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200">
-                        </div>
-
-                        {{-- CHECK OUT TO --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Check Out To</label>
-                            <input type="text" name="check_out_to"
-                                value="{{ old('check_out_to', $asset->check_out_to) }}"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200">
-                        </div>
-
-                        {{-- CATATAN --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Catatan</label>
-                            <textarea name="notes" rows="3"
-                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600
-                                bg-gray-50 dark:bg-gray-700
-                                focus:bg-white dark:focus:bg-gray-800
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                                transition duration-200">{{ old('notes', $asset->notes) }}</textarea>
-                        </div>
-
-                        {{-- IMAGE --}}
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2">Gambar</label>
-                            <input type="file" name="image"
-                                class="w-full text-sm text-gray-700 dark:text-gray-200">
-                        </div>
 
                         {{-- BUTTON --}}
                         <div class="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">

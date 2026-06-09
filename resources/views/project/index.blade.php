@@ -63,9 +63,9 @@
                 'accent' => 'bg-blue-600',
                 'subtitle' => 'Project yang sedang berjalan',
             ],
-            'done' => [
-                'label' => 'Done',
-                'count' => $stats['done'] ?? 0,
+            'resolved' => [
+                'label' => 'resolved',
+                'count' => $stats['resolved'] ?? 0,
                 'badge' => 'bg-green-600/10 text-green-700 dark:bg-green-400/10 dark:text-green-300',
                 'accent' => 'bg-green-600',
                 'subtitle' => 'Project yang sudah selesai',
@@ -90,7 +90,7 @@
         $statusMap = collect($statuses ?? [])->keyBy('type');
         $stWaiting = optional($statusMap->get('waiting'))->id;
         $stInProgress = optional($statusMap->get('in_progress'))->id;
-        $stDone = optional($statusMap->get('done'))->id;
+        $stresolved = optional($statusMap->get('resolved'))->id;
         $stVoid = optional($statusMap->get('void'))->id;
         $stPending = optional($statusMap->get('pending'))->id;
     @endphp
@@ -276,15 +276,15 @@
                                                 Update
                                             </button>
 
-                                            {{-- DONE --}}
-                                            <button onclick="openDoneModal(this)" data-id="{{ $project->id }}"
+                                            {{-- resolved --}}
+                                            <button onclick="openresolvedModal(this)" data-id="{{ $project->id }}"
                                                 data-code="{{ $project->project_code }}"
                                                 data-name="{{ $project->project_name }}"
                                                 data-developer-id="{{ $project->dev_id ?? ($project->developer_id ?? '') }}"
                                                 data-developer-name="{{ $project->developer->name ?? '' }}"
                                                 data-description="{{ $project->description ?? '' }}"
                                                 class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 hover:bg-green-700 text-white transition-colors">
-                                                Done
+                                                resolved
                                             </button>
 
                                             {{-- PENDING --}}
@@ -377,16 +377,16 @@
                 </div>
             </div>
 
-            {{-- ================= DONE ================= --}}
-            <div x-show="tab==='done'" x-cloak class="{{ $card }} p-4 sm:p-5">
+            {{-- ================= resolved ================= --}}
+            <div x-show="tab==='resolved'" x-cloak class="{{ $card }} p-4 sm:p-5">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <div class="text-base sm:text-lg font-semibold text-light-text dark:text-dark-text">
-                            Project Done
+                            Project resolved
                         </div>
-                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['done']['subtitle'] }}</div>
+                        <div class="text-xs mt-1 {{ $muted2 }}">{{ $tabs['resolved']['subtitle'] }}</div>
                     </div>
-                    <span class="{{ $badgeBase }} {{ $tabs['done']['badge'] }}">Done</span>
+                    <span class="{{ $badgeBase }} {{ $tabs['resolved']['badge'] }}">resolved</span>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -406,7 +406,7 @@
                         </thead>
 
                         <tbody class="divide-y divide-light-eval-3 dark:divide-dark-eval-2">
-                            @foreach ($doneProject as $project)
+                            @foreach ($resolvedProject as $project)
                                 <tr class="transition-colors hover:bg-light-eval-2 dark:hover:bg-dark-eval-2">
                                     <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">
                                         {{ $project->project_code ?? '-' }}
@@ -659,18 +659,14 @@
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
                     Pilih Requestor <span class="text-red-500">*</span>
                 </label>
-                <input type="text" id="user-search" placeholder="Cari user..." required
-                    class="{{ $input }}">
+                <input type="text" id="user-search" placeholder="Cari user..." required class="{{ $input }}">
                 <input type="hidden" name="requestor_id" id="user-id" required>
 
                 <ul id="search-results"
                     class="hidden absolute z-50 w-full rounded-lg mt-2 overflow-y-auto shadow-lg max-h-40
                            bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
                     @foreach ($users as $user)
-                        <li class="px-3 py-2 cursor-pointer border-b border-light-eval-3 dark:border-dark-eval-2
-                                   hover:bg-light-eval-2 dark:hover:bg-dark-eval-1 text-light-text dark:text-dark-text"
-                            data-id="{{ $user->id }}">
-                            {{ $user->name }}
+                        <li class="px-3 py-2 cursor-pointer border-b border-light-eval-3 dark:border-dark-eval-2 hover:bg-light-eval-2 dark:hover:bg-dark-eval-1 text-light-text dark:text-dark-text" data-id="{{ $user->id }}">{{ $user->name }}
                         </li>
                     @endforeach
                 </ul>
@@ -721,178 +717,291 @@
         </form>
     </x-modal-form>
 
-    {{-- ========================================================= MODAL: EDIT PROGRESS (IN PROGRESS) ========================================================= --}}
+        {{-- ========================================================= MODAL: EDIT PROGRESS (IN PROGRESS) ========================================================= --}}
     <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
         <form id="editProgressForm" method="POST">
             @csrf
             @method('PUT')
 
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
-                    Code</label>
-                <input type="text" id="modal_project_code" readonly
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Project Code
+                </label>
+                <input type="text"
+                    id="modal_project_code"
+                    readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
-                    Name</label>
-                <input type="text" id="modal_project_name" readonly
-                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
-            </div>
-
-            {{-- Developer dropdown --}}
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer</label>
-
-                <div id="selected-developers"
-                    class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
-                           bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
-                           border-light-eval-3 dark:border-dark-eval-2">
-                    <span id="selected-text" class="truncate">Pilih Developer...</span>
-                    <svg id="dropdown-icon" class="w-4 h-4 transform transition-transform duration-200"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-
-                <input type="hidden" name="developer_id" id="developer_id">
-
-                <div id="developer-dropdown"
-                    class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
-                           bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
-                    @foreach ($developers as $dev)
-                        <label
-                            class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
-                            <input type="checkbox" value="{{ $dev->id }}" data-name="{{ $dev->name }}"
-                                class="dev-checkbox">
-                            <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- progress date tetap ada (buat log detail) --}}
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Progress
-                    Date</label>
-                <input type="datetime-local" name="progress_date" id="modal_progress_date"
-                    class="{{ $input }}">
+                    border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Progress Percent <span class="text-red-500">*</span>
+                    Project Name
                 </label>
-                <input type="number" name="progress_percent" id="modal_progress_percent" min="0"
-                    max="100" step="1" required class="{{ $input }}">
-            </div>
-
-            {{-- ✅ memo dibuang -> pakai description --}}
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Description</label>
-                <textarea name="description" id="modal_description" rows="3" class="{{ $input }}"></textarea>
-            </div>
-
-            {{-- ✅ status dropdown dibuang (default in_progress by controller) --}}
-
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('editProgressModal')"
-                    class="{{ $btnGhost }}">Cancel</button>
-                <button type="submit" class="{{ $btnPrimary }}">Save</button>
-            </div>
-        </form>
-    </x-modal-form>
-
-    {{-- ========================================================= MODAL: DONE PROJECT ========================================================= --}}
-    <x-modal-form id="doneModal" title="Done Project" size="max-w-3xl">
-        <form id="doneForm" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
-                    Code</label>
-                <input type="text" id="done_project_code" readonly
+                <input type="text"
+                    id="modal_project_name"
+                    readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+                    border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
             </div>
 
+            {{-- Developer --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Project
-                    Name</label>
-                <input type="text" id="done_project_name" readonly
-                    class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                           border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
-            </div>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Developer <span class="text-red-500">*</span>
+                </label>
 
-            {{-- Developer (id) --}}
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Developer</label>
-
-                <div id="selected-developers-done"
+                <div id="selected-developers"
                     class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
-                           bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
-                           border-light-eval-3 dark:border-dark-eval-2">
-                    <span id="selected-text-done" class="truncate">Pilih Developer...</span>
-                    <svg id="dropdown-icon-done" class="w-4 h-4 transform transition-transform duration-200"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
+                    border-light-eval-3 dark:border-dark-eval-2">
+
+                    <span id="selected-text" class="truncate">
+                        Pilih Developer...
+                    </span>
+
+                    <svg id="dropdown-icon"
+                        class="w-4 h-4 transform transition-transform duration-200"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
                     </svg>
                 </div>
 
-                <input type="hidden" name="developer_id" id="developer_id_done">
+                <input type="hidden"
+                    name="developer_id"
+                    id="developer_id">
 
-                <div id="developer-dropdown-done"
+                <div id="developer-dropdown"
                     class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
-                           bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+                    bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+
                     @foreach ($developers as $dev)
                         <label
                             class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
-                            <input type="checkbox" value="{{ $dev->id }}" data-name="{{ $dev->name }}"
-                                class="dev-checkbox-done">
-                            <span class="text-sm text-light-text dark:text-dark-text">{{ $dev->name }}</span>
+
+                            <input type="checkbox"
+                                value="{{ $dev->id }}"
+                                data-name="{{ $dev->name }}"
+                                class="dev-checkbox">
+
+                            <span class="text-sm text-light-text dark:text-dark-text">
+                                {{ $dev->name }}
+                            </span>
                         </label>
                     @endforeach
                 </div>
             </div>
 
-            {{-- ✅ tidak ada progress date, tidak ada status, progress auto 100% by controller --}}
+            {{-- Progress Date --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">Description</label>
-                <textarea name="description" id="done_description" rows="3" class="{{ $input }}"></textarea>
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Progress Date <span class="text-red-500">*</span>
+                </label>
+
+                <input type="datetime-local"
+                    name="progress_date"
+                    id="modal_progress_date"
+                    required
+                    class="{{ $input }}">
             </div>
 
+            {{-- Progress Percent --}}
+  {{-- Progress Percent --}}
+<div class="mb-4">
+    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+        Progress Percent <span class="text-red-500">*</span>
+    </label>
+
+    <input type="number"
+        name="progress_percent"
+        id="modal_progress_percent"
+        min="0"
+        max="100"
+        step="1"
+        required
+        class="{{ $input }}">
+
+    <input type="hidden" id="old_progress_percent">
+</div>
+
+            {{-- Description --}}
             <div class="mb-4">
-                <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
-                    Tambahkan total pending duration ke Effective End Date?
+                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                    Description <span class="text-red-500">*</span>
                 </label>
-                <div class="flex items-center gap-4 text-sm">
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="apply_pending_duration" value="1" checked>
-                        <span>YES</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="apply_pending_duration" value="0">
-                        <span>NO</span>
-                    </label>
-                </div>
+
+                <textarea
+                    name="description"
+                    id="modal_description"
+                    rows="3"
+                    required
+                    class="{{ $input }}"></textarea>
             </div>
 
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('doneModal')"
-                    class="{{ $btnGhost }}">Cancel</button>
+                <button type="button"
+                    onclick="closeModal('editProgressModal')"
+                    class="{{ $btnGhost }}">
+                    Cancel
+                </button>
+
                 <button type="submit"
-                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
-                           bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm"
-                    onclick="return confirm('Yakin set project ini DONE?')">
-                    Done
+                    class="{{ $btnPrimary }}">
+                    Save
                 </button>
             </div>
         </form>
     </x-modal-form>
+
+    {{-- ========================================================= MODAL: resolved PROJECT ========================================================= --}}
+{{-- ========================================================= MODAL: RESOLVED PROJECT ========================================================= --}}
+<x-modal-form id="resolvedModal" title="Resolved Project" size="max-w-3xl">
+    <form id="resolvedForm" method="POST">
+        @csrf
+        @method('PUT')
+
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                Project Code
+            </label>
+            <input type="text"
+                id="resolved_project_code"
+                readonly
+                class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                Project Name
+            </label>
+            <input type="text"
+                id="resolved_project_name"
+                readonly
+                class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+        </div>
+
+        {{-- Developer --}}
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                Developer <span class="text-red-500">*</span>
+            </label>
+
+            <div id="selected-developers-resolved"
+                class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
+                bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
+                border-light-eval-3 dark:border-dark-eval-2">
+
+                <span id="selected-text-resolved" class="truncate">
+                    Pilih Developer...
+                </span>
+
+                <svg id="dropdown-icon-resolved"
+                    class="w-4 h-4 transform transition-transform duration-200"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+
+            <input
+                type="hidden"
+                name="developer_id"
+                id="developer_id_resolved"
+                required>
+
+            <div id="developer-dropdown-resolved"
+                class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
+                bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+
+                @foreach ($developers as $dev)
+                    <label
+                        class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
+
+                        <input
+                            type="checkbox"
+                            value="{{ $dev->id }}"
+                            data-name="{{ $dev->name }}"
+                            class="dev-checkbox-resolved">
+
+                        <span class="text-sm text-light-text dark:text-dark-text">
+                            {{ $dev->name }}
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Description --}}
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                Description <span class="text-red-500">*</span>
+            </label>
+
+            <textarea
+                name="description"
+                id="resolved_description"
+                rows="3"
+                required
+                class="{{ $input }}"></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                Tambahkan total pending duration ke Effective End Date?
+            </label>
+
+            <div class="flex items-center gap-4 text-sm">
+                <label class="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        name="apply_pending_duration"
+                        value="1"
+                        checked>
+                    <span>YES</span>
+                </label>
+
+                <label class="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        name="apply_pending_duration"
+                        value="0">
+                    <span>NO</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button
+                type="button"
+                onclick="closeModal('resolvedModal')"
+                class="{{ $btnGhost }}">
+                Cancel
+            </button>
+
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm">
+                Resolved
+            </button>
+        </div>
+    </form>
+</x-modal-form>
 
     {{-- ========================================================= MODAL: PENDING ========================================================= --}}
     <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
@@ -1001,7 +1110,73 @@
                 .catch(err => modalBody.innerHTML = `<div class="p-6 text-center text-red-500">⚠️ ${err.message}</div>`);
         }
     </script>
+<script>
+document.getElementById('resolvedForm').addEventListener('submit', function(e) {
 
+    if (!this.checkValidity()) {
+        e.preventDefault();
+        this.reportValidity();
+        return;
+    }
+
+    const developerId = document.getElementById('developer_id_resolved').value;
+    const description = document.getElementById('resolved_description').value.trim();
+
+    if (!developerId || !description) {
+
+        e.preventDefault();
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Form Belum Lengkap',
+            text: 'Semua field wajib diisi.'
+        });
+
+        return false;
+    }
+});
+</script>
+<script>
+    document.getElementById('editProgressForm').addEventListener('submit', function(e) {
+
+    if (!this.checkValidity()) {
+        e.preventDefault();
+        this.reportValidity();
+        return;
+    }
+
+    const developerId = document.getElementById('developer_id').value;
+    const oldProgress = parseInt(document.getElementById('old_progress_percent').value || 0);
+    const newProgress = parseInt(document.getElementById('modal_progress_percent').value || 0);
+
+    if (!developerId) {
+
+        e.preventDefault();
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Form Belum Lengkap',
+            text: 'Semua field wajib diisi.'
+        });
+
+        return false;
+    }
+
+    if (newProgress <= oldProgress) {
+
+        e.preventDefault();
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Progress Tidak Valid',
+            text: `Progress harus lebih besar dari progress sebelumnya (${oldProgress}%).`
+        });
+
+        return false;
+    }
+
+});
+</script>
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 
     <script>
@@ -1033,114 +1208,137 @@
             });
 
             // =========================
-            // DEV DROPDOWN (DONE)
+            // DEV DROPDOWN (resolved)
             // =========================
-            $(document).on('click', '#selected-developers-done', function() {
-                $('#developer-dropdown-done').toggleClass('hidden');
-                $('#dropdown-icon-done').toggleClass('rotate-180');
+            $(document).on('click', '#selected-developers-resolved', function() {
+                $('#developer-dropdown-resolved').toggleClass('hidden');
+                $('#dropdown-icon-resolved').toggleClass('rotate-180');
             });
 
             $(document).on('click', function(e) {
-                if (!$(e.target).closest('#selected-developers-done, #developer-dropdown-done').length) {
-                    $('#developer-dropdown-done').addClass('hidden');
-                    $('#dropdown-icon-done').removeClass('rotate-180');
+                if (!$(e.target).closest('#selected-developers-resolved, #developer-dropdown-resolved').length) {
+                    $('#developer-dropdown-resolved').addClass('hidden');
+                    $('#dropdown-icon-resolved').removeClass('rotate-180');
                 }
             });
 
-            $(document).on('change', '.dev-checkbox-done', function() {
-                $('.dev-checkbox-done').not(this).prop('checked', false);
+            $(document).on('change', '.dev-checkbox-resolved', function() {
+                $('.dev-checkbox-resolved').not(this).prop('checked', false);
 
                 const selectedId = $(this).is(':checked') ? $(this).val() : '';
                 const selectedName = $(this).is(':checked') ? ($(this).data('name') || '') : '';
 
-                $('#selected-text-done').text(selectedName || 'Pilih Developer...');
-                $('#developer_id_done').val(selectedId);
+                $('#selected-text-resolved').text(selectedName || 'Pilih Developer...');
+                $('#developer_id_resolved').val(selectedId);
             });
 
             // =========================
-            // OPEN EDIT MODAL
+          // =========================
+// OPEN EDIT MODAL
+// =========================
+// =========================
+// OPEN EDIT MODAL
+// =========================
+window.openEditModal = function(button) {
+
+    const projectId = $(button).data('id');
+    const projectCode = $(button).data('code');
+    const projectName = $(button).data('name');
+    const progress = parseInt($(button).data('progress')) || 0;
+    const developerId = $(button).data('developer-id');
+    const developerName = $(button).data('developer-name');
+
+    const $form = $('#editProgressForm');
+    if (!$form.length) return;
+
+    $form[0].reset();
+
+    $('.dev-checkbox').prop('checked', false);
+
+    $('#dropdown-icon').removeClass('rotate-180');
+    $('#developer-dropdown').addClass('hidden');
+
+    $form.attr('action', `/project/${projectId}`);
+
+    $('#modal_project_code').val(projectCode || '');
+    $('#modal_project_name').val(projectName || '');
+
+   // simpan progress lama
+$('#old_progress_percent').val(progress);
+
+// tampilkan progress lama
+$('#modal_progress_percent').val(progress);
+
+// tetap batasi maksimal 100
+$('#modal_progress_percent').attr('max', 100);
+    // description kosong
+    $('#modal_description').val('');
+
+    if (developerId) {
+
+        $(`.dev-checkbox[value="${developerId}"]`)
+            .prop('checked', true);
+
+        $('#selected-text')
+            .text(developerName || 'Pilih Developer...');
+
+        $('#developer_id').val(developerId);
+
+    } else {
+
+        $('#selected-text').text('Pilih Developer...');
+        $('#developer_id').val('');
+
+    }
+
+    const now = new Date();
+
+    const datetime =
+        `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    $('#modal_progress_date').val(datetime);
+
+    openModal('editProgressModal');
+};
+
             // =========================
-            window.openEditModal = function(button) {
+            // OPEN resolved MODAL
+            // =========================
+            window.openresolvedModal = function(button) {
                 const projectId = $(button).data('id');
                 const projectCode = $(button).data('code');
                 const projectName = $(button).data('name');
-                const progress = $(button).data('progress');
                 const developerId = $(button).data('developer-id');
                 const developerName = $(button).data('developer-name');
-                const description = $(button).data('description');
+                const description = $(button).data('');
 
-                const $form = $('#editProgressForm');
+                const $form = $('#resolvedForm');
                 if (!$form.length) return;
 
                 $form[0].reset();
-                $('.dev-checkbox').prop('checked', false);
-                $('#dropdown-icon').removeClass('rotate-180');
-                $('#developer-dropdown').addClass('hidden');
+                $('.dev-checkbox-resolved').prop('checked', false);
+                $('#dropdown-icon-resolved').removeClass('rotate-180');
+                $('#developer-dropdown-resolved').addClass('hidden');
 
-                // route update (PUT) => /project/{project}
-                $form.attr('action', `/project/${projectId}`);
-
-                $('#modal_project_code').val(projectCode || '');
-                $('#modal_project_name').val(projectName || '');
-                $('#modal_progress_percent').val(progress ?? '');
-                $('#modal_description').val(description ?? '');
-
-                if (developerId) {
-                    $(`.dev-checkbox[value="${developerId}"]`).prop('checked', true);
-                    $('#selected-text').text(developerName || 'Pilih Developer...');
-                    $('#developer_id').val(developerId);
-                } else {
-                    $('#selected-text').text('Pilih Developer...');
-                    $('#developer_id').val('');
-                }
-
-                // default progress date = now
-                const now = new Date();
-                const datetime =
-                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                $('#modal_progress_date').val(datetime);
-
-                openModal('editProgressModal');
-            };
-
-            // =========================
-            // OPEN DONE MODAL
-            // =========================
-            window.openDoneModal = function(button) {
-                const projectId = $(button).data('id');
-                const projectCode = $(button).data('code');
-                const projectName = $(button).data('name');
-                const developerId = $(button).data('developer-id');
-                const developerName = $(button).data('developer-name');
-                const description = $(button).data('description');
-
-                const $form = $('#doneForm');
-                if (!$form.length) return;
-
-                $form[0].reset();
-                $('.dev-checkbox-done').prop('checked', false);
-                $('#dropdown-icon-done').removeClass('rotate-180');
-                $('#developer-dropdown-done').addClass('hidden');
-
-                // route done (PUT) => sesuai routes kamu:
-                // Route::put('/project/{project}/done', ...)->name('project.done');
+                // route resolved (PUT) => sesuai routes kamu:
+                // Route::put('/project/{project}/resolved', ...)->name('project.resolved');
                 // (group name kamu agak dobel, tapi kita pake URL biar aman)
-                $form.attr('action', `/project/${projectId}/done`);
+                $form.attr('action', `/project/${projectId}/resolved`);
 
-                $('#done_project_code').val(projectCode || '');
-                $('#done_project_name').val(projectName || '');
-                $('#done_description').val(description ?? '');
+                $('#resolved_project_code').val(projectCode || '');
+                $('#resolved_project_name').val(projectName || '');
+                $('#resolved_description').val(description ?? '');
 
                 if (developerId) {
-                    $(`.dev-checkbox-done[value="${developerId}"]`).prop('checked', true);
-                    $('#selected-text-done').text(developerName || 'Pilih Developer...');
-                    $('#developer_id_done').val(developerId);
+                    $(`.dev-checkbox-resolved[value="${developerId}"]`).prop('checked', true);
+                    $('#selected-text-resolved').text(developerName || 'Pilih Developer...');
+                    $('#developer_id_resolved').val(developerId);
                 } else {
-                    $('#selected-text-done').text('Pilih Developer...');
-                    $('#developer_id_done').val('');
+                    $('#selected-text-resolved').text('Pilih Developer...');
+                    $('#developer_id_resolved').val('');
                 }
 
-                openModal('doneModal');
+                openModal('resolvedModal');
             };
 
             // =========================

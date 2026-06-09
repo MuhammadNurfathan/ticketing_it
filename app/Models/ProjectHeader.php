@@ -112,9 +112,9 @@ class ProjectHeader extends Model
     {
         return $q->byStatusType('in_progress');
     }
-    public function scopeDone($q)
+    public function scopeResolved($q)
     {
-        return $q->byStatusType('done');
+        return $q->byStatusType('resolved');
     }
     public function scopeVoid($q)
     {
@@ -134,7 +134,7 @@ class ProjectHeader extends Model
         return [
             'waiting'     => self::waiting()->betweenRequestDates($start, $end)->count(),
             'in_progress' => self::inProgress()->betweenRequestDates($start, $end)->count(),
-            'done'        => self::done()->betweenRequestDates($start, $end)->count(),
+            'resolved'        => self::resolved()->betweenRequestDates($start, $end)->count(),
             'void'        => self::void()->betweenRequestDates($start, $end)->count(),
             'pending'     => self::pending()->betweenRequestDates($start, $end)->count(),
         ];
@@ -184,7 +184,7 @@ class ProjectHeader extends Model
         $pending = (clone $base)->pending()->count();
         $void    = (clone $base)->void()->count();
 
-        $closedQuery = (clone $base)->done();
+        $closedQuery = (clone $base)->resolved();
         if ($year) {
             $closedQuery->whereYear('effective_end_date', $year);
         }
