@@ -34,8 +34,6 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware('auth')->group(function () {
 
-    // Dashboard
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
 
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {

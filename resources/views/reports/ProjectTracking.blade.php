@@ -485,7 +485,7 @@
                                 </div>
 
                                 <div class="mt-2 text-xs text-light-text-secondary dark:text-dark-text-secondary break-words">
-                                    <span class="font-semibold">Memo:</span> ${p.memo || '-'}
+                                    <span class="font-semibold">Memo:</span> ${p.description || '-'}
                                 </div>
                             `;
                             list.appendChild(item);
@@ -585,7 +585,7 @@
                         <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary">${p.detail_status ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary whitespace-nowrap">${p.progress_date ?? '-'}</td>
                         <td class="px-4 py-3 text-center text-sm font-bold text-blue-700 dark:text-blue-300 whitespace-nowrap">${p.progress ?? 0}%</td>
-                        <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary break-words">${p.memo ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary break-words">${p.description ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary whitespace-nowrap">${p.start_date ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary whitespace-nowrap">${p.end_date ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary whitespace-nowrap">${p.is_late ?? '-'}</td>

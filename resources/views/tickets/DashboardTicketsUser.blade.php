@@ -123,6 +123,7 @@
                                 <th class="{{ $thBase }}">Feedback</th>
                                 <th class="{{ $thBase }}">IT Support</th>
                                 <th class="{{ $thBase }}">Status</th>
+                                <th class="{{ $thBase }}">Image</th>
                                 <th class="{{ $thBase }} text-center">Action</th>
                             </tr>
                         </thead>
@@ -154,13 +155,12 @@
                                         {{ $ticket->problem }}
                                     </td>
 
-
                                     <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs break-words">
                                         {{ $ticket->solution ?? '-' }}
                                     </td>
 
                                     <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs break-words">
-                                        {{ $ticket->feedback->description ?? '-' }}
+                                        {{ $ticket->feedback->comment ?? '-' }}
                                     </td>
                                     <td class="px-4 py-4 text-sm {{ $muted }} max-w-xs truncate">
                                         {{ $ticket->support->name ?? '-' }}
@@ -173,6 +173,15 @@
                                             {{ $ticket->status->name }}
                                         </span>
                                     </td>
+                                      <td class="px-4 py-4">
+                            @if ($ticket->image)
+                                <a href="{{ asset('storage/' . $ticket->image) }}" target="_blank" class="w-16 h-16 object-cover">
+                                    <img src="{{ asset('storage/' . $ticket->image) }}" alt="Ticket Image" class="w-16 h-16 object-cover">
+                                </a>
+                            @else
+                                -
+                            @endif
+                        </td>
                                     <td class="px-4 py-4 text-center">
                                         @if ($ticket->status_id == 3)
                                             <a href="{{ route('feedback.form', $ticket->id) }}"
@@ -189,7 +198,6 @@
                                             <span class="text-xs {{ $muted2 }}">-</span>
                                         @endif
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>

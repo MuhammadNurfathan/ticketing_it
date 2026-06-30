@@ -1,6 +1,6 @@
 <div class="flex items-center justify-between flex-shrink-0 px-3">
     <!-- Logo -->
-    <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2">
+    <a href="{{ route('DashboardTicketsUser.index') }}" class="inline-flex items-center gap-2">
         <!-- Logo kecil (collapse) -->
         <template x-if="!(isSidebarOpen || isSidebarHovered)">
             <div x-transition.opacity.duration.300ms>

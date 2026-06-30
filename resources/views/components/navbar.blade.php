@@ -25,7 +25,7 @@
         </x-button>
 
         <!-- Logo & App Name (Mobile Only) -->
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 lg:hidden">
+        <a href="{{ route('DashboardTicketsUser.index') }}" class="flex items-center gap-2 lg:hidden">
             <x-application-logo aria-hidden="true" class="w-8 h-8" />
             <span class="text-base font-bold text-gray-800 dark:text-white">Ticketing IT</span>
         </a>

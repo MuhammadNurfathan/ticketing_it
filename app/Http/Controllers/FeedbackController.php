@@ -63,10 +63,8 @@ class FeedbackController extends Controller
             ]
         );
 
-        // Update status tiket jadi 5 (sesuai code kamu)
         Ticket::where('id', $data['ticket_id'])->update(['status_id' => 5]);
 
-        // route kamu tadi agak beda-beda, sesuaikan salah satu yang bener
         return redirect()->route('DashboardTicketsUser.index')
             ->with('success', 'Feedback berhasil disimpan dan status tiket diperbarui!');
     }

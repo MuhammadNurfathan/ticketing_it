@@ -384,10 +384,10 @@
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.requestor_name ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.support_name ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.problem ?? '-'}</td>
-                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.status_name ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.status ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.start_date ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.end_date ?? '-'}</td>
-                        <td class="px-4 py-3 text-sm text-center text-light-text dark:text-dark-text">${t.time_spent ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm text-center text-light-text dark:text-dark-text">${t.time_spent_minutes ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-center text-light-text dark:text-dark-text">${t.is_late ?? '-'}</td>
                         <td class="px-4 py-3 text-sm text-light-text dark:text-dark-text">${t.created_at ?? '-'}</td>
                     `;

@@ -83,13 +83,13 @@
                             $selectedAsset = null;
 
                             // Ambil asset dari ticket yang sedang diedit
-                            if (isset($ticket) && $ticket->assets_id) {
-                                $selectedAsset = $assets->firstWhere('id', $ticket->assets_id);
+                            if (isset($ticket) && $ticket->asset_id) {
+                                $selectedAsset = $assets->firstWhere('id', $ticket->asset_id);
                             }
 
                             // Override dengan old() kalau validasi gagal
-                            if (old('assets_id')) {
-                                $selectedAsset = $assets->firstWhere('id', old('assets_id'));
+                            if (old('asset_id')) {
+                                $selectedAsset = $assets->firstWhere('id', old('asset_id'));
                             }
 
                             $selectedText = $selectedAsset
@@ -109,13 +109,12 @@
                                 value="{{ $selectedText }}"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
 
-                            <input type="hidden" name="assets_id" id="assets-id" value="{{ old('assets_id') }}">
+                            <input type="hidden" name="asset_id" id="assets-id" value="{{ old('asset_id') }}">
                             <ul id="assets-results"
                                 class="hidden absolute z-50 w-full left-0 border border-gray-300 dark:border-gray-600 rounded-md mt-1 overflow-y-auto bg-white dark:bg-gray-800 shadow-lg max-h-32">
                                 @foreach ($assets as $ass)
                                     <li class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100"
-                                        data-id="{{ $ass->id }}">{{ $ass->name }} -
-                                        {{ $ass->code }}</li>
+                                        data-id="{{ $ass->id }}">{{ $ass->name }} - {{ $ass->code }}</li>
                                 @endforeach
                             </ul>
                         </div>

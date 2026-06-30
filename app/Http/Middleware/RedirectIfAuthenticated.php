@@ -11,7 +11,7 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, ...$guards)
     {
         if (Auth::check()) {
-            return redirect('/dashboard');
+            return redirect()->route('DashboardTicketsUser.index');
         }
 
         return $next($request);

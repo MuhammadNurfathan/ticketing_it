@@ -58,7 +58,7 @@ class Ticket extends Model
 
     public function asset()
     {
-        return $this->belongsTo(Assets::class, 'assets_id');
+        return $this->belongsTo(Assets::class, 'asset_id');
     }
 
     public function status()
@@ -122,7 +122,7 @@ class Ticket extends Model
         return $query->whereHas(
             'status',
             fn($q) =>
-            $q->where('type', 'done')
+            $q->whereIn ('type', ['done','feedback'])
         );
     }
 

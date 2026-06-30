@@ -197,7 +197,7 @@
 
         {{-- ========================================================= TABLE AREA ========================================================= --}}
         <div id="table-area" class="space-y-6">
-
+            
             {{-- ================= IN PROGRESS ================= --}}
             <div x-show="tab==='in_progress'" x-cloak class="{{ $card }} p-4 sm:p-5">
                 <div class="flex items-center justify-between mb-4">
@@ -505,59 +505,6 @@
                 </div>
             </div>
 
-            <x-modal-form id="continueModal" title="Continue Project" size="max-w-md">
-                <form id="continueForm" method="POST">
-                    @csrf
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                            Developer yang Continue-in <span class="text-red-500">*</span>
-                        </label>
-                        <select name="developer_id" required class="{{ $input }}">
-                            <option value="" hidden>-- Pilih Developer --</option>
-                            @foreach ($developers as $dev)
-                                <option value="{{ $dev->id }}">{{ $dev->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
-                            Pakai durasi manual?
-                        </label>
-                        <div class="flex items-center gap-4 text-sm">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="use_override" value="0" checked
-                                    onclick="toggleOverride(false)">
-                                <span>Tidak (auto hitung)</span>
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="use_override" value="1"
-                                    onclick="toggleOverride(true)">
-                                <span>Ya (manual)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="mb-4" id="overrideBox" style="display:none;">
-                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                            Duration Override (menit)
-                        </label>
-                        <input type="number" min="0" name="duration_override" class="{{ $input }}"
-                            placeholder="cth: 30">
-                    </div>
-
-                    <div class="flex justify-end gap-2">
-                        <button type="button" onclick="closeModal('continueModal')"
-                            class="{{ $btnGhost }}">Cancel</button>
-                        <button type="submit" class="{{ $btnPrimary }}"
-                            onclick="return confirm('Yakin continue project ini?')">
-                            Continue
-                        </button>
-                    </div>
-                </form>
-            </x-modal-form>
-
             {{-- ================= VOID ================= --}}
             <div x-show="tab==='void'" x-cloak class="{{ $card }} p-4 sm:p-5">
                 <div class="flex items-center justify-between mb-4">
@@ -616,6 +563,60 @@
 
         </div>
     </div>
+
+
+    <x-modal-form id="continueModal" title="Continue Project" size="max-w-md">
+                <form id="continueForm" method="POST">
+                    @csrf
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Developer yang Continue-in <span class="text-red-500">*</span>
+                        </label>
+                        <select name="developer_id" required class="{{ $input }}">
+                            <option value="" hidden>-- Pilih Developer --</option>
+                            @foreach ($developers as $dev)
+                                <option value="{{ $dev->id }}">{{ $dev->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                            Pakai durasi manual?
+                        </label>
+                        <div class="flex items-center gap-4 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="use_override" value="0" checked
+                                    onclick="toggleOverride(false)">
+                                <span>Tidak (auto hitung)</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="use_override" value="1"
+                                    onclick="toggleOverride(true)">
+                                <span>Ya (manual)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4" id="overrideBox" style="display:none;">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Duration Override (menit)
+                        </label>
+                        <input type="number" min="0" name="duration_override" class="{{ $input }}"
+                            placeholder="cth: 30">
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button" onclick="closeModal('continueModal')"
+                            class="{{ $btnGhost }}">Cancel</button>
+                        <button type="submit" class="{{ $btnPrimary }}"
+                            onclick="return confirm('Yakin continue project ini?')">
+                            Continue
+                        </button>
+                    </div>
+                </form>
+    </x-modal-form>
 
     {{-- ========================================================= MODAL: DETAIL HISTORY ========================================================= --}}
     <x-modal-table name="project-detail" title="Detail Project">
@@ -717,9 +718,152 @@
         </form>
     </x-modal-form>
 
-        {{-- ========================================================= MODAL: EDIT PROGRESS (IN PROGRESS) ========================================================= --}}
+    {{-- ========================================================= MODAL: EDIT PROGRESS (IN PROGRESS) ========================================================= --}}
     <x-modal-form id="editProgressModal" title="Update Progress Project" size="max-w-3xl">
-        <form id="editProgressForm" method="POST">
+                <form id="editProgressForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Project Code
+                        </label>
+                        <input type="text"
+                            id="modal_project_code"
+                            readonly
+                            class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                            border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Project Name
+                        </label>
+                        <input type="text"
+                            id="modal_project_name"
+                            readonly
+                            class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
+                            border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
+                    </div>
+
+                    {{-- Developer --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Developer <span class="text-red-500">*</span>
+                        </label>
+
+                        <div id="selected-developers"
+                            class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
+                            bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
+                            border-light-eval-3 dark:border-dark-eval-2">
+
+                            <span id="selected-text" class="truncate">
+                                Pilih Developer...
+                            </span>
+
+                            <svg id="dropdown-icon"
+                                class="w-4 h-4 transform transition-transform duration-200"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+
+                        <input type="hidden"
+                            name="developer_id"
+                            id="developer_id">
+
+                        <div id="developer-dropdown"
+                            class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
+                            bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
+
+                            @foreach ($developers as $dev)
+                                <label
+                                    class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
+
+                                    <input type="checkbox"
+                                        value="{{ $dev->id }}"
+                                        data-name="{{ $dev->name }}"
+                                        class="dev-checkbox">
+
+                                    <span class="text-sm text-light-text dark:text-dark-text">
+                                        {{ $dev->name }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Progress Date --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Progress Date <span class="text-red-500">*</span>
+                        </label>
+
+                        <input type="datetime-local"
+                            name="progress_date"
+                            id="modal_progress_date"
+                            required
+                            class="{{ $input }}">
+                    </div>
+
+                    {{-- Progress Percent --}}
+                    {{-- Progress Percent --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Progress Percent <span class="text-red-500">*</span>
+                        </label>
+
+                        <input type="number"
+                            name="progress_percent"
+                            id="modal_progress_percent"
+                            min="0"
+                            max="100"
+                            step="1"
+                            required
+                            class="{{ $input }}">
+
+                        <input type="hidden" id="old_progress_percent">
+                    </div>
+
+                    {{-- Description --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
+                            Description <span class="text-red-500">*</span>
+                        </label>
+
+                        <textarea
+                            name="description"
+                            id="modal_description"
+                            rows="3"
+                            required
+                            class="{{ $input }}"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button"
+                            onclick="closeModal('editProgressModal')"
+                            class="{{ $btnGhost }}">
+                            Cancel
+                        </button>
+
+                        <button type="submit"
+                            class="{{ $btnPrimary }}">
+                            Save
+                        </button>
+                    </div>
+                </form>
+        </x-modal-form>        
+
+    {{-- ========================================================= MODAL: RESOLVED PROJECT ========================================================= --}}
+    <x-modal-form id="resolvedModal" title="Resolved Project" size="max-w-3xl">
+        <form id="resolvedForm" method="POST">
             @csrf
             @method('PUT')
 
@@ -728,7 +872,7 @@
                     Project Code
                 </label>
                 <input type="text"
-                    id="modal_project_code"
+                    id="resolved_project_code"
                     readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
                     border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
@@ -739,7 +883,7 @@
                     Project Name
                 </label>
                 <input type="text"
-                    id="modal_project_name"
+                    id="resolved_project_name"
                     readonly
                     class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
                     border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
@@ -751,16 +895,16 @@
                     Developer <span class="text-red-500">*</span>
                 </label>
 
-                <div id="selected-developers"
+                <div id="selected-developers-resolved"
                     class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
                     bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
                     border-light-eval-3 dark:border-dark-eval-2">
 
-                    <span id="selected-text" class="truncate">
+                    <span id="selected-text-resolved" class="truncate">
                         Pilih Developer...
                     </span>
 
-                    <svg id="dropdown-icon"
+                    <svg id="dropdown-icon-resolved"
                         class="w-4 h-4 transform transition-transform duration-200"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -774,11 +918,13 @@
                     </svg>
                 </div>
 
-                <input type="hidden"
+                <input
+                    type="hidden"
                     name="developer_id"
-                    id="developer_id">
+                    id="developer_id_resolved"
+                    required>
 
-                <div id="developer-dropdown"
+                <div id="developer-dropdown-resolved"
                     class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
                     bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
 
@@ -786,10 +932,11 @@
                         <label
                             class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
 
-                            <input type="checkbox"
+                            <input
+                                type="checkbox"
                                 value="{{ $dev->id }}"
                                 data-name="{{ $dev->name }}"
-                                class="dev-checkbox">
+                                class="dev-checkbox-resolved">
 
                             <span class="text-sm text-light-text dark:text-dark-text">
                                 {{ $dev->name }}
@@ -799,38 +946,6 @@
                 </div>
             </div>
 
-            {{-- Progress Date --}}
-            <div class="mb-4">
-                <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                    Progress Date <span class="text-red-500">*</span>
-                </label>
-
-                <input type="datetime-local"
-                    name="progress_date"
-                    id="modal_progress_date"
-                    required
-                    class="{{ $input }}">
-            </div>
-
-            {{-- Progress Percent --}}
-  {{-- Progress Percent --}}
-<div class="mb-4">
-    <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-        Progress Percent <span class="text-red-500">*</span>
-    </label>
-
-    <input type="number"
-        name="progress_percent"
-        id="modal_progress_percent"
-        min="0"
-        max="100"
-        step="1"
-        required
-        class="{{ $input }}">
-
-    <input type="hidden" id="old_progress_percent">
-</div>
-
             {{-- Description --}}
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
@@ -839,169 +954,54 @@
 
                 <textarea
                     name="description"
-                    id="modal_description"
+                    id="resolved_description"
                     rows="3"
                     required
                     class="{{ $input }}"></textarea>
             </div>
 
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
+                    Tambahkan total pending duration ke Effective End Date?
+                </label>
+
+                <div class="flex items-center gap-4 text-sm">
+                    <label class="flex items-center gap-2">
+                        <input
+                            type="radio"
+                            name="apply_pending_duration"
+                            value="1"
+                            checked>
+                        <span>YES</span>
+                    </label>
+
+                    <label class="flex items-center gap-2">
+                        <input
+                            type="radio"
+                            name="apply_pending_duration"
+                            value="0">
+                        <span>NO</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="flex justify-end gap-2">
-                <button type="button"
-                    onclick="closeModal('editProgressModal')"
+                <button
+                    type="button"
+                    onclick="closeModal('resolvedModal')"
                     class="{{ $btnGhost }}">
                     Cancel
                 </button>
 
-                <button type="submit"
-                    class="{{ $btnPrimary }}">
-                    Save
+                <button
+                    type="submit"
+                    class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
+                    bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm">
+                    Resolved
                 </button>
             </div>
         </form>
     </x-modal-form>
-
-    {{-- ========================================================= MODAL: resolved PROJECT ========================================================= --}}
-{{-- ========================================================= MODAL: RESOLVED PROJECT ========================================================= --}}
-<x-modal-form id="resolvedModal" title="Resolved Project" size="max-w-3xl">
-    <form id="resolvedForm" method="POST">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                Project Code
-            </label>
-            <input type="text"
-                id="resolved_project_code"
-                readonly
-                class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                Project Name
-            </label>
-            <input type="text"
-                id="resolved_project_name"
-                readonly
-                class="w-full px-3 py-2 rounded-lg border bg-light-eval-2 dark:bg-dark-eval-2
-                border-light-eval-3 dark:border-dark-eval-2 text-light-text dark:text-dark-text">
-        </div>
-
-        {{-- Developer --}}
-        <div class="mb-4">
-            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                Developer <span class="text-red-500">*</span>
-            </label>
-
-            <div id="selected-developers-resolved"
-                class="w-full px-3 py-2 rounded-lg border cursor-pointer flex justify-between items-center
-                bg-light-bg dark:bg-dark-eval-2 text-light-text dark:text-dark-text
-                border-light-eval-3 dark:border-dark-eval-2">
-
-                <span id="selected-text-resolved" class="truncate">
-                    Pilih Developer...
-                </span>
-
-                <svg id="dropdown-icon-resolved"
-                    class="w-4 h-4 transform transition-transform duration-200"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor">
-
-                    <path stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 9l-7 7-7-7" />
-                </svg>
-            </div>
-
-            <input
-                type="hidden"
-                name="developer_id"
-                id="developer_id_resolved"
-                required>
-
-            <div id="developer-dropdown-resolved"
-                class="hidden mt-2 rounded-lg shadow-lg max-h-48 overflow-y-auto p-2
-                bg-light-bg dark:bg-dark-eval-2 border border-light-eval-3 dark:border-dark-eval-2">
-
-                @foreach ($developers as $dev)
-                    <label
-                        class="flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-light-eval-2 dark:hover:bg-dark-eval-1">
-
-                        <input
-                            type="checkbox"
-                            value="{{ $dev->id }}"
-                            data-name="{{ $dev->name }}"
-                            class="dev-checkbox-resolved">
-
-                        <span class="text-sm text-light-text dark:text-dark-text">
-                            {{ $dev->name }}
-                        </span>
-                    </label>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Description --}}
-        <div class="mb-4">
-            <label class="block text-sm font-semibold mb-1 text-light-text dark:text-dark-text">
-                Description <span class="text-red-500">*</span>
-            </label>
-
-            <textarea
-                name="description"
-                id="resolved_description"
-                rows="3"
-                required
-                class="{{ $input }}"></textarea>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-sm font-semibold mb-2 text-light-text dark:text-dark-text">
-                Tambahkan total pending duration ke Effective End Date?
-            </label>
-
-            <div class="flex items-center gap-4 text-sm">
-                <label class="flex items-center gap-2">
-                    <input
-                        type="radio"
-                        name="apply_pending_duration"
-                        value="1"
-                        checked>
-                    <span>YES</span>
-                </label>
-
-                <label class="flex items-center gap-2">
-                    <input
-                        type="radio"
-                        name="apply_pending_duration"
-                        value="0">
-                    <span>NO</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="flex justify-end gap-2">
-            <button
-                type="button"
-                onclick="closeModal('resolvedModal')"
-                class="{{ $btnGhost }}">
-                Cancel
-            </button>
-
-            <button
-                type="submit"
-                class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium
-                bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm">
-                Resolved
-            </button>
-        </div>
-    </form>
-</x-modal-form>
 
     {{-- ========================================================= MODAL: PENDING ========================================================= --}}
     <x-modal-form id="pendingModal" title="Pending" size="max-w-md">
@@ -1110,73 +1110,73 @@
                 .catch(err => modalBody.innerHTML = `<div class="p-6 text-center text-red-500">⚠️ ${err.message}</div>`);
         }
     </script>
-<script>
-document.getElementById('resolvedForm').addEventListener('submit', function(e) {
+    <script>
+            document.getElementById('resolvedForm').addEventListener('submit', function(e) {
 
-    if (!this.checkValidity()) {
-        e.preventDefault();
-        this.reportValidity();
-        return;
-    }
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                this.reportValidity();
+                return;
+            }
 
-    const developerId = document.getElementById('developer_id_resolved').value;
-    const description = document.getElementById('resolved_description').value.trim();
+            const developerId = document.getElementById('developer_id_resolved').value;
+            const description = document.getElementById('resolved_description').value.trim();
 
-    if (!developerId || !description) {
+            if (!developerId || !description) {
 
-        e.preventDefault();
+                e.preventDefault();
 
-        Swal.fire({
-            icon: 'warning',
-            title: 'Form Belum Lengkap',
-            text: 'Semua field wajib diisi.'
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Form Belum Lengkap',
+                    text: 'Semua field wajib diisi.'
+                });
+
+                return false;
+            }
+            });
+        </script>
+    <script>
+        document.getElementById('editProgressForm').addEventListener('submit', function(e) {
+
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            this.reportValidity();
+            return;
+        }
+
+        const developerId = document.getElementById('developer_id').value;
+        const oldProgress = parseInt(document.getElementById('old_progress_percent').value || 0);
+        const newProgress = parseInt(document.getElementById('modal_progress_percent').value || 0);
+
+        if (!developerId) {
+
+            e.preventDefault();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Form Belum Lengkap',
+                text: 'Semua field wajib diisi.'
+            });
+
+            return false;
+        }
+
+        if (newProgress <= oldProgress) {
+
+            e.preventDefault();
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Progress Tidak Valid',
+                text: `Progress harus lebih besar dari progress sebelumnya (${oldProgress}%).`
+            });
+
+            return false;
+        }
+
         });
-
-        return false;
-    }
-});
-</script>
-<script>
-    document.getElementById('editProgressForm').addEventListener('submit', function(e) {
-
-    if (!this.checkValidity()) {
-        e.preventDefault();
-        this.reportValidity();
-        return;
-    }
-
-    const developerId = document.getElementById('developer_id').value;
-    const oldProgress = parseInt(document.getElementById('old_progress_percent').value || 0);
-    const newProgress = parseInt(document.getElementById('modal_progress_percent').value || 0);
-
-    if (!developerId) {
-
-        e.preventDefault();
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Form Belum Lengkap',
-            text: 'Semua field wajib diisi.'
-        });
-
-        return false;
-    }
-
-    if (newProgress <= oldProgress) {
-
-        e.preventDefault();
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Progress Tidak Valid',
-            text: `Progress harus lebih besar dari progress sebelumnya (${oldProgress}%).`
-        });
-
-        return false;
-    }
-
-});
-</script>
+    </script>
     <script src="{{ asset('js/jquery-3.7.0.min.js') }}"></script>
 
     <script>
@@ -1234,72 +1234,70 @@ document.getElementById('resolvedForm').addEventListener('submit', function(e) {
 
             // =========================
           // =========================
-// OPEN EDIT MODAL
-// =========================
-// =========================
-// OPEN EDIT MODAL
-// =========================
-window.openEditModal = function(button) {
 
-    const projectId = $(button).data('id');
-    const projectCode = $(button).data('code');
-    const projectName = $(button).data('name');
-    const progress = parseInt($(button).data('progress')) || 0;
-    const developerId = $(button).data('developer-id');
-    const developerName = $(button).data('developer-name');
+            // OPEN EDIT MODAL
+            // =========================
+            window.openEditModal = function(button) {
 
-    const $form = $('#editProgressForm');
-    if (!$form.length) return;
+                const projectId = $(button).data('id');
+                const projectCode = $(button).data('code');
+                const projectName = $(button).data('name');
+                const progress = parseInt($(button).data('progress')) || 0;
+                const developerId = $(button).data('developer-id');
+                const developerName = $(button).data('developer-name');
 
-    $form[0].reset();
+                const $form = $('#editProgressForm');
+                if (!$form.length) return;
 
-    $('.dev-checkbox').prop('checked', false);
+                $form[0].reset();
 
-    $('#dropdown-icon').removeClass('rotate-180');
-    $('#developer-dropdown').addClass('hidden');
+                $('.dev-checkbox').prop('checked', false);
 
-    $form.attr('action', `/project/${projectId}`);
+                $('#dropdown-icon').removeClass('rotate-180');
+                $('#developer-dropdown').addClass('hidden');
 
-    $('#modal_project_code').val(projectCode || '');
-    $('#modal_project_name').val(projectName || '');
+                $form.attr('action', `/project/${projectId}`);
 
-   // simpan progress lama
-$('#old_progress_percent').val(progress);
+                $('#modal_project_code').val(projectCode || '');
+                $('#modal_project_name').val(projectName || '');
 
-// tampilkan progress lama
-$('#modal_progress_percent').val(progress);
+            // simpan progress lama
+            $('#old_progress_percent').val(progress);
 
-// tetap batasi maksimal 100
-$('#modal_progress_percent').attr('max', 100);
-    // description kosong
-    $('#modal_description').val('');
+            // tampilkan progress lama
+            $('#modal_progress_percent').val(progress);
 
-    if (developerId) {
+            // tetap batasi maksimal 100
+            $('#modal_progress_percent').attr('max', 100);
+                // description kosong
+                $('#modal_description').val('');
 
-        $(`.dev-checkbox[value="${developerId}"]`)
-            .prop('checked', true);
+                if (developerId) {
 
-        $('#selected-text')
-            .text(developerName || 'Pilih Developer...');
+                    $(`.dev-checkbox[value="${developerId}"]`)
+                        .prop('checked', true);
 
-        $('#developer_id').val(developerId);
+                    $('#selected-text')
+                        .text(developerName || 'Pilih Developer...');
 
-    } else {
+                    $('#developer_id').val(developerId);
 
-        $('#selected-text').text('Pilih Developer...');
-        $('#developer_id').val('');
+                } else {
 
-    }
+                    $('#selected-text').text('Pilih Developer...');
+                    $('#developer_id').val('');
 
-    const now = new Date();
+                }
 
-    const datetime =
-        `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                const now = new Date();
 
-    $('#modal_progress_date').val(datetime);
+                const datetime =
+                    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
-    openModal('editProgressModal');
-};
+                $('#modal_progress_date').val(datetime);
+
+                openModal('editProgressModal');
+            };
 
             // =========================
             // OPEN resolved MODAL

@@ -205,14 +205,13 @@ class ProjectReportController extends Controller
                     optional($p->header)->project_code ?? '-',
                     optional($p->header)->project_name ?? '-',
                     optional(optional($p->header)->requestor)->name ?? '-',
-                    // ✅ priority_name -> name (kalau kolom lu beda, ganti aja di sini)
                     optional(optional($p->header)->priority)->name ?? '-',
                     optional(optional($p->header)->status)->name ?? '-',
                     optional($p->developer)->name ?? '-',      // ✅ developer_name -> relasi users
                     optional($p->status)->name ?? '-',         // ✅ status_name -> name
                     $p->progress_date ? $p->progress_date->format('Y-m-d') : '-',
                     (int) ($p->progress_percent ?? 0),
-                    $p->description ?? '-',                    // ✅ memo -> description
+                    $p->description ?? '-',              
                     optional($p->header)->start_date ? $p->header->start_date->format('Y-m-d') : '-',
                     optional($p->header)->end_date ? $p->header->end_date->format('Y-m-d') : '-',
                     optional($p->header)->is_late ? 'Yes' : 'No',

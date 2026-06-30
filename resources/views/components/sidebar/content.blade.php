@@ -101,7 +101,7 @@ $masterActive = request()->routeIs(...$masterRoutes);
         <x-sidebar.link title="Department" href="{{ route('departments.index') }}" :isActive="request()->routeIs('departments.*')" />
         <x-sidebar.link title="Users" href="{{ route('users.index') }}" :isActive="request()->routeIs('users.*')" />
         <x-sidebar.link title="Roles" href="{{ route('roles.index') }}" :isActive="request()->routeIs('roles.*')" />
-        <x-sidebar.link title="Problem Category" href="{{ route('categories.index') }}" :isActive="request()->routeIs('categories.*')" />
+        <x-sidebar.link title="Category" href="{{ route('categories.index') }}" :isActive="request()->routeIs('categories.*')" />
         <x-sidebar.link title="Status" href="{{ route('status.index') }}" :isActive="request()->routeIs('status.*')" />
         <x-sidebar.link title="Priority" href="{{ route('priority.index') }}" :isActive="request()->routeIs('priority.*')" />
         <x-sidebar.link title="Assets" href="{{ route('assets.index') }}" :isActive="request()->routeIs('assets.*')" />

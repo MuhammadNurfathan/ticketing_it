@@ -19,7 +19,7 @@ class TicketUpdateRequest extends FormRequest
         $rules = [
             'support_id'  => ['required', 'exists:users,id'],
             'priority_id' => ['required', 'exists:priorities,id'],
-            'assets_id'   => ['nullable', 'integer'],
+            'asset_id'   => ['nullable', 'integer'],
 
             'status_id'   => [
                 'required',

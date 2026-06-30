@@ -336,8 +336,7 @@
                     cardBody.innerHTML = '';
 
                     data.forEach((item, index) => {
-                        // badge priority (premium, gak alay)
-                        const pr = (item.priority?.priority_name || '').toLowerCase();
+                        const pr = (item.priority?.name || '').toLowerCase();
                         const badgeClass =
                             pr === 'high'
                                 ? 'bg-red-600/10 text-red-700 dark:bg-red-400/10 dark:text-red-300'
@@ -353,7 +352,7 @@
                                 <td class="px-4 py-3 text-sm font-semibold text-light-text dark:text-dark-text">${item.project_name ?? '-'}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${badgeClass}">
-                                        ${item.priority?.priority_name ?? '-'}
+                                        ${item.priority?.name ?? '-'}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-sm text-light-text-secondary dark:text-dark-text-secondary">${item.requestor?.name ?? '-'}</td>
@@ -380,7 +379,7 @@
                                         </div>
                                     </div>
                                     <span class="shrink-0 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${badgeClass}">
-                                        ${item.priority?.priority_name ?? '-'}
+                                        ${item.priority?.name ?? '-'}
                                     </span>
                                 </div>
 

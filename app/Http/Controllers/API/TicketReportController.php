@@ -372,11 +372,11 @@ class TicketReportController extends Controller
         $startDate = Carbon::parse($startQ)->startOfDay();
         $endDate   = Carbon::parse($endQ)->endOfDay();
 
-        $tickets = Ticket::with(['user.department', 'support', 'status', 'assets', 'category'])
+        $tickets = Ticket::with(['user.department', 'support', 'status', 'asset', 'category'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'asc')
             ->get([
-                'ticket_code', 'user_id', 'support_id', 'category_id', 'assets_id', 'status_id',
+                'ticket_code', 'user_id', 'support_id', 'category_id', 'asset_id', 'status_id',
                 'problem', 'solution', 'notes', 'start_date', 'end_date',
                 'time_spent_minutes', 'is_late', 'created_at',
             ]);
@@ -400,7 +400,7 @@ class TicketReportController extends Controller
                     optional(optional($t->user)->department)->name ?? '-',
                     optional($t->support)->name ?? '-',
                     optional($t->category)->name ?? '-',
-                    optional($t->assets)->name ?? '-',
+                    optional($t->asset)->name ?? '-',
                     $t->problem ?? '-',
                     $t->solution ?? '-',
                     $t->notes ?? '-',

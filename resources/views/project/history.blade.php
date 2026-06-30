@@ -46,7 +46,7 @@
                     <th class="{{ $th }}">Progress Date</th>
                     <th class="{{ $th }}">Status</th>
                     <th class="{{ $th }} text-center">Progress</th>
-                    <th class="{{ $th }}">Memo</th>
+                    <th class="{{ $th }}">Description</th>
                 </tr>
             </thead>
 
@@ -110,7 +110,7 @@
                         </td>
 
                         <td class="px-4 py-3 text-sm {{ $muted }} max-w-xl break-words whitespace-normal">
-                            {{ $d->memo ?? '-' }}
+                            {{ $d->description ?? '-' }}
                         </td>
                     </tr>
                 @empty

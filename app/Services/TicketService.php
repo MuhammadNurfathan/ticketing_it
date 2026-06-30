@@ -91,7 +91,6 @@ class TicketService
         );
     }
 
-
 public function editUser($id)
 {
     return [
@@ -109,8 +108,8 @@ public function editUser($id)
     {
         $ticket = Ticket::findOrFail($id);
 
-        if (!isset($data['assets_id'])) {
-            unset($data['assets_id']);
+        if (!isset($data['asset_id'])) {
+            unset($data['asset_id']);
         }
 
         if ($ticket->request_date) {

@@ -21,7 +21,7 @@ class TicketStoreRequest extends FormRequest
             'from'        => ['nullable', 'in:user,admin'],
             'user_id'     => ['required', 'exists:users,id'],
             'category_id' => ['required', 'exists:categories,id'],
-            'assets_id'   => ['nullable', 'integer','exists:assets,id'],
+            'asset_id'   => ['nullable', 'integer','exists:assets,id'],
 
             'status_id' => [
     'nullable',

@@ -59,7 +59,7 @@ class ProjectDetail extends Model
             'progress_date' => now(),
             'progress_percent' => 100,
             'status_id' => $statusId,
-            'description' => 'resolved. Applied=' . ($apply ? 'YES' : 'NO'),
+            'description' => trim($data['description'] ?? ''),
             'developer_id' => $data['developer_id'] ?? auth()->id,
         ]);
     }
